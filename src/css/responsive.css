@@ -1,0 +1,264 @@
+@media screen and (max-width: 1280px) {
+    .break-tag {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .homepaage-banner-image-1 {
+        height: 60vh;
+    }
+
+    .homepaage-banner-image-2 {
+        height: 60vh;
+    }
+
+    .destination-detail-banner-main {
+        height: 50vh;
+    }
+
+    .destination-slide {
+        height: 50vh;
+    }
+
+    .latest-blogs-left .blogs-card-img {
+        object-fit: cover;
+    }
+    .our-achievements-content p {
+        width: auto;
+    }
+}
+
+
+@media screen and (max-width: 991px) {
+    .homepaage-banner-image-1 {
+        height: 60vh;
+    }
+
+    .navbar-collapse {
+        margin-top: 30px;
+    }
+
+    .header-main {
+        background-color: rgb(39, 39, 39);
+    }
+
+    .navbar-toggler {
+        background-color: white;
+    }
+
+    .fixed-header {
+        position: sticky;
+    }
+
+    .banner-para {
+        padding: 0px 20px;
+    }
+
+    .offer-left {
+        padding: 45px;
+        height: auto;
+    }
+
+    .booking-offer-main {
+        padding: 40px;
+    }
+
+    .tours-overview-head {
+        width: 100%;
+    }
+
+    .swiper-button-prev:after,
+    .swiper-rtl .swiper-button-next:after {
+        margin-left: 0px !important;
+    }
+
+    .swiper-button-next:after,
+    .swiper-rtl .swiper-button-prev:after {
+        margin-right: 0px !important;
+    }
+
+    .destination-enquiry-input-main {
+        flex-direction: column;
+    }
+
+    .destination-filter-card-center {
+        margin-top: 20px;
+    }
+
+    .destination-filter-card-right {
+        border-left: none;
+        padding-left: 0px;
+        margin-top: 30px;
+    }
+
+    .filter-card-view-main {
+        margin-top: 35px;
+    }
+
+    .filter-card-view-main button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0px auto;
+        margin-top: 30px;
+    }
+
+    .tour-overview-right {
+        margin: 40px 0px 0px 0px;
+    }
+
+    .blogs-swiper-nav-btn {
+        display: none;
+    }
+
+    .blogs-detail-left {
+        margin-top: 70px;
+        margin-left: 0px;
+    }
+
+    .get-in-touch-box {
+        margin: 25px 0px;
+    }
+    .our-culture-card{
+        padding: 30px 25px;
+    }
+
+}
+
+
+
+@media screen and (max-width: 767px) {
+    .our-achievements-card {
+        padding: 30px 15px;
+    }
+
+    .our-achievements-content p {
+        width: auto;
+    }
+
+    .about-company-name {
+        font-size: 40px;
+    }
+
+    .about-we-are {
+        font-size: 27px;
+        margin-bottom: 0px;
+    }
+
+    .footer-last {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .contact-us-map iframe {
+        width: 100%;
+        height: 400px;
+    }
+
+    .contact-us-right-innner {
+        padding: 10px 20px 40px;
+        margin-top: 40px;
+    }
+
+    .blogs-swiper-nav-btn {
+        display: none;
+    }
+
+    .blogs-category-card {
+        height: 350px;
+    }
+
+    .blogs-category-card h5 {
+        font-size: 30px;
+    }
+
+    .blogs-slider-wrapper {
+        padding-bottom: 0px;
+    }
+
+    .popular-post-img {
+        height: auto;
+    }
+
+    .banner-heading {
+        font-size: 40px;
+        padding: 0px 20px;
+        margin-top: 10px;
+    }
+
+    .slider-navigation {
+        display: none;
+    }
+
+    .footer-top-main {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .subscribe-main {
+        display: flex;
+        flex-direction: column;
+        background-color: transparent;
+        width: 100%;
+    }
+
+    .subscribe-main input {
+        width: 100%;
+        padding: 20px 0px 20px 20px;
+    }
+
+    .subscribe-btn {
+        margin-top: 20px;
+        padding: 10px 0px 10px 0px;
+    }
+
+    .destination-filter-top {
+        flex-direction: column;
+    }
+
+    .tours-overview-head {
+        font-size: 25px;
+    }
+
+    .tour-overview-ratings-place {
+        flex-direction: column;
+    }
+
+    .tour-overview-image-bottom {
+        flex-wrap: wrap;
+    }
+
+    .destination-enquiry-input-main {
+        flex-direction: column;
+    }
+
+    .dest-package-name {
+        font-size: 40px;
+    }
+
+    .destination-overlay {
+        height: 75%;
+    }
+
+    .destination-detail-banner-main {
+        height: 60vh;
+    }
+
+    .destination-slide {
+        height: 60vh;
+    }
+
+    .destination-slide-content {
+        bottom: 40px;
+        left: 46px;
+    }
+
+    .dest-package-para {
+        padding-right: 40px;
+    }
+
+
+
+}

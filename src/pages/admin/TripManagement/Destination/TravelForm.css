@@ -1,0 +1,170 @@
+.travel-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.left-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #ff7a18, #ff4800);
+  color: #fff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left-panel h1 {
+  margin-bottom: 10px;
+}
+
+.left-panel p {
+  margin-bottom: 25px;
+  opacity: 0.9;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.step i {
+  margin-right: 12px;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.stats {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.contact-box {
+  display: flex;
+  align-items: center;
+  margin-top: 25px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.contact-box i {
+  margin-right: 12px;
+  font-size: 20px;
+  background: #fff;
+  color: #ff4800;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.right-panel {
+  flex: 1;
+  background: #fff;
+  padding: 40px;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.right-panel h2 {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.right-panel p {
+  margin-bottom: 20px;
+  color: #777;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.form-row select,
+.form-row input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.date-toggle {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.date-toggle button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.date-toggle .active {
+  background: #ff4800;
+  color: #fff;
+  border-radius: 8px 0 0 8px;
+}
+
+.date-toggle .inactive {
+  background: #eee;
+  color: #333;
+  border-radius: 0 8px 8px 0;
+}
+
+.form-check {
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
+.form-check label a {
+  color: #ff4800;
+  text-decoration: none;
+}
+
+.submit-btn {
+  background: #ff4800;
+  color: #fff;
+  border: none;
+  padding: 15px;
+  width: 100%;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background: #e63e00;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .travel-container {
+    flex-direction: column;
+  }
+  .left-panel, .right-panel {
+    border-radius: 0;
+    padding: 25px;
+  }
+}

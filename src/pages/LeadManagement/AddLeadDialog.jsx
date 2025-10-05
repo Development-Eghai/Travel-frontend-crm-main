@@ -1,0 +1,205 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Grid,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+const AddLeadDialog = ({ open, onClose }) => {
+  const [tripThemes, setTripThemes] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    mobile: '',
+    destinationType: '',
+    pickup: '',
+    drop: '',
+    travelFrom: null,
+    travelTo: null,
+    adults: 1,
+    children: 0
+  });
+
+  // Fetch trip themes from API
+  useEffect(() => {
+    const fetchTripThemes = async () => {
+      try {
+        const response = await fetch('/api/trip-themes');
+        const data = await response.json();
+        setTripThemes(data);
+      } catch (error) {
+        console.error('Error fetching trip themes:', error);
+      }
+    };
+    fetchTripThemes();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleDateChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      if (response.ok) {
+        onClose();
+      } else {
+        console.error('Error creating lead');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>Add New Lead</DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Client Name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Mobile"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleInputChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <FormControl fullWidth>
+              <InputLabel>Destination Type</InputLabel>
+              <Select
+                name="destinationType"
+                value={formData.destinationType}
+                onChange={handleInputChange}
+                label="Destination Type"
+              >
+                {tripThemes.map((theme) => (
+                  <MenuItem key={theme.id} value={theme.id}>
+                    {theme.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Pickup Location"
+              name="pickup"
+              value={formData.pickup}
+              onChange={handleInputChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Drop Location"
+              name="drop"
+              value={formData.drop}
+              onChange={handleInputChange}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                label="Travel From"
+                value={formData.travelFrom}
+                onChange={(value) => handleDateChange('travelFrom', value)}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                label="Travel To"
+                value={formData.travelTo}
+                onChange={(value) => handleDateChange('travelTo', value)}
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Number of Adults"
+              name="adults"
+              type="number"
+              value={formData.adults}
+              onChange={handleInputChange}
+              InputProps={{ inputProps: { min: 1 } }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Number of Children"
+              name="children"
+              type="number"
+              value={formData.children}
+              onChange={handleInputChange}
+              InputProps={{ inputProps: { min: 0 } }}
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary">
+          Add Lead
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default AddLeadDialog;
