@@ -22,9 +22,11 @@ const InvoiceManagement = () => {
   useEffect(() => { fetchInvoices(); }, []);
 
   return (
+
+    <div className='mt-4'>
     <Container maxWidth="xl">
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Invoicing</h1>
+        <h3>Invoicing</h3>
         <Box>
           <Button variant="contained" color="primary" onClick={() => setOpenBuilder(true)}>Create New Invoice</Button>
         </Box>
@@ -54,6 +56,7 @@ const InvoiceManagement = () => {
 
       <InvoiceBuilder open={openBuilder} onClose={() => { setOpenBuilder(false); fetchInvoices(); }} />
     </Container>
+    </div>
   );
 };
 

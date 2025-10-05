@@ -47,10 +47,10 @@ const LeadManagement = () => {
   });
 
   return (
-    <div className='section-padding'>
+    <div className='mt-4'>
       <Container maxWidth="xl">
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>Lead Management</h1>
+          <h3>Lead Management</h3>
           <Button variant="contained" color="primary" onClick={handleAddNewLead}>
             Add New Lead
           </Button>

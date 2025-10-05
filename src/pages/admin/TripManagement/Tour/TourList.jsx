@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import MyDataTable from '../../../../component/MyDataTable';
 import { GetAllDestination, GetAllTrip } from '../../../../common/api/ApiService';
 import { capitalizeWords } from '../../../../common/Validation';
+import { getAllTrips } from '../../../../store/slices/tripSlices';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 const TourList = () => {
     const [tripList, setTripList] = useState([])
 
     const navigate = useNavigate();
-    
+
     const handlePreview = (slug, id) => {
         const url = `/trip-preview/${slug}/${id}`;
         window.open(url, '_blank');
@@ -17,9 +19,9 @@ const TourList = () => {
     const columns = [
         { field: 'sno', headerName: 'SNO', flex: 1 },
         {
-            field: 'trip_title', headerName: 'Trip Title', flex: 1,
+            field: 'title', headerName: 'Trip Title', flex: 1,
             renderCell: (params) => {
-                const tripTitle = params.row?.fixedPackage?.trip_title || params.row?.customizePackage?.trip_title || "";
+                const tripTitle = params.row?.title || params.row?.title || "";
                 return (
                     <div className='admin-actions'>
                         {capitalizeWords(tripTitle)}
@@ -28,83 +30,89 @@ const TourList = () => {
             }
         },
         {
-            field: 'slug', headerName: 'Slug', flex: 1,
+            field: 'destination_type', headerName: 'Destination Type', flex: 1,
             renderCell: (params) => {
-                const slug = params.row?.fixedPackage?.slug || params.row?.customizePackage?.slug || "";
+                const slug = params.row?.destination_type || params.row?.destination_type || "";
                 return (
                     <div className='admin-actions'>
-                       {slug}
+                        {capitalizeWords(slug)}
                     </div>
                 );
             }
         },
         {
-            field: 'featured_trip_page', headerName: 'Feature Trip Page', flex: 1,
+            field: 'pickup_location', headerName: 'Pickup Location', flex: 1,
             renderCell: (params) => {
-                const slug = params.row?.fixedPackage?.featured_trip_page || params.row?.customizePackage?.featured_trip_page || "";
+                const slug = params.row?.pickup_location || params.row?.pickup_location || "";
                 return (
                     <div className='admin-actions'>
-                       {slug}
+                        {capitalizeWords(slug)}
                     </div>
                 );
             }
         },
         {
-            field: '_id',
-            headerName: 'Actions',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            disableColumnMenu: true,
+            field: 'drop_location', headerName: 'Dropup Location', flex: 1,
             renderCell: (params) => {
-                const slug = params.row?.fixedPackage?.slug || params.row?.customizePackage?.slug || "";
-                const id = params.row?._id;
-
+                const slug = params.row?.drop_location || params.row?.drop_location || "";
                 return (
                     <div className='admin-actions'>
-                        {/* <i className="fa-solid fa-pen-to-square"></i>
-
-                        <i className="fa-solid fa-trash ms-3"></i> */}
-
-                        <i
-                            className="fa-solid fa-eye ms-3"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handlePreview(slug, id)}
-                        ></i>
+                        {capitalizeWords(slug)}
                     </div>
                 );
             }
         },
         // {
-        //     field: 'status',
-        //     headerName: 'Status',
+        //     field: '_id',
+        //     headerName: 'Actions',
         //     flex: 1,
         //     sortable: false,
         //     filterable: false,
         //     disableColumnMenu: true,
         //     renderCell: (params) => {
-        //         const status = params.row.status === "active" ? true : false;
+        //         const slug = params.row?.fixedPackage?.slug || params.row?.customizePackage?.slug || "";
+        //         const id = params.row?._id;
+
         //         return (
-        //             <div className="switch">
-        //                 <input type="checkbox" checked={status} readOnly />
-        //                 <span className="slider-table round"></span>
+        //             <div className='admin-actions'>
+        //                 <i
+        //                     className="fa-solid fa-eye ms-3"
+        //                     style={{ cursor: "pointer" }}
+        //                     onClick={() => handlePreview(slug, id)}
+        //                 ></i>
         //             </div>
         //         );
-        //     },
-        // }
+        //     }
+        // },
     ];
 
-    const numberedRows = tripList?.length && tripList?.map((row, index) => ({
-        ...row,
-        sno: index + 1,
-    }));
+    const numberedRows = Array.isArray(tripList)
+        ? tripList.map((row, index) => ({
+            ...row,
+            sno: index + 1,
+        }))
+        : [];
+
+  
 
     const getAllTrips = async () => {
-        const response = await GetAllTrip()
-        if (response && response?.statusCode === 200) {
-            setTripList(response?.data)
+        try {
+            const res = await APIBaseUrl.get("trips/", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true && res?.data?.error_code === 0) {
+                setTripList(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
-    }
+    };
+    console.log(numberedRows, "Trip Rows");
+    console.log(tripList, "tripList")
 
     useEffect(() => {
         getAllTrips()
@@ -122,8 +130,8 @@ const TourList = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    getRowId={(row) => row._id}
-                // isLoading={isLoading}
+                    // getRowId={(row) => row._id}
+                    // isLoading={isLoading}
                 />
             </div>
         </div>

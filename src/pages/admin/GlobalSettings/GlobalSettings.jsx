@@ -243,9 +243,9 @@ export default function GlobalSettings() {
   };
 
   return (
-    <div className="settings-container">
+    <div className="settings-container mt-3">
       <div className="settings-header">
-        <h2>Global Settings</h2>
+        <h3>Global Settings</h3>
       </div>
 
       <div className="progress-bar">
