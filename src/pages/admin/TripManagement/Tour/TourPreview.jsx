@@ -6,9 +6,9 @@ import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import { Images } from "../../../../helpers/Images/images";
 import { useNavigate, useParams } from "react-router";
-import Header from '../../../user/component/Header';
 import { TourPreviewDetails } from '../../../../common/api/ApiService';
 import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 
 const TourPreview = () => {
@@ -77,28 +77,25 @@ const TourPreview = () => {
 
 
     const getSpecificTour = async () => {
-        const response = await TourPreviewDetails(id)
-
-        if (response && response.statusCode === 200) {
-            const fixedPackage = response.data?.fixedPackage;
-            const customizePackage = response.data?.customizePackage;
-
-            const isFixed = fixedPackage && Object.keys(fixedPackage).length > 0;
-            const isCustom = customizePackage && Object.keys(customizePackage).length > 0;
-
-            if (isFixed) {
-                setSpecificTourData(fixedPackage);
-                setIsFixedPackage(true);
-            } else if (isCustom) {
-                setSpecificTourData(customizePackage);
-                setIsFixedPackage(false);
+        try {
+            const res = await APIBaseUrl.get(`trips/${id}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true && res?.data?.error_code === 0) {
+                setSpecificTourData(res?.data?.data)
             }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
     }
 
     const handlePreview = (id) => {
         const url = `/booking/${specificTourData?.slug}/${id}`;
-        window.location.href = url; // Opens in the same tab
+        window.location.href = url;
     };
 
     console.log(specificTourData, "specificTourData-specificTourData")
@@ -109,8 +106,7 @@ const TourPreview = () => {
 
     return (
         <div className=''>
-            <Header />
-            <section className="destination-detail-banner-main">
+            {/* <section className="destination-detail-banner-main">
                 <Swiper
                     modules={[EffectFade, Autoplay, Navigation]}
                     navigation={true}
@@ -130,18 +126,18 @@ const TourPreview = () => {
                                     backgroundImage: `url(${BACKEND_DOMAIN}${imageUrl})`,
                                 }}
                             >
-                                {/* <div className="destination-overlay"></div>
+                                <div className="destination-overlay"></div>
                                 <div className='destination-slide-content'>
                                     <h1 className="dest-package-name">Europe Tour Packages</h1>
                                     <p className="dest-package-para">
                                         Explore the nature-kissed beauty of Thailand
                                     </p>
-                                </div> */}
+                                </div>
                             </div>
                         </SwiperSlide>
                     ))}
                 </Swiper>
-            </section>
+            </section> */}
 
             <div className='trip-detail-content-main'>
                 <div className='container'>
@@ -184,7 +180,7 @@ const TourPreview = () => {
                                     <h3>Overview & Highlights</h3>
                                     <div className={showReadMore ? "trip-detail-overview-more" : 'trip-detail-overview'}>
                                         <div>
-                                            <p dangerouslySetInnerHTML={{ __html: specificTourData?.long_description || "<p>No description available</p>" }}></p>
+                                            <p dangerouslySetInnerHTML={{ __html: specificTourData?.overview || "<p>No description available</p>" }}></p>
                                         </div>
                                     </div>
                                     <p className='read-more' onClick={() => setShowReadMore(!showReadMore)}>{showReadMore ? "Read Less" : "Read More"}</p>
@@ -196,13 +192,13 @@ const TourPreview = () => {
                                         <div className='trip-detail-faqs mt-4'>
                                             <div className="accordion" id="accordionExample">
 
-                                                {specificTourData?.day_wise_itenary.map((item, index) => (
+                                                {specificTourData?.itinerary?.map((item, index) => (
                                                     <div className="accordion-item" key={index}>
                                                         <h2 className="accordion-header" id={`day_wise_itenary${index}`}>
                                                             <button className="accordion-button" type="button" data-bs-toggle="collapse"
                                                                 data-bs-target={`#itenarys${index}`} aria-expanded={index === 0 ? 'true' : 'false'}
                                                                 aria-controls={`itenarys${index}`}>
-                                                                <p className='trip-faq-accordion'>Day {index + 1}</p>  {item?.day_title}
+                                                                <p className='trip-faq-accordion'>Day {index + 1}</p>  {item?.title}
                                                             </button>
                                                         </h2>
                                                         <div id={`itenarys${index}`}
@@ -210,7 +206,19 @@ const TourPreview = () => {
                                                             aria-labelledby={`day_wise_itenary${index}`}
                                                             data-bs-parent="#accordionExample">
                                                             <div className="accordion-body">
-                                                                <p>{item?.day_description}</p>
+                                                                <p>{item?.description}</p>
+                                                                <p className='mt-3 fw-bold'>Activity : </p>
+                                                                <ul>
+                                                                    {item?.activities?.map((item, index) => (
+                                                                        <li key={index}>{item}</li>))}
+                                                                </ul>
+                                                                <p className='mt-3'><span className='fw-bold'>Hotel Name :</span> {item?.hotel_name}</p>
+
+                                                                <p className='mt-3 fw-bold'>Meal Plan : </p>
+                                                                <ul>
+                                                                    {item?.meal_plan?.map((item, index) => (
+                                                                        <li key={index}>{item}</li>))}
+                                                                </ul>
 
                                                                 <div className='d-flex flex-wrap'>
                                                                     {item?.day_images?.map((img, index) => (
@@ -232,7 +240,7 @@ const TourPreview = () => {
                                     <h3>Inclusions</h3>
 
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.price_per_package?.inclusion || "<p>No description available</p>" }}></p>
+                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.inclusions || "<p>No description available</p>" }}></p>
                                     </div>
 
                                 </div>
@@ -240,44 +248,50 @@ const TourPreview = () => {
                                 <div className='trip-detail-section' ref={exclusionRef}>
                                     <h3>Exclusions</h3>
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.price_per_package?.exclusion || "<p>No description available</p>" }}></p>
+                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.exclusions || "<p>No description available</p>" }}></p>
                                     </div>
                                 </div>
 
                                 <div className='trip-detail-section' ref={highlightsRef}>
                                     <h3>Key Highlights</h3>
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.price_per_package?.key_highlights || "<p>No description available</p>" }}></p>
+                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.key_highlights || "<p>No description available</p>" }}></p>
                                     </div>
                                 </div>
 
                                 <div className='trip-detail-section'>
-                                    <h3>Cancellation Policy</h3>
+                                    <h3>Policies</h3>
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.price_per_package?.cancellation_policy || "<p>No description available</p>" }}></p>
+                                        {specificTourData?.policies?.map((item, index) => (
+                                            <>
+                                                <p className='mt-5 fw-bold'>{item?.title} :</p>
+                                                <p className='mt-3'>{item?.content} </p>
+                                            </>
+                                        ))}
                                     </div>
                                 </div>
+
 
                             </div>
                         </div>
 
                         <div className='col-lg-4'>
-                            {isFixedPackage && (
-                                <div className='trip-detail-right'>
-                                    <div className='trip-detail-price-card'>
-                                        <p className='mb-1'>Starting from</p>
+                            {specificTourData?.pricing?.pricing_model==="fixed" && (
+                            <div className='trip-detail-right'>
+                                <div className='trip-detail-price-card'>
+                                    <p className='mb-1'>Starting from</p>
 
-                                        <div className='d-flex'>
-                                            <p className='trip-price'>₹ {specificTourData?.price_per_package?.base_price}/-</p>
-                                            <p className='trip-price-per'>Per Person</p>
-                                        </div>
-
-                                        <button onClick={() => handlePreview(id)}>Dates & Pricing</button>
+                                    <div className='d-flex'>
+                                        <p className='trip-price'>₹ {specificTourData?.pricing?.pricing_model==="fixed" && specificTourData?.pricing?.fixed_departure?.fixed_departure[0]?.base_price}/-</p>
+                                        <p className='trip-price-per'>Per Person</p>
                                     </div>
+
+                                    <button onClick={() => handlePreview(id)}>Dates & Pricing</button>
                                 </div>
+                            </div>
                             )}
 
-                            <div className='trip-detail-right'>
+                            {/* <div className='trip-detail-right'>
                                 {!isFixedPackage && (
                                     <div className='trip-detail-contact-form'>
                                         <div className='trip-detail-contact-form-head'>
@@ -350,7 +364,7 @@ const TourPreview = () => {
                                         </div>
                                     </div>
                                 )}
-                            </div>
+                            </div> */}
 
                         </div>
                     </div>

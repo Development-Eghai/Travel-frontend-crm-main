@@ -141,7 +141,7 @@ const TourBookingPreview = () => {
   return (
     <div>
       <div className="booking-main-parent">
-        <Header fixed={false} />
+        {/* <Header fixed={false} /> */}
 
         {tripSection === 1 && (
           <div className="">

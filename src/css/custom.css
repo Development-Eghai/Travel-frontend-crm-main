@@ -46,7 +46,7 @@
     justify-content: space-between;
     padding: 0px 40px 1px;
     position: sticky;
-    top: 4px;
+    top: 0px;
     z-index: 10;
 }
 
@@ -135,7 +135,7 @@
 
 .trip-detail-right {
     position: sticky;
-    top: 120px;
+    top: 20px;
 }
 
 
@@ -348,27 +348,32 @@
 
 .trip-detail-contact-form {
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-    border-radius: 3px;
+    border-radius: 5px;
     margin-top: 50px;
     border: 1px solid #EB662B;
     position: sticky;
+
 }
 
 .trip-detail-contact-form-head .head-1 {
     color: #EB662B;
     font-weight: 600;
     font-size: 19px;
+    border-radius: 5px;
+    
 }
 
 .trip-detail-contact-form-head .head-2 {
     color: black;
     font-weight: 600;
     font-size: 17px;
+    border-radius: 5px;
 }
 
 .trip-detail-contact-form-head {
     background-color: #FFD0B2;
     padding: 15px 30px;
+    border-radius: 5px;
 }
 
 .trip-detail-contact-input {

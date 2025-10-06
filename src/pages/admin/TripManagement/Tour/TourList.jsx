@@ -62,28 +62,28 @@ const TourList = () => {
                 );
             }
         },
-        // {
-        //     field: '_id',
-        //     headerName: 'Actions',
-        //     flex: 1,
-        //     sortable: false,
-        //     filterable: false,
-        //     disableColumnMenu: true,
-        //     renderCell: (params) => {
-        //         const slug = params.row?.fixedPackage?.slug || params.row?.customizePackage?.slug || "";
-        //         const id = params.row?._id;
+        {
+            field: '_id',
+            headerName: 'Actions',
+            flex: 1,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
+            renderCell: (params) => {
+                const slug = params.row?.slug || params.row?.slug || "";
+                const id = params.row?.id;
 
-        //         return (
-        //             <div className='admin-actions'>
-        //                 <i
-        //                     className="fa-solid fa-eye ms-3"
-        //                     style={{ cursor: "pointer" }}
-        //                     onClick={() => handlePreview(slug, id)}
-        //                 ></i>
-        //             </div>
-        //         );
-        //     }
-        // },
+                return (
+                    <div className='admin-actions'>
+                        <i
+                            className="fa-solid fa-eye ms-3"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handlePreview(slug, id)}
+                        ></i>
+                    </div>
+                );
+            }
+        },
     ];
 
     const numberedRows = Array.isArray(tripList)
