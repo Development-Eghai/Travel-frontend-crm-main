@@ -6,6 +6,7 @@ import { NonEmptyValidation, normalizeEmptyFields, SlugValidation, StringValidat
 import { errorMsg, successMsg } from '../../../../common/Toastify';
 import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
 import { CreateTourType, deleteTourType, GetAllTourType, GetSpecificTourType, SingleFileUpload, updateTourType } from '../../../../common/api/ApiService';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 
 
@@ -23,8 +24,8 @@ const TourType = () => {
 
     const columns = [
         { field: 'sno', headerName: 'SNO', flex: 1 },
-        { field: 'tour_name', headerName: 'Name', flex: 1 },
-        { field: 'tour_slug', headerName: 'Slug', flex: 1 },
+        { field: 'name', headerName: 'Name', flex: 1 },
+        { field: 'slug', headerName: 'Slug', flex: 1 },
         {
             field: '_id',
             headerName: 'Actions',
@@ -36,37 +37,22 @@ const TourType = () => {
                 <>
                     <div>
                         <div className='admin-actions'>
-                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourType(params?.row?._id); setIsUpdate(true) }}></i>
-                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?._id); setOpenDeleteModal(true) }}></i>
-                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourType(params?.row?._id); setIsViewOnly(true) }} ></i>
+                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourType(params?.row?.id); setIsUpdate(true) }}></i>
+                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
+                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourType(params?.row?.id); setIsViewOnly(true) }} ></i>
                         </div>
                     </div>
                 </>
             ),
         },
-        {
-            field: 'status',
-            headerName: 'Status',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            disableColumnMenu: true,
-            renderCell: (params) => {
-                const status = params.row.status === "active" ? true : false;
-                return (
-                    <div className="switch" onClick={() => handleStatusUpdate(params?.row?._id, status)}>
-                        <input type="checkbox" checked={status} readOnly />
-                        <span className="slider-table round"></span>
-                    </div>
-                );
-            },
-        }
     ];
 
-    const numberedRows = tourTypeList?.map((row, index) => ({
-        ...row,
-        sno: index + 1,
-    }));
+    const numberedRows = Array.isArray(tourTypeList?.reverse())
+        ? tourTypeList.map((row, index) => ({
+            ...row,
+            sno: index + 1,
+        }))
+        : [];
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -150,17 +136,37 @@ const TourType = () => {
     };
 
     const getAllTourTypes = async () => {
-        const response = await GetAllTourType()
-        if (response && response?.statusCode === 200) {
-            setTourTypeList(response?.data),
-                setIsLoading(false);
+        try {
+            const res = await APIBaseUrl.get("trip-types/", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+
+                setTourTypeList(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
     }
 
-    const getSpecificTourType = async (_id) => {
-        const response = await GetSpecificTourType(_id)
-        if (response && response?.statusCode === 200) {
-            setTourTypeData(response?.data)
+    const getSpecificTourType = async (id) => {
+        try {
+            const res = await APIBaseUrl.get(`trip-types/${id}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                setTourTypeData(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
     }
 
@@ -183,28 +189,22 @@ const TourType = () => {
 
     }
 
-    const handleStatusUpdate = async (_id, currentStatus) => {
-        const newStatus = currentStatus ? "inactive" : "active";
-        const Payload = {
-            _id,
-            status: newStatus,
-        };
-
-        const response = await updateTourType(Payload)
-        if (response && response?.statusCode === 200) {
-            successMsg("Status Updated Successsfully")
-            getAllTourTypes()
-        }
-
-    }
-
     const handleDelete = async () => {
-        const response = await deleteTourType(deleteId)
-        if (response && response?.statusCode === 200) {
-            successMsg("Trip Type Deleted Successsfully")
-            setOpenDeleteModal(false)
-            getAllTourTypes()
-            setDeleteId('')
+        try {
+            const res = await APIBaseUrl.delete(`trip-types/${deleteId}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                successMsg("Activity Deleted Successsfully")
+                getAllTourTypes()
+                setOpenDeleteModal(false)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
 
     }
@@ -214,7 +214,7 @@ const TourType = () => {
         getAllTourTypes()
     }, [])
 
-    console.log(tourTypeData,"tourTypeData")
+    console.log(tourTypeList,"tourTypeList")
 
     return (
         <div className='admin-content-main'>
@@ -227,7 +227,6 @@ const TourType = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    getRowId={(row) => row._id}
                 // isLoading={isLoading}
                 />
             </div>
@@ -250,40 +249,40 @@ const TourType = () => {
 
                         <div className='model-input-div'>
                             <label>Tour Name  <span className='required-icon'>*</span></label>
-                            <input type="text" placeholder="Enter Name" name='tour_name'
+                            <input type="text" placeholder="Enter Name" name='name'
                                 onChange={(e) => handleChange(e)}
-                                value={tourTypeData?.tour_name || ""}
+                                value={tourTypeData?.name || ""}
                                 readOnly={isViewOnly}
                                 onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                             />
-                            {validation?.tour_name?.status === false && validation?.tour_name?.message && (
-                                <p className='error-para'>Tour Name {validation.tour_name.message}</p>
+                            {validation?.name?.status === false && validation?.name?.message && (
+                                <p className='error-para'>Tour Name {validation.name.message}</p>
                             )}
                         </div>
 
                         <div className='model-input-div'>
                             <label>Tour Slug  <span className='required-icon'>*</span></label>
-                            <input type="text" placeholder="Enter Tour Slug" name='tour_slug'
+                            <input type="text" placeholder="Enter Tour Slug" name='slug'
                                 onChange={(e) => handleChange(e)}
-                                value={tourTypeData?.tour_slug || ""}
+                                value={tourTypeData?.slug || ""}
                                 readOnly={isViewOnly}
                                 onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                             />
-                            {validation?.tour_slug?.status === false && validation?.tour_slug?.message && (
-                                <p className='error-para'>Tour Slug {validation.tour_slug.message}</p>
+                            {validation?.slug?.status === false && validation?.slug?.message && (
+                                <p className='error-para'>Tour Slug {validation.slug.message}</p>
                             )}
                         </div>
 
                         <div className='model-input-div'>
                             <label>Tour Description  <span className='required-icon'>*</span></label>
-                            <textarea type="text" placeholder='Enter Tour Description' name='tour_description'
+                            <textarea type="text" placeholder='Enter Tour Description' name='description'
                                 onChange={(e) => handleChange(e)}
-                                value={tourTypeData?.tour_description || ""}
+                                value={tourTypeData?.description || ""}
                                 readOnly={isViewOnly}
                                 onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                             />
-                            {validation?.tour_description?.status === false && validation?.tour_description?.message && (
-                                <p className='error-para'>Tour Description {validation.tour_description.message}</p>
+                            {validation?.description?.status === false && validation?.description?.message && (
+                                <p className='error-para'>Tour Description {validation.description.message}</p>
                             )}
                         </div>
 
@@ -293,19 +292,19 @@ const TourType = () => {
                                 <input
                                     type="file"
                                     // multiple
-                                    name='tour_image'
+                                    name='image'
                                     accept='.png,.jpeg,.jpg,.pdf,.webp'
                                     className="form-control"
-                                    onChange={(e) => { handleFileUpload(e, "tour_image"); handleChange(e) }}
+                                    onChange={(e) => { handleFileUpload(e, "image"); handleChange(e) }}
                                     // onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                                 />
                             )}
-                            {validation?.tour_image?.status === false && validation?.tour_image?.message && (
-                                <p className='error-para'>Tour Image {validation.tour_image.message}</p>
+                            {validation?.image?.status === false && validation?.image?.message && (
+                                <p className='error-para'>Tour Image {validation.image.message}</p>
                             )}
-                            {tourTypeData?.tour_image && (
+                            {tourTypeData?.image && (
                                 <div className='upload-image-div'>
-                                    <img src={`${BACKEND_DOMAIN}${tourTypeData?.tour_image}`} alt="Category-Preview" />
+                                    <img src={`${BACKEND_DOMAIN}${tourTypeData?.image}`} alt="Category-Preview" />
                                 </div>
                             )}
 

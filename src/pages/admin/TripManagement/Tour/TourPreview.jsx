@@ -276,7 +276,7 @@ const TourPreview = () => {
                         </div>
 
                         <div className='col-lg-4'>
-                            {specificTourData?.pricing?.pricing_model==="fixed" && (
+                            {/* {specificTourData?.pricing?.pricing_model==="fixed" && (
                             <div className='trip-detail-right'>
                                 <div className='trip-detail-price-card'>
                                     <p className='mb-1'>Starting from</p>
@@ -289,9 +289,9 @@ const TourPreview = () => {
                                     <button onClick={() => handlePreview(id)}>Dates & Pricing</button>
                                 </div>
                             </div>
-                            )}
+                            )} */}
 
-                            {/* <div className='trip-detail-right'>
+                            <div className='trip-detail-right'>
                                 {!isFixedPackage && (
                                     <div className='trip-detail-contact-form'>
                                         <div className='trip-detail-contact-form-head'>
@@ -315,23 +315,12 @@ const TourPreview = () => {
                                                 <input type='email' placeholder='eg. JohnDoe@gmail.com' />
                                             </div>
 
-
-                                            <div className='trip-detail-contact-input'>
-                                                <label>No Of People</label>
-                                                <input type='number' placeholder='eg. 5' />
-                                            </div>
-
-                                            <div className='trip-detail-contact-input'>
-                                                <label>No Of Days</label>
-                                                <input type='number' placeholder='eg. 10' />
-                                            </div>
-
                                             <div className='trip-detail-contact-input'>
                                                 <div className='admin-input-div mt-0'>
-                                                    <label>Select Prepared Hotel </label>
+                                                    <label>Select Slots </label>
                                                     <select
                                                         name="featured_trip_page">
-                                                        <option value="">Select Hotel</option>
+                                                        <option value="">Select Slots</option>
                                                         <option value="Five Star">⭐ ⭐ ⭐ ⭐ ⭐</option>
                                                         <option value="Four Star">⭐ ⭐ ⭐ ⭐</option>
                                                         <option value="Three Star">⭐ ⭐ ⭐</option>
@@ -342,16 +331,30 @@ const TourPreview = () => {
 
                                             <div className='trip-detail-contact-input'>
                                                 <div className='admin-input-div mt-0'>
-                                                    <label>Select Destination</label>
+                                                    <label>Select Package</label>
                                                     <select
                                                         name="featured_trip_page">
-                                                        <option value="">Select Destination</option>
-                                                        <option value="Five Star">Chennai</option>
-                                                        <option value="Four Star">India</option>
-                                                        <option value="Three Star">Mumbai</option>
-                                                        <option value="Two Star">Keral</option>
+                                                        <option value="">Select Package</option>
+                                                        <option value="Double">Double</option>
+                                                        <option value="Triple">Triple</option>
+                                                        <option value="Quad">Quad</option>
                                                     </select>
                                                 </div>
+                                            </div>
+
+                                            <div className='trip-detail-contact-input'>
+                                                <label>No. of Adults</label>
+                                                <input type='number' placeholder='eg. 4' />
+                                            </div>
+
+                                            <div className='trip-detail-contact-input'>
+                                                <label>no. of Infants</label>
+                                                <input type='number' placeholder='eg. 3' />
+                                            </div>
+
+                                            <div className='trip-detail-contact-input'>
+                                                <label>no. of Children</label>
+                                                <input type='number' placeholder='eg. 2' />
                                             </div>
 
                                             <div className='trip-detail-contact-input'>
@@ -364,7 +367,7 @@ const TourPreview = () => {
                                         </div>
                                     </div>
                                 )}
-                            </div> */}
+                            </div>
 
                         </div>
                     </div>

@@ -6,6 +6,7 @@ import { NonEmptyValidation, normalizeEmptyFields, SlugValidation, StringValidat
 import { errorMsg, successMsg } from '../../../../common/Toastify';
 import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
 import { CreateActivity, deleteActivity, GetAllActivity, GetSpecificActivity, SingleFileUpload, updateActivity } from '../../../../common/api/ApiService';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 
 
@@ -22,8 +23,8 @@ const TourType = () => {
 
     const columns = [
         { field: 'sno', headerName: 'SNO', flex: 1 },
-        { field: 'activity_name', headerName: 'Name', flex: 1 },
-        { field: 'activity_slug', headerName: 'Slug', flex: 1 },
+        { field: 'name', headerName: 'Name', flex: 1 },
+        { field: 'slug', headerName: 'Slug', flex: 1 },
         {
             field: '_id',
             headerName: 'Actions',
@@ -35,37 +36,23 @@ const TourType = () => {
                 <>
                     <div>
                         <div className='admin-actions'>
-                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificActivity(params?.row?._id); setIsUpdate(true) }}></i>
-                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?._id); setOpenDeleteModal(true) }}></i>
-                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificActivity(params?.row?._id); setIsViewOnly(true) }} ></i>
+                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificActivity(params?.row?.id); setIsUpdate(true) }}></i>
+                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
+                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificActivity(params?.row?.id); setIsViewOnly(true) }} ></i>
                         </div>
                     </div>
                 </>
             ),
         },
-        {
-            field: 'status',
-            headerName: 'Status',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            disableColumnMenu: true,
-            renderCell: (params) => {
-                const status = params.row.status === "active" ? true : false;
-                return (
-                    <div className="switch" onClick={() => handleStatusUpdate(params?.row?._id, status)}>
-                        <input type="checkbox" checked={status} readOnly />
-                        <span className="slider-table round"></span>
-                    </div>
-                );
-            },
-        }
     ];
 
-    const numberedRows = activityList?.map((row, index) => ({
-        ...row,
-        sno: index + 1,
-    }));
+    const numberedRows = Array.isArray(activityList?.reverse())
+        ? activityList.map((row, index) => ({
+            ...row,
+            sno: index + 1,
+        }))
+        : [];
+
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -78,10 +65,10 @@ const TourType = () => {
     const validateDetails = (data) => {
         let validate = {};
 
-        validate.activity_name = StringValidation(data?.activity_name);
-        validate.activity_slug = SlugValidation(data?.activity_slug);
-        validate.activity_description = NonEmptyValidation(data?.activity_description);
-        validate.activity_image = NonEmptyValidation(data?.activity_image);
+        validate.name = StringValidation(data?.name);
+        validate.slug = SlugValidation(data?.slug);
+        validate.description = NonEmptyValidation(data?.description);
+        validate.image = NonEmptyValidation(data?.image);
 
         return validate;
     };
@@ -148,18 +135,20 @@ const TourType = () => {
         setActivityData({ ...activityData, [key]: path })
     };
 
-    const getAllActivity = async () => {
-        const response = await GetAllActivity()
-        if (response && response?.statusCode === 200) {
-            setActivityList(response?.data),
-                setIsLoading(false);
-        }
-    }
+    const getSpecificActivity = async (id) => {
+        try {
+            const res = await APIBaseUrl.get(`activities/${id}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                setActivityData(res?.data?.data)
+            }
 
-    const getSpecificActivity = async (_id) => {
-        const response = await GetSpecificActivity(_id)
-        if (response && response?.statusCode === 200) {
-            setActivityData(response?.data)
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
     }
 
@@ -182,36 +171,47 @@ const TourType = () => {
 
     }
 
-    const handleStatusUpdate = async (_id, currentStatus) => {
-        const newStatus = currentStatus ? "inactive" : "active";
-        const Payload = {
-            _id,
-            status: newStatus,
-        };
-
-        const response = await updateActivity(Payload)
-        if (response && response?.statusCode === 200) {
-            successMsg("Status Updated Successsfully")
-            getAllActivity()
-        }
-
-    }
-
     const handleDelete = async () => {
-        const response = await deleteActivity(deleteId)
-        if (response && response?.statusCode === 200) {
-            successMsg("Activity Deleted Successsfully")
-            setOpenDeleteModal(false)
-            getAllActivity()
-            setDeleteId('')
-        }
+        try {
+            const res = await APIBaseUrl.delete(`activities/${deleteId}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                successMsg("Activity Deleted Successsfully")
+                getAllActivity()
+                setOpenDeleteModal(false)
+            }
 
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
+        }
     }
 
+    const getAllActivity = async () => {
+        try {
+            const res = await APIBaseUrl.get("activities/", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+
+                setActivityList(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
+        }
+    };
 
     useEffect(() => {
         getAllActivity()
     }, [])
+
     console.log(activityData, 'activityData')
 
     return (
@@ -225,7 +225,7 @@ const TourType = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    getRowId={(row) => row._id}
+                    // getRowId={(row) => row._id}
                 // isLoading={isLoading}
                 />
             </div>
@@ -248,40 +248,40 @@ const TourType = () => {
 
                         <div className='model-input-div'>
                             <label>Activity Name  <span className='required-icon'>*</span></label>
-                            <input type="text" placeholder="Enter Name" name='activity_name'
+                            <input type="text" placeholder="Enter Name" name='name'
                                 onChange={(e) => handleChange(e)}
-                                value={activityData?.activity_name || ""}
+                                value={activityData?.name || ""}
                                 readOnly={isViewOnly}
                                 onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                             />
-                            {validation?.activity_name?.status === false && validation?.activity_name?.message && (
-                                <p className='error-para'>Activity Name {validation.activity_name.message}</p>
+                            {validation?.name?.status === false && validation?.name?.message && (
+                                <p className='error-para'>Activity Name {validation.name.message}</p>
                             )}
                         </div>
 
                         <div className='model-input-div'>
                             <label>Activity Slug  <span className='required-icon'>*</span></label>
-                            <input type="text" placeholder="Enter Activity Slug" name='activity_slug'
+                            <input type="text" placeholder="Enter Activity Slug" name='slug'
                                 onChange={(e) => handleChange(e)}
-                                value={activityData?.activity_slug || ""}
+                                value={activityData?.slug || ""}
                                 readOnly={isViewOnly}
                                 onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                             />
-                            {validation?.activity_slug?.status === false && validation?.activity_slug?.message && (
-                                <p className='error-para'>Activity Slug {validation.activity_slug.message}</p>
+                            {validation?.slug?.status === false && validation?.slug?.message && (
+                                <p className='error-para'>Activity Slug {validation.slug.message}</p>
                             )}
                         </div>
 
                         <div className='model-input-div'>
                             <label>Activity Description  <span className='required-icon'>*</span></label>
-                            <textarea type="text" placeholder='Enter Activity Description' name='activity_description'
+                            <textarea type="text" placeholder='Enter Activity Description' name='description'
                                 onChange={(e) => handleChange(e)}
-                                value={activityData?.activity_description || ""}
+                                value={activityData?.description || ""}
                                 readOnly={isViewOnly}
                                 onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                             />
-                            {validation?.activity_description?.status === false && validation?.activity_description?.message && (
-                                <p className='error-para'>Activity Description {validation.activity_description.message}</p>
+                            {validation?.description?.status === false && validation?.description?.message && (
+                                <p className='error-para'>Activity Description {validation.description.message}</p>
                             )}
                         </div>
 
@@ -291,19 +291,19 @@ const TourType = () => {
                                 <input
                                     type="file"
                                     // multiple
-                                    name='activity_image'
+                                    name='image'
                                     accept='.png,.jpeg,.jpg,.pdf,.webp'
                                     className="form-control"
-                                    onChange={(e) => { handleFileUpload(e, "activity_image"); handleChange(e) }}
+                                    onChange={(e) => { handleFileUpload(e, "image"); handleChange(e) }}
                                 // onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                                 />
                             )}
-                            {validation?.activity_image?.status === false && validation?.activity_image?.message && (
-                                <p className='error-para'>Activity Image {validation.activity_image.message}</p>
+                            {validation?.image?.status === false && validation?.image?.message && (
+                                <p className='error-para'>Activity Image {validation.image.message}</p>
                             )}
-                            {activityData?.activity_image && (
+                            {activityData?.image && (
                                 <div className='upload-image-div'>
-                                    <img src={`${BACKEND_DOMAIN}${activityData?.activity_image}`} alt="Category-Preview" />
+                                    <img src={`${BACKEND_DOMAIN}${activityData?.image}`} alt="Category-Preview" />
                                 </div>
                             )}
 

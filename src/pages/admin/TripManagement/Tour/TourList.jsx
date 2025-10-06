@@ -111,8 +111,6 @@ const TourList = () => {
             throw error;
         }
     };
-    console.log(numberedRows, "Trip Rows");
-    console.log(tripList, "tripList")
 
     useEffect(() => {
         getAllTrips()
