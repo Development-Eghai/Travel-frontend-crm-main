@@ -65,10 +65,10 @@ const TourType = () => {
     const validateDetails = (data) => {
         let validate = {};
 
-        validate.tour_name = StringValidation(data?.tour_name);
-        validate.tour_slug = SlugValidation(data?.tour_slug);
-        validate.tour_description = NonEmptyValidation(data?.tour_description);
-        validate.tour_image = NonEmptyValidation(data?.tour_image);
+        validate.name = StringValidation(data?.name);
+        validate.slug = SlugValidation(data?.slug);
+        validate.description = NonEmptyValidation(data?.description);
+        validate.image = NonEmptyValidation(data?.image);
 
         return validate;
     };
@@ -91,16 +91,29 @@ const TourType = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         const cleanedData = normalizeEmptyFields(tourTypeData);
+        cleanedData.tenant_id = 1;
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
         if (Object.values(isValide).every((data) => data?.status === true)) {
-            const response = await CreateTourType(cleanedData)
-            if (response && response?.statusCode === 200) {
-                successMsg("Trip Type created successsfully")
-                setTourTypeData({})
-                setOpen(false)
-                getAllTourTypes()
+            try {
+                const res = await APIBaseUrl.post("trip-types/", cleanedData, {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                });
+                console.log(res?.data?.data,"res?.data?.data")
+                if (res?.data?.success === true) {
+                    successMsg("Trip Type created successsfully")
+                    setTourTypeData({})
+                    setOpen(false)
+                    getAllTourTypes()
+                }
+
+            } catch (error) {
+                console.error("Error fetching trips:", error?.response?.data || error.message);
+                throw error;
             }
+
         }
 
     }
@@ -120,14 +133,14 @@ const TourType = () => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("storage", "local");
-        const response = await SingleFileUpload(formData);
+        // const response = await SingleFileUpload(formData);
 
-        if (response?.statusCode !== 200) {
-            errorMsg("Failed to upload file")
-            return;
-        }
+        // if (response?.statusCode !== 200) {
+        //     errorMsg("Failed to upload file")
+        //     return;
+        // }
 
-        const path = response?.path;
+        const path = image_name;
         successMsg("File upload successfully")
         if (validation[key]) {
             setValidation({ ...validation, [key]: false })
@@ -214,7 +227,6 @@ const TourType = () => {
         getAllTourTypes()
     }, [])
 
-    console.log(tourTypeList,"tourTypeList")
 
     return (
         <div className='admin-content-main'>
@@ -238,6 +250,7 @@ const TourType = () => {
                     setValidation({})
                     setTourTypeData({})
                     setIsViewOnly(false)
+                    setIsUpdate(false)
                 }}
             >
                 <>

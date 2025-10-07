@@ -91,16 +91,29 @@ const TourType = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         const cleanedData = normalizeEmptyFields(activityData);
+        cleanedData.tenant_id = 1;
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
         if (Object.values(isValide).every((data) => data?.status === true)) {
-            const response = await CreateActivity(cleanedData)
-            if (response && response?.statusCode === 200) {
-                successMsg("Activity created successsfully")
-                setActivityData({})
-                setOpen(false)
-                getAllActivity()
+
+            try {
+                const res = await APIBaseUrl.post("activities/", cleanedData, {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                });
+                if (res?.data?.success === true) {
+                    successMsg("Activity created successsfully")
+                    setActivityData({})
+                    setOpen(false)
+                    getAllActivity()
+                }
+
+            } catch (error) {
+                console.error("Error fetching trips:", error?.response?.data || error.message);
+                throw error;
             }
+           
         }
 
     }
@@ -120,14 +133,14 @@ const TourType = () => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("storage", "local");
-        const response = await SingleFileUpload(formData);
+        // const response = await SingleFileUpload(formData);
 
-        if (response?.statusCode !== 200) {
-            errorMsg("Failed to upload file")
-            return;
-        }
+        // if (response?.statusCode !== 200) {
+        //     errorMsg("Failed to upload file")
+        //     return;
+        // }
 
-        const path = response?.path;
+        const path = image_name;
         successMsg("File upload successfully")
         if (validation[key]) {
             setValidation({ ...validation, [key]: false })
@@ -212,8 +225,6 @@ const TourType = () => {
         getAllActivity()
     }, [])
 
-    console.log(activityData, 'activityData')
-
     return (
         <div className='admin-content-main'>
             <div className='d-flex justify-content-between'>
@@ -237,6 +248,7 @@ const TourType = () => {
                     setValidation({})
                     setActivityData({})
                     setIsViewOnly(false)
+                    setIsUpdate(false)
                 }}
             >
                 <>

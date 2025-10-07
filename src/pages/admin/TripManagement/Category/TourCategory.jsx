@@ -6,6 +6,7 @@ import { NonEmptyValidation, normalizeEmptyFields, SlugValidation, StringValidat
 import { errorMsg, successMsg } from '../../../../common/Toastify';
 import { CreateTourCategory, deleteTourCategory, GetAllTourCategory, GetSpecificTourCategory, SingleFileUpload, updateTourCategory } from '../../../../common/api/ApiService';
 import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 
 
@@ -37,37 +38,23 @@ const TourCategory = () => {
                 <>
                     <div>
                         <div className='admin-actions'>
-                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?._id); setIsUpdate(true) }}></i>
-                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?._id); setOpenDeleteModal(true) }}></i>
-                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?._id); setIsViewOnly(true) }} ></i>
+                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsUpdate(true) }}></i>
+                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
+                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsViewOnly(true) }} ></i>
                         </div>
                     </div>
                 </>
             ),
         },
-        {
-            field: 'status',
-            headerName: 'Status',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            disableColumnMenu: true,
-            renderCell: (params) => {
-                const status = params.row.status === "active" ? true : false;
-                return (
-                    <div className="switch" onClick={() => handleStatusUpdate(params?.row?._id, status)}>
-                        <input type="checkbox" checked={status} readOnly />
-                        <span className="slider-table round"></span>
-                    </div>
-                );
-            },
-        }
     ];
 
-    const numberedRows = categoryList?.map((row, index) => ({
-        ...row,
-        sno: index + 1,
-    }));
+    const numberedRows = Array.isArray(categoryList?.reverse())
+        ? categoryList.map((row, index) => ({
+            ...row,
+            sno: index + 1,
+        }))
+        : [];
+
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -106,16 +93,29 @@ const TourCategory = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         const cleanedData = normalizeEmptyFields(categoryData);
+        cleanedData.tenant_id = 1;
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
         if (Object.values(isValide).every((data) => data?.status === true)) {
-            const response = await CreateTourCategory(cleanedData)
-            if (response && response?.statusCode === 200) {
-                successMsg("Trip category created successsfully")
-                setcategoryData({})
-                setOpen(false)
-                getAllTourCategory()
+
+            try {
+                const res = await APIBaseUrl.post("categories/", cleanedData, {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                });
+                if (res?.data?.success === true) {
+                    successMsg("Trip category created successsfully")
+                    setcategoryData({})
+                    setOpen(false)
+                    getAllTourCategory()
+                }
+
+            } catch (error) {
+                console.error("Error fetching trips:", error?.response?.data || error.message);
+                throw error;
             }
+
         }
 
     }
@@ -135,14 +135,14 @@ const TourCategory = () => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("storage", "local");
-        const response = await SingleFileUpload(formData);
+        // const response = await SingleFileUpload(formData);
 
-        if (response?.statusCode !== 200) {
-            errorMsg("Failed to upload file")
-            return;
-        }
+        // if (response?.statusCode !== 200) {
+        //     errorMsg("Failed to upload file")
+        //     return;
+        // }
 
-        const path = response?.path;
+        const path = image_name;
         successMsg("File upload successfully")
         if (validation[key]) {
             setValidation({ ...validation, [key]: false })
@@ -151,17 +151,38 @@ const TourCategory = () => {
     };
 
     const getAllTourCategory = async () => {
-        const response = await GetAllTourCategory()
-        if (response && response?.statusCode === 200) {
-            setcategoryList(response?.data),
+        try {
+            const res = await APIBaseUrl.get("categories/", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+
+                setcategoryList(res?.data?.data)
                 setIsLoading(false);
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
     }
 
-    const getSpecificTourCategory = async (_id) => {
-        const response = await GetSpecificTourCategory(_id)
-        if (response && response?.statusCode === 200) {
-            setcategoryData(response?.data)
+    const getSpecificTourCategory = async (id) => {
+        try {
+            const res = await APIBaseUrl.get(`categories/${id}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                setcategoryData(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
     }
 
@@ -184,29 +205,22 @@ const TourCategory = () => {
 
     }
 
-    const handleStatusUpdate = async (_id, currentStatus) => {
-        const newStatus = currentStatus ? "inactive" : "active";
-        const Payload = {
-            _id,
-            status: newStatus,
-        };
-
-        const response = await updateTourCategory(Payload)
-        if (response && response?.statusCode === 200) {
-            successMsg("Status Updated Successsfully")
-            getAllTourCategory()
-        }
-
-    }
-
     const handleDelete = async () => {
-        const response = await deleteTourCategory(deleteId)
-        console.log(response, "handleDelete")
-        if (response && response?.statusCode === 200) {
-            successMsg("Trip Category Deleted Successsfully")
-            setOpenDeleteModal(false)
-            getAllTourCategory()
-            setDeleteId('')
+        try {
+            const res = await APIBaseUrl.delete(`categories/${deleteId}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                successMsg("Category Deleted Successsfully")
+                getAllTourCategory()
+                setOpenDeleteModal(false)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
 
     }
@@ -215,6 +229,8 @@ const TourCategory = () => {
     useEffect(() => {
         getAllTourCategory()
     }, [])
+
+    // console.log(categoryList,"categoryList")
 
 
     return (
@@ -228,7 +244,7 @@ const TourCategory = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    getRowId={(row) => row._id}
+                // getRowId={(row) => row._id}
                 // isLoading={isLoading}
                 />
             </div>
@@ -240,6 +256,7 @@ const TourCategory = () => {
                     setValidation({})
                     setcategoryData({})
                     setIsViewOnly(false)
+                    setIsUpdate(false)
                 }}
             >
                 <>
