@@ -17,7 +17,10 @@ const Homepage = () => {
     const nextRef = useRef(null);
     const allTrips = useSelector((state) => state.home_page_slice.featured_trips);
     const allDestination = useSelector((state) => state.home_page_slice.all_destination);
-    console.log(allDestination, "allDestination")
+    const lastFourTrips = allTrips.slice(-4);
+    const firstSixDestination = allDestination.slice(0, 6);
+    console.log(allDestination, "allDestination");
+
 
     return (
         <div className='overflow-hidden'>
@@ -123,22 +126,22 @@ const Homepage = () => {
                                 <div className="col-lg-3">
                                     <div className='trending-grid-one'>
                                         <div className='position-relative trending-card'>
-                                            <a href="destination">
+                                            <a href={`/destination/${firstSixDestination[0]?.slug}/${firstSixDestination[0]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_one} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-three'>
-                                                    <p className='trending-grid-para'>Paris, France</p>
+                                                    <p className='trending-grid-para'>{firstSixDestination[0]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
                                         <div className='mt-4 trending-card position-relative'>
-                                            <a href="destination">
+                                        <a href={`/destination/${firstSixDestination[1]?.slug}/${firstSixDestination[1]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_two} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-three'>
-                                                    <p className='trending-grid-para'>Italy</p>
+                                                <p className='trending-grid-para'>{firstSixDestination[1]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
@@ -146,33 +149,33 @@ const Homepage = () => {
                                 </div>
                                 <div className="col-lg-5">
                                     <div className='position-relative trending-card'>
-                                        <a href="destination">
+                                         <a href={`/destination/${firstSixDestination[2]?.slug}/${firstSixDestination[2]?.id}`} target='_blank'>
                                             <figure>
                                                 <img src={Images.trending_three} alt="trending-one" className='trending-image' />
                                             </figure>
                                             <div className='trending-grid-content-three'>
-                                                <p className='trending-grid-para'>France</p>
+                                            <p className='trending-grid-para'>{firstSixDestination[2]?.title}</p>
                                             </div>
                                         </a>
                                     </div>
                                     <div className='d-flex mt-4 justify-content-start justify-content-md-around'>
                                         <div className='position-relative trending-card'>
-                                            <a href="destination">
+                                             <a href={`/destination/${firstSixDestination[3]?.slug}/${firstSixDestination[3]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_four} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-center-image'>
-                                                    <p className='trending-grid-para'>Iran</p>
+                                                <p className='trending-grid-para'>{firstSixDestination[3]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
                                         <div className='ms-4 position-relative trending-card'>
-                                            <a href="destination">
+                                             <a href={`/destination/${firstSixDestination[4]?.slug}/${firstSixDestination[4]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_five} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-center-image'>
-                                                    <p className='trending-grid-para'>chennai</p>
+                                                <p className='trending-grid-para'>{firstSixDestination[4]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
@@ -180,12 +183,12 @@ const Homepage = () => {
                                 </div>
                                 <div className="col-lg-4">
                                     <div className='position-relative trending-card'>
-                                        <a>
+                                    <a href={`/destination/${firstSixDestination[5]?.slug}/${firstSixDestination[5]?.id}`} target='_blank'>
                                             <figure>
                                                 <img src={Images.trending_six} alt="trending-one" className='trending-image' />
                                             </figure>
                                             <div className='trending-grid-content-three'>
-                                                <p className='trending-grid-para'>Australia</p>
+                                            <p className='trending-grid-para'>{firstSixDestination[5]?.title}</p>
                                             </div>
                                         </a>
                                     </div>
@@ -217,6 +220,7 @@ const Homepage = () => {
                     </div>
                 </section>
 
+                {/* Find Popular Tours */}
                 <section className='section-padding'>
                     <div className='container'>
                         <div className='d-flex justify-content-between'>
@@ -226,66 +230,43 @@ const Homepage = () => {
                         </div>
                         <div className='mt-3'>
                             <div className="row">
-                                <div className='col-lg-3 col-md-6'>
-                                    <div className="featured-card-main popular-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">Paris, France</p>
-                                            <p className="featured-content">Centipede Tour - Guided Arizona Desert Tour by ATV</p>
-                                            <div className="featured-bottom-content">
-                                                <p>4 days</p>
-                                                <p>from <span className="fw-bold">1200rs</span></p>
+                                {lastFourTrips && lastFourTrips.length > 0 ? (
+                                    lastFourTrips.map((trip, index) => (
+                                        <div className='col-lg-3 col-md-6'>
+                                            <div className="featured-card-main">
+                                                <div>
+                                                    <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                                </div>
+
+                                                <div className="featured-content-main">
+                                                    <p className="featured-city-para">
+                                                        {trip?.pickup_location} → {trip?.drop_location}
+                                                    </p>
+
+                                                    <p className="featured-content">{trip?.title}</p>
+
+                                                    <div className="featured-bottom-content d-flex gap-2">
+                                                        <div className='trip-card-amount button'>
+                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, '_blank')}>
+                                                                Trip Detail
+                                                            </p>
+                                                        </div>
+                                                        <div className='trip-card-amount'>
+                                                            <p className="">
+                                                                From <span className="fw-bold">{
+                                                                    trip?.pricing?.fixed_departure?.fixed_departure?.[0]
+                                                                        ?.final_price || "N/A"
+                                                                }</span>/-
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className='col-lg-3 col-md-6'>
-                                    <div className="featured-card-main popular-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">Paris, France</p>
-                                            <p className="featured-content">Centipede Tour - Guided Arizona Desert Tour by ATV</p>
-                                            <div className="featured-bottom-content">
-                                                <p>4 days</p>
-                                                <p>from <span className="fw-bold">1200rs</span></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-lg-3 col-md-6'>
-                                    <div className="featured-card-main popular-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">Paris, France</p>
-                                            <p className="featured-content">Centipede Tour - Guided Arizona Desert Tour by ATV</p>
-                                            <div className="featured-bottom-content">
-                                                <p>4 days</p>
-                                                <p>from <span className="fw-bold">1200rs</span></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-lg-3 col-md-6'>
-                                    <div className="featured-card-main popular-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">Paris, France</p>
-                                            <p className="featured-content">Centipede Tour - Guided Arizona Desert Tour by ATV</p>
-                                            <div className="featured-bottom-content">
-                                                <p>4 days</p>
-                                                <p>from <span className="fw-bold">1200rs</span></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center py-4">No Popular Tours available</p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -427,7 +408,7 @@ const Homepage = () => {
                     </div>
                 </section>
 
-                <section className='section-padding'>
+                {/* <section className='section-padding'>
                     <div className='container'>
                         <div className='d-flex justify-content-between'>
                             <div>
@@ -494,7 +475,7 @@ const Homepage = () => {
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> */}
 
             </div>
         </div>
