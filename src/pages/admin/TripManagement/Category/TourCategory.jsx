@@ -200,20 +200,28 @@ const TourCategory = () => {
     }
 
     const handleUpdate = async (e) => {
-        const { __v, createdAt, updatedAt, is_deleted, ...removedObject } = categoryData;
         e.preventDefault()
-        const cleanedData = normalizeEmptyFields(removedObject);
+        const cleanedData = normalizeEmptyFields(categoryData);
+        cleanedData.tenant_id = 1;
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
-        if (Object.values(isValide).every((data) => data?.status === true)) {
-            const response = await updateTourCategory(cleanedData)
-            if (response && response?.statusCode === 200) {
+        try {
+            const res = await APIBaseUrl.put(`categories/${categoryData?.id}`, cleanedData, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
                 successMsg("Trip Category Updated Successsfully")
                 setcategoryData({})
                 setOpen(false)
                 setIsUpdate(false)
                 getAllTourCategory()
             }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
 
     }

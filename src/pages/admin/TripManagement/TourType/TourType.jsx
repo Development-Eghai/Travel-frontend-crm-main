@@ -184,20 +184,27 @@ const TourType = () => {
     }
 
     const handleUpdate = async (e) => {
-        const { __v, createdAt, updatedAt, is_deleted,...removedObject } = tourTypeData;
         e.preventDefault()
-        const cleanedData = normalizeEmptyFields(removedObject);
+        const cleanedData = normalizeEmptyFields(tourTypeData);
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
-        if (Object.values(isValide).every((data) => data?.status === true)) {
-            const response = await updateTourType(cleanedData)
-            if (response && response?.statusCode === 200) {
+        try {
+            const res = await APIBaseUrl.put(`trip-types/${tourTypeData?.id}`, cleanedData, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
                 successMsg("Trip Type Updated Successsfully")
                 setTourTypeData({})
                 setOpen(false)
                 setIsUpdate(false)
                 getAllTourTypes()
             }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
 
     }

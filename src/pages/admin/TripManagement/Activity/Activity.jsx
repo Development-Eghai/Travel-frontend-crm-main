@@ -113,7 +113,7 @@ const TourType = () => {
                 console.error("Error fetching trips:", error?.response?.data || error.message);
                 throw error;
             }
-           
+
         }
 
     }
@@ -166,20 +166,33 @@ const TourType = () => {
     }
 
     const handleUpdate = async (e) => {
-        const { __v, createdAt, updatedAt, is_deleted, ...removedObject } = activityData;
         e.preventDefault()
-        const cleanedData = normalizeEmptyFields(removedObject);
+        const cleanedData = normalizeEmptyFields(activityData);
+        cleanedData.tenant_id = 1;
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
+
         if (Object.values(isValide).every((data) => data?.status === true)) {
-            const response = await updateActivity(cleanedData)
-            if (response && response?.statusCode === 200) {
-                successMsg("Activity Updated Successsfully")
-                setActivityData({})
-                setOpen(false)
-                setIsUpdate(false)
-                getAllActivity()
+
+            try {
+                const res = await APIBaseUrl.put(`activities/${activityData?.id}`, cleanedData, {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                });
+                if (res?.data?.success === true) {
+                    successMsg("Activity Updated Successsfully")
+                    setActivityData({})
+                    setOpen(false)
+                    setIsUpdate(false)
+                    getAllActivity()
+                }
+
+            } catch (error) {
+                console.error("Error fetching trips:", error?.response?.data || error.message);
+                throw error;
             }
+
         }
 
     }
@@ -236,7 +249,7 @@ const TourType = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    // getRowId={(row) => row._id}
+                // getRowId={(row) => row._id}
                 // isLoading={isLoading}
                 />
             </div>
