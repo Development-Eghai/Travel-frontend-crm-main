@@ -360,7 +360,7 @@
     font-weight: 600;
     font-size: 19px;
     border-radius: 5px;
-    
+
 }
 
 .trip-detail-contact-form-head .head-2 {
@@ -1229,3 +1229,49 @@ input::placeholder {
     /* hides the arrow */
 }
 
+
+.category-heading-preview {
+    text-align: center;
+    font-size: 35px;
+    font-weight: 600;
+}
+
+.trip-card-amount {
+    background-color: #d9764b;
+    color: white;
+    border-radius: 6px;
+    padding: 7px 0px;
+    width: 100%;
+}
+
+.trip-card-amount p {
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.trip-card-amount.button{
+    border: 2px solid #d9764b;
+    background-color: white;
+    border-radius: 6px;
+    padding: 7px 0px;
+    width: 100%;
+}
+
+.trip-card-amount.button:hover{
+    background-color:  #007bff;
+    border: 2px solid #007bff;
+}
+
+
+.trip-card-amount.button:hover p{
+    color: white;
+}
+
+.trip-card-amount.button p{
+    color: #d9764b;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0px;
+}

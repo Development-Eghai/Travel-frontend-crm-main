@@ -1638,7 +1638,7 @@ export default function TourCreation() {
               <span
                 className={`step-label ${active ? "step-label-active" : "step-label-inactive"}`}
               >
-                {step.label}
+                {step.label }
               </span>
             </button>
           );

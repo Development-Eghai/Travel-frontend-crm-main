@@ -184,8 +184,8 @@ p {
 
 .featured-card-main:hover {
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(235, 102, 43, 0.9);
-  transform: scale(1.05);
+  box-shadow: 0 0 13px rgba(235, 102, 43, 0.9);
+  transform: scale(1.02);
 }
 
 .featured-card-main img {
@@ -201,6 +201,7 @@ p {
   background-color: white;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
+  width: 100%;
 }
 
 .featured-city-para {

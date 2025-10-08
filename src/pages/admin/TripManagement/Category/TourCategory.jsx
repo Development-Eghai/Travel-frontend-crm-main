@@ -22,29 +22,43 @@ const TourCategory = () => {
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
 
+    const handlePreview = (slug, id) => {
+        const url = `/category-preview/${slug}/${id}`;
+        window.open(url, '_blank');
+    };
 
     const columns = [
         { field: 'sno', headerName: 'SNO', flex: 1 },
         { field: 'name', headerName: 'Name', flex: 1 },
         { field: 'slug', headerName: 'Slug', flex: 1 },
         {
-            field: '_id',
+            field: 'id',
             headerName: 'Actions',
             flex: 1,
             sortable: false,
             filterable: false,
             disableColumnMenu: true,
-            renderCell: (params) => (
-                <>
-                    <div>
-                        <div className='admin-actions'>
-                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsUpdate(true) }}></i>
-                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
-                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsViewOnly(true) }} ></i>
+            renderCell: (params) => {
+                const slug = params.row?.slug;
+                const id = params.row?.id;
+                return (
+                    <>
+                        <div>
+                            <div className='admin-actions'>
+                                <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsUpdate(true) }}></i>
+                                <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
+                                {/* <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsViewOnly(true) }} ></i> */}
+                                <i
+                                    className="fa-solid fa-eye ms-3"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => handlePreview(slug, id)}
+                                ></i>
+                            </div>
                         </div>
-                    </div>
-                </>
-            ),
+
+                    </>
+                )
+            },
         },
     ];
 
@@ -54,7 +68,6 @@ const TourCategory = () => {
             sno: index + 1,
         }))
         : [];
-
 
     const handleChange = (e) => {
         const { name, value } = e.target

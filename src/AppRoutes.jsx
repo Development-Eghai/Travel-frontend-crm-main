@@ -22,6 +22,7 @@ import LoginPage from "./pages/admin/Auth/LoginPage";
 import { CommonLayout } from "./layouts/commonLayout";
 import ClientLayout from "./pages/client/common/ClientLayout";
 import DestinationCreation from "./pages/admin/TripManagement/Destination/DestinationCreation";
+import CategoryPreview from "./pages/admin/TripManagement/Category/CategoryPreview";
 
 const DestinationDetail = lazy(() => import("./pages/user/DestinationDetail"));
 const Homepage = lazy(() => import("./pages/user/Homepage"));
@@ -53,6 +54,7 @@ const AppRoutes = () => {
                     {/* Preview */}
                     <Route path="/destination/:slug?/:id?" element={<DestinationPreview />} />
                     <Route path="/trip-preview/:slug?/:id?" element={<TourPreview />} />
+                    <Route path="/category-preview/:slug?/:id?" element={<CategoryPreview  />} />
                     <Route path="/booking/:slug?/:id?" element={<TourBookingPreview />} />
                 </Route>
 

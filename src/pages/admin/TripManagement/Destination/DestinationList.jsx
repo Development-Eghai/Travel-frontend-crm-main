@@ -5,6 +5,7 @@ import { DeleteDestination, GetAllDestination, UpdateDestination } from '../../.
 import { capitalizeWords } from '../../../../common/Validation';
 import CustomModal from '../../../../component/CustomModel';
 import { successMsg } from '../../../../common/Toastify';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 const DestinationList = () => {
     const [destinationList, setDestinationList] = useState([])
@@ -19,15 +20,15 @@ const DestinationList = () => {
     };
 
     const handleUpdateNavigate = (_id) => {
-        navigate(`/dashboard/destination-create/${_id}`);
+        navigate(`/admin/destination-create/${_id}`);
     }
 
     const columns = [
         { field: 'sno', headerName: 'SNO', flex: 1 },
         {
-            field: 'destination_name', headerName: 'Destination Name', flex: 1,
+            field: 'title', headerName: 'Destination Name', flex: 1,
             renderCell: (params) => {
-                const region = params.row?.destination_name || "";
+                const region = params.row?.title || "";
                 return (
                     <div className='admin-actions'>
                         {capitalizeWords(region)}
@@ -36,9 +37,9 @@ const DestinationList = () => {
             }
         },
         {
-            field: 'trip_region', headerName: 'Trip Region', flex: 1,
+            field: 'destination_type', headerName: 'Destination Type', flex: 1,
             renderCell: (params) => {
-                const region = params.row?.trip_region || "";
+                const region = params.row?.destination_type || "";
                 return (
                     <div className='admin-actions'>
                         {capitalizeWords(region)}
@@ -48,7 +49,7 @@ const DestinationList = () => {
         },
         { field: 'slug', headerName: 'Slug', flex: 1 },
         {
-            field: '_id',
+            field: 'id',
             headerName: 'Actions',
             flex: 1,
             sortable: false,
@@ -56,13 +57,13 @@ const DestinationList = () => {
             disableColumnMenu: true,
             renderCell: (params) => {
                 const slug = params.row?.slug;
-                const id = params.row?._id;
+                const id = params.row?.id;
 
                 return (
                     <div className='admin-actions'>
-                        <i className="fa-solid fa-pen-to-square" onClick={() => { handleUpdateNavigate(params?.row?._id); }}></i>
+                        <i className="fa-solid fa-pen-to-square" onClick={() => { handleUpdateNavigate(params?.row?.id); }}></i>
 
-                        <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?._id); setOpenDeleteModal(true) }}></i>
+                        <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
 
                         <i
                             className="fa-solid fa-eye ms-3"
@@ -73,62 +74,88 @@ const DestinationList = () => {
                 );
             }
         },
-        {
-            field: 'status',
-            headerName: 'Status',
-            flex: 1,
-            sortable: false,
-            filterable: false,
-            disableColumnMenu: true,
-            renderCell: (params) => {
-                const status = params.row.status === "active" ? true : false;
-                return (
-                    <div className="switch" onClick={() => handleStatusUpdate(params?.row?._id, status)}>
-                        <input type="checkbox" checked={status} readOnly />
-                        <span className="slider-table round"></span>
-                    </div>
-                );
-            },
-        }
+        // {
+        //     field: 'status',
+        //     headerName: 'Status',
+        //     flex: 1,
+        //     sortable: false,
+        //     filterable: false,
+        //     disableColumnMenu: true,
+        //     renderCell: (params) => {
+        //         const status = params.row.status === "active" ? true : false;
+        //         return (
+        //             <div className="switch" onClick={() => handleStatusUpdate(params?.row?._id, status)}>
+        //                 <input type="checkbox" checked={status} readOnly />
+        //                 <span className="slider-table round"></span>
+        //             </div>
+        //         );
+        //     },
+        // }
     ];
 
-    const numberedRows = destinationList?.length && destinationList?.map((row, index) => ({
-        ...row,
-        sno: index + 1,
-    }));
+    const numberedRows = Array.isArray(destinationList?.reverse())
+        ? destinationList.map((row, index) => ({
+            ...row,
+            sno: index + 1,
+        }))
+        : [];
 
     const getAllDestination = async () => {
-        const response = await GetAllDestination()
-        if (response && response?.statusCode === 200) {
-            setDestinationList(response?.data)
+
+        try {
+            const res = await APIBaseUrl.get("destinations/", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+
+                setDestinationList(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
+
     }
+
 
     const handleDelete = async () => {
-        const response = await DeleteDestination(deleteId)
-        if (response && response?.statusCode === 200) {
-            successMsg("Destination Deleted Successsfully")
-            setOpenDeleteModal(false)
-            getAllDestination()
-            setDeleteId('')
+        try {
+            const res = await APIBaseUrl.delete(`destinations/${deleteId}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                successMsg("Destination Deleted Successsfully")
+                setOpenDeleteModal(false)
+                getAllDestination()
+                setDeleteId('')
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
         }
 
     }
 
-    const handleStatusUpdate = async (_id, currentStatus) => {
-        const newStatus = currentStatus ? "inactive" : "active";
-        const Payload = {
-            _id,
-            status: newStatus,
-        };
+    // const handleStatusUpdate = async (_id, currentStatus) => {
+    //     const newStatus = currentStatus ? "inactive" : "active";
+    //     const Payload = {
+    //         _id,
+    //         status: newStatus,
+    //     };
 
-        const response = await UpdateDestination(Payload)
-        if (response && response?.statusCode === 200) {
-            successMsg("Destination Updated Successsfully")
-            getAllDestination()
-        }
+    //     const response = await UpdateDestination(Payload)
+    //     if (response && response?.statusCode === 200) {
+    //         successMsg("Destination Updated Successsfully")
+    //         getAllDestination()
+    //     }
 
-    }
+    // }
 
     useEffect(() => {
         getAllDestination()
@@ -147,7 +174,7 @@ const DestinationList = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    getRowId={(row) => row._id}
+                // getRowId={(row) => row._id}
                 // isLoading={isLoading}
                 />
             </div>

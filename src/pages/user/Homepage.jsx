@@ -9,17 +9,22 @@ import "swiper/css";
 import "swiper/css/navigation";
 import 'swiper/css/pagination';
 import { Pagination, Autoplay } from 'swiper/modules';
+import { useSelector } from 'react-redux';
 
 
 const Homepage = () => {
     const prevRef = useRef(null);
     const nextRef = useRef(null);
-    
+    const allTrips = useSelector((state) => state.home_page_slice.featured_trips);
+    const allDestination = useSelector((state) => state.home_page_slice.all_destination);
+    console.log(allDestination, "allDestination")
+
     return (
         <div className='overflow-hidden'>
             <HomeBanner />
             <div className=''>
 
+                {/* Featured Trips */}
                 <section className='featured-trips-section section-padding'>
                     <div className='container'>
                         <div className='d-flex justify-content-between'>
@@ -57,38 +62,60 @@ const Homepage = () => {
                                 }}
                                 loop={false}
                             >
-                                {[...Array(20)].map((_, index) => (
-                                    <SwiperSlide key={index}>
 
-                                        <div className="featured-card-main">
-                                            <div>
-                                                <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                            </div>
-                                            <div className="featured-content-main">
-                                                <p className="featured-city-para">Paris, France</p>
-                                                <p className="featured-content">Centipede Tour - Guided Arizona Desert Tour by ATV</p>
-                                                <div className="featured-bottom-content">
-                                                    <p>4 days</p>
-                                                    <p>from <span className="fw-bold">1200rs</span></p>
+                                {allTrips && allTrips.length > 0 ? (
+                                    allTrips.map((trip, index) => (
+                                        <SwiperSlide key={trip.id || index}>
+                                            <div className="featured-card-main">
+                                                <div>
+                                                    <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                                </div>
+
+                                                <div className="featured-content-main">
+                                                    <p className="featured-city-para">
+                                                        {trip?.pickup_location} → {trip?.drop_location}
+                                                    </p>
+
+                                                    <p className="featured-content">{trip?.title}</p>
+
+                                                    <div className="featured-bottom-content d-flex gap-2">
+                                                        <div className='trip-card-amount button'>
+                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, '_blank')}>
+                                                                Trip Detail
+                                                            </p>
+                                                        </div>
+                                                        <div className='trip-card-amount'>
+                                                            <p className="">
+                                                                From <span className="fw-bold">{
+                                                                    trip?.pricing?.fixed_departure?.fixed_departure?.[0]
+                                                                        ?.final_price || "N/A"
+                                                                }</span>/-
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
+                                        </SwiperSlide>
+                                    ))
+                                ) : (
+                                    <p className="text-center py-4">No trips available</p>
+                                )}
+
                             </Swiper>
                         </div>
                     </div>
                 </section>
 
+                {/* Trending Destinations */}
                 <section className='trending-destination-section section-padding'>
                     <div className='container'>
                         <div className='d-flex flex-lg-row flex-md-row flex-column justify-content-lg-between justify-content-md-between'>
                             <div className='d-flex justify-content-center'>
                                 <h4 className='common-section-heading'>Trending Destinations</h4>
                             </div>
-                            <div className='mt-lg-0 my-md-auto mt-3 d-flex justify-content-center'>
+                            {/* <div className='mt-lg-0 my-md-auto mt-3 d-flex justify-content-center'>
                                 <a href='/' className='anchor-tag text-lg-start text-center'>See all</a>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className='mt-4'>
@@ -468,7 +495,7 @@ const Homepage = () => {
                         </div>
                     </div>
                 </section>
-                
+
             </div>
         </div>
     )

@@ -98,7 +98,7 @@ const DestinationPreview = () => {
 
   return (
     <div className="">
-      <section className="destination-detail-banner-main">
+      {/* <section className="destination-detail-banner-main">
         <Swiper
           modules={[EffectFade, Autoplay, Navigation]}
           navigation={true}
@@ -131,7 +131,7 @@ const DestinationPreview = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </section>
+      </section> */}
 
       <section className="destination-tabsection-parent">
         <div className="container">
@@ -564,6 +564,7 @@ const DestinationPreview = () => {
               </div>
             </div>
           </section>
+
           <section className="section-padding-bottom">
             <div className="container">
               <div>
@@ -897,6 +898,7 @@ const DestinationPreview = () => {
               </div>
             </div>
           </section>
+
           <section className="section-padding-bottom">
             <div className="container">
               <div>
@@ -1230,6 +1232,7 @@ const DestinationPreview = () => {
               </div>
             </div>
           </section>
+
           <section className="section-padding-bottom">
             <div className="container">
               <div>
@@ -1563,6 +1566,7 @@ const DestinationPreview = () => {
               </div>
             </div>
           </section>
+
           <section className="section-padding-bottom">
             <div className="container">
               <div>
@@ -1607,6 +1611,7 @@ const DestinationPreview = () => {
               </div>
             </div>
           </section>
+
           <section className="section-padding-bottom">
             <div className="container">
               <div>
@@ -1626,6 +1631,7 @@ const DestinationPreview = () => {
               </div>
             </div>
           </section>
+          
           <section className="section-padding-bottom">
             <div className="container">
               <div className="row justify-content-center">
