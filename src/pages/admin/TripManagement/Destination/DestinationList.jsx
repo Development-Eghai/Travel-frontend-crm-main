@@ -61,7 +61,7 @@ const DestinationList = () => {
 
                 return (
                     <div className='admin-actions'>
-                        <i className="fa-solid fa-pen-to-square" onClick={() => { handleUpdateNavigate(params?.row?.id); }}></i>
+                        {/* <i className="fa-solid fa-pen-to-square" onClick={() => { handleUpdateNavigate(params?.row?.id); }}></i> */}
 
                         <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
 

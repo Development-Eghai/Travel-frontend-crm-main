@@ -2445,8 +2445,6 @@ const DestinationPreview = () => {
         </>
       )}
 
-      <Footer />
-
        <ContactForm
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 

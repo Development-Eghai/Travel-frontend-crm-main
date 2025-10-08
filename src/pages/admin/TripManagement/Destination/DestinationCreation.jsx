@@ -1,18 +1,17 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import JoditEditor from "jodit-react";
-import { CreateDestination, GetAllDestination, GetSpecificDestination, MultipleFileUpload, UpdateDestination } from "../../../../common/api/ApiService";
+import { UpdateDestination } from "../../../../common/api/ApiService";
 // import "jodit/build/jodit.min.css";
 import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
-import { NonEmptyArrayValidation, NonEmptyFaqArrayValidation, NonEmptyValidation, normalizeEmptyFields, SlugValidation, StringValidation } from "../../../../common/Validation";
+import { NonEmptyArrayValidation, NonEmptyValidation, normalizeEmptyFields, SlugValidation, StringValidation } from "../../../../common/Validation";
 import { errorMsg, successMsg } from "../../../../common/Toastify";
-import { BACKEND_DOMAIN } from "../../../../common/api/ApiClient";
-import MyDataTable from "../../../../component/MyDataTable";
 import { APIBaseUrl } from "../../../../common/api/api";
 
 
 const DestinationCreation = () => {
+
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -167,17 +166,17 @@ const DestinationCreation = () => {
             }
         ]
 
-        cleanedData.blog_category_ids= [
+        cleanedData.blog_category_ids = [
             201,
             202
         ]
 
-        cleanedData.testimonial_ids= [
+        cleanedData.testimonial_ids = [
             501,
             502
         ]
 
-        cleanedData.related_blog_ids= [
+        cleanedData.related_blog_ids = [
             302,
             303
         ]
@@ -352,7 +351,7 @@ const DestinationCreation = () => {
             });
             if (res?.data?.success === true) {
                 setCreateDestination(res?.data?.data)
-                setCustomPackage(res?.data?.data?.custom_packages ||[{ title: "", description: "", trip_packages: [] }])
+                setCustomPackage(res?.data?.data?.custom_packages || [{ title: "", description: "", trip_packages: [] }])
             }
 
         } catch (error) {
@@ -371,13 +370,12 @@ const DestinationCreation = () => {
         getAllActivities()
     }, [])
 
-    console.log(createDestination, 'createDestination')
-    console.log(allTrips, 'allTrips')
 
     return (
         <>
 
-            <div className='admin-content-main'>
+            <div className="tour-container">
+
                 <div className='d-flex justify-content-between mb-5'>
                     <h3 className='my-auto'>Create Destination</h3>
                     <button className='admin-add-button mt-0' onClick={() => navigate(-1)}><i class="fa-solid fa-arrow-left me-2"></i> Back</button>
@@ -423,7 +421,7 @@ const DestinationCreation = () => {
                                 <p className='error-para'>Banner Images {validation.hero_image.message}</p>
                             )}
 
-                            {/* {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
+                        {/* {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
                                 <div className="d-flex flex-wrap">
                                     {createDestination?.hero_image?.map((image, index) => (
                                         <div className='upload-image-div destination-image-div'>
@@ -434,9 +432,9 @@ const DestinationCreation = () => {
                                     ))}
 
                                 </div>
-                            )} */}
+                            )}  */}
                         </div>
-                    </div>
+                    </div> 
 
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>
@@ -451,19 +449,19 @@ const DestinationCreation = () => {
                         </div>
                     </div>
 
-                    <div className='col-lg-6'>
+                    {/* <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Primary Destination  <span className='required-icon'>*</span></label>
                             <select onChange={(e) => handleChange("primary_destination_id", e.target.value)}
                                 onBlur={(e) => handleBlur("primary_destination_id", e.target.value)}
                                 value={createDestination?.primary_destination_id || ""}>
-                                <option value="null" defaultValue={null}>None (Main Destination)</option>
+                                <option value="null">None (Main Destination)</option>
                                 {destinationList?.map((item, index) => (
                                     <option key={index} value={item?.id}>{item?.title}</option>
                                 ))}
                             </select>
                             {validation?.primary_destination_id?.status === false && validation?.primary_destination_id?.message && (
-                                <p className='error-para'>{validation.primary_destination_id.message}</p>
+                                <p className='error-para'>{validation?.primary_destination_id?.message}</p>
                             )}
                         </div>
                     </div>
@@ -490,7 +488,7 @@ const DestinationCreation = () => {
                             <Select
                                 isMulti
                                 placeholder="Select Trip Packages"
-                                value={allTrips.filter((opt) =>
+                                value={allTrips?.filter((opt) =>
                                     (createDestination?.popular_trip_ids || []).includes(opt.value)
                                 )}
                                 onChange={(selectedOptions) =>
@@ -588,7 +586,7 @@ const DestinationCreation = () => {
                                 options={options}
                             />
                         </div>
-                    </div>
+                    </div> */}
 
                 </div>
 
@@ -688,7 +686,7 @@ const DestinationCreation = () => {
                                                     <label>Select Trip Packages</label>
                                                     <Select
                                                         isMulti
-                                                        value={allTrips.filter(opt => trip?.trip_packages?.includes(opt.value))}
+                                                        value={allTrips?.filter(opt => trip?.trip_packages?.includes(opt.value))}
                                                         placeholder="Select Packages Here..."
                                                         onChange={(selectedOptions) =>
                                                             updateCustomPackage(index, "trip_packages", selectedOptions.map((opt) => opt?.value))

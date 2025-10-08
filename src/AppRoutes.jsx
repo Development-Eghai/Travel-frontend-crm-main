@@ -20,9 +20,10 @@ import TourPreview from "./pages/admin/TripManagement/Tour/TourPreview";
 import TourBookingPreview from "./pages/admin/TripManagement/Tour/TourBookingPreview";
 import LoginPage from "./pages/admin/Auth/LoginPage";
 import { CommonLayout } from "./layouts/commonLayout";
-import ClientLayout from "./pages/client/common/ClientLayout";
+// import ClientLayout from "./pages/client/common/ClientLayout";
 import DestinationCreation from "./pages/admin/TripManagement/Destination/DestinationCreation";
 import CategoryPreview from "./pages/admin/TripManagement/Category/CategoryPreview";
+import NotFound from "./common/NotFound";
 
 const DestinationDetail = lazy(() => import("./pages/user/DestinationDetail"));
 const Homepage = lazy(() => import("./pages/user/Homepage"));
@@ -56,10 +57,10 @@ const AppRoutes = () => {
                     <Route path="/trip-preview/:slug?/:id?" element={<TourPreview />} />
                     <Route path="/category-preview/:slug?/:id?" element={<CategoryPreview  />} />
                     <Route path="/booking/:slug?/:id?" element={<TourBookingPreview />} />
+                    <Route path="*" element={<NotFound />} />
                 </Route>
 
                 <Route path="/admin/*" element={<Layout />} />
-                <Route path="/dashboard/*" element={<ClientLayout />} />
                 <Route path="/admin-login" element={<LoginPage />} />
             </Routes>
         </Router>

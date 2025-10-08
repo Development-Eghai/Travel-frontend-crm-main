@@ -64,7 +64,7 @@ const HomeBanner = () => {
             <section className='overflow-hidden'>
                 <div className="banner-container">
                     {/* Static Search Bar */}
-                    <div className="static-search-bar-container">
+                    {/* <div className="static-search-bar-container">
                         <div className="search-bar-container">
                             <div className="search-bar" onClick={handleSearchBarClick}>
                                 <div className="search-input-group">
@@ -89,7 +89,7 @@ const HomeBanner = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Background Slider */}
                     <div className="banner-slider-container">

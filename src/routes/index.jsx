@@ -20,13 +20,15 @@ import QuotationManagement from "../pages/QuotationManagement/QuotationManagemen
 import InvoiceManagement from "../pages/InvoiceManagement/InvoiceManagement";
 import GlobalSettings from "../pages/admin/GlobalSettings/GlobalSettings";
 
+
+
 export const routes = [
     {
         path: "/dashboard",
         component: AdminDashboard,
     },
     {
-        path: "/destination-create/:id?",
+        path: "/destination-create",
         component: DestinationCreation,
     },
     {
@@ -109,17 +111,4 @@ export const routes = [
     //     path: "/comprehensive-quote-builder",
     //     component: ComprehensiveQuoteBuilder,
     // }
-]
-
-
-export const client_routes = [
-    {
-        path: "/admin-dashboard",
-    },
-    {
-        path: "/destination-create/:id?",
-    },
-    {
-        path: "/destination-list",
-    },
 ]

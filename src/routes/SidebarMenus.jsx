@@ -27,7 +27,7 @@ export const ClientMenu = [
         name: "overview",
         subMenu: [
             {
-                path: "/dashboard",
+                path: "/admin",
                 icon: <MdOutlineDashboard size={18} />,
                 name: "Dashboard",
             }
@@ -37,43 +37,43 @@ export const ClientMenu = [
         name: "Trip Management",
         subMenu: [
             {
-                path: "/dashboard/tour-list",
+                path: "/admin/tour-list",
                 icon: <SlPlane size={18} />,
                 name: "Add New Trip",
             },
             {
-                path: "/dashboard/destination-list",
+                path: "/admin/destination-list",
                 icon: <IoLocationOutline size={18} />,
                 name: "Add Destination",
             },
             {
-                path: "/dashboard/activity",
+                path: "/admin/activity",
                 icon: <SiJordan size={18} />,
                 name: "Add Actvity",
             },
             {
-                path: "/dashboard/category-create",
+                path: "/admin/category-create",
                 icon: <TbCategoryPlus size={18} />,
                 name: "Add Categories",
             },
             {
-                path: "/dashboard/create-tour-type",
+                path: "/admin/create-tour-type",
                 icon: <MdOutlineAddLocationAlt size={18} />,
                 name: "Destination Type",
             },
             
             // {
-            //     path: "/dashboard",
+            //     path: "/admin",
             //     icon: <LuCompass size={18} />,
             //     name: "Categories",
             // },
             // {
-            //     path: "/dashboard",
+            //     path: "/admin",
             //     icon: <CiLocationOn size={18} />,
             //     name: "Destinations",
             // },
             // {
-            //     path: "/dashboard",
+            //     path: "/admin",
             //     icon: <CiCalendar size={18} />,
             //     name: "Itineraries",
             // }
@@ -83,22 +83,22 @@ export const ClientMenu = [
         name: "Travel Crm",
         subMenu: [
             {
-                path: "/dashboard/lead-management",
+                path: "/admin/lead-management",
                 icon: <SlPlane size={18} />,
                 name: "Lead Management",
             },
             // {
-            //     path: "/dashboard/destination-list",
+            //     path: "/admin/destination-list",
             //     icon: <IoLocationOutline size={18} />,
             //     name: "Booking Mangement",
             // },
             {
-                path: "/dashboard/quotation-management",
+                path: "/admin/quotation-management",
                 icon: <SiJordan size={18} />,
                 name: "Quotation Mangement",
             },
             {
-                path: "/dashboard/invoice-management",
+                path: "/admin/invoice-management",
                 icon: <TbCategoryPlus size={18} />,
                 name: "Invoice Mangement",
             },
@@ -108,7 +108,7 @@ export const ClientMenu = [
         name: "Settings",
         subMenu: [
             {
-                path: "/dashboard/global-settings",
+                path: "/admin/global-settings",
                 icon: <SlPlane size={18} />,
                 name: "Global Settings",
             },
@@ -119,17 +119,17 @@ export const ClientMenu = [
     //     name: "Inventory",
     //     subMenu: [
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <LiaHotelSolid size={18} />,
     //             name: "Hotels",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <PiPulseLight size={18} />,
     //             name: "Activities",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <LiaCarSideSolid size={18} />,
     //             name: "Cab Booking",
     //         }
@@ -139,22 +139,22 @@ export const ClientMenu = [
     //     name: "Sales & Marketing",
     //     subMenu: [
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <BsPeople size={18} />,
     //             name: "Leads",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <GrDocumentText size={18} />,
     //             name: "Quotations",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <AiOutlinePercentage size={18} />,
     //             name: "Offers & Coupons",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <HiOutlineSpeakerphone size={18} />,
     //             name: "Banners",
     //         }
@@ -164,12 +164,12 @@ export const ClientMenu = [
     //     name: "Content & SEO",
     //     subMenu: [
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <PiNotePencilThin size={18} />,
     //             name: "CMS",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <IoSearchOutline size={18} />,
     //             name: "SEO Settings",
     //         }
@@ -179,12 +179,12 @@ export const ClientMenu = [
     //     name: "Communication",
     //     subMenu: [
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <CiMail size={18} />,
     //             name: "Email Marketing",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <PiWhatsappLogoThin size={18} />,
     //             name: "Whatsapp Marketing",
     //         }
@@ -194,238 +194,16 @@ export const ClientMenu = [
     //     name: "System",
     //     subMenu: [
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <IoSettingsOutline size={18} />,
     //             name: "Settings",
     //         },
     //         {
-    //             path: "/dashboard",
+    //             path: "/admin",
     //             icon: <FiUserPlus size={18} />,
     //             name: "User & Roles",
     //         }
     //     ]
     // },
-]
-
-
-export const AdminMenu = [
-    {
-        path: "/admin/admin-dashboard",
-        icon: <i class="fa-solid fa-grip"></i>,
-        name: "Dashboard",
-    },
-    {
-        path: "",
-        icon: <i className="fa-solid fa-suitcase-rolling"></i>,
-        name: "Trip Management",
-        subMenu: [
-            {
-                path: "/admin/destination-list",
-                icon: <span class="material-symbols-outlined">
-                    distance
-                </span>,
-                name: "Destinations",
-            },
-            {
-                path: "/admin/activity",
-                icon: <span class="material-symbols-outlined">hiking</span>,
-                name: "Activities",
-            },
-            {
-                path: "/admin/tour-list",
-                icon: <span class="material-symbols-outlined">
-                    connecting_airports
-                </span>,
-                name: " All Trips",
-            },
-            {
-                path: "/admin/category-create",
-                icon: <span class="material-symbols-outlined">
-                    bus_railway
-                </span>,
-                name: "Categories",
-            },
-            {
-                path: "/admin/create-tour-type",
-                icon: <span class="material-symbols-outlined">
-                    checked_bag_question
-                </span>,
-                name: "Trip Type",
-            },
-        ],
-    },
-    {
-        path: "",
-        icon: <i class="fa-brands fa-microblog"></i>,
-        name: "Blogs Management",
-        subMenu: [
-            {
-                path: "/admin/tag-blogs",
-                icon: <span class="material-symbols-outlined">
-                    add_comment
-                </span>,
-                name: "Blog Tag",
-            },
-            {
-                path: "/admin/categories-blog",
-                icon: <span class="material-symbols-outlined">
-                    dynamic_feed
-                </span>,
-                name: "Blog Category",
-            },
-            {
-                path: "/admin/blogs-List",
-                icon: <span class="material-symbols-outlined">
-                    article_person
-                </span>,
-                name: "Blogs",
-            },
-
-        ],
-    },
-
-    {
-        path: "/admin/lead-management",
-        icon: <i class="fa-solid fa-circle-user"></i>,
-        name: "Lead Management",
-    },
-    {
-        path: "/admin/quote-builder",
-        icon: <i class="fa-solid fa-money-bill-trend-up"></i>,
-        name: "QuoteBuilder",
-    },
-    {
-        path: "/admin/global-settings",
-        icon: <i class="fa-solid fa-gear"></i>,
-        name: "GlobalSettings",
-    },
-    {
-        path: "",
-        icon: <i class="fa-solid fa-warehouse"></i>,
-        name: "Inventory",
-        subMenu: [
-            {
-                path: "/admin/not-available-1",
-                icon: <span class="material-symbols-outlined">
-                    hotel
-                </span>,
-                name: "Hotels",
-            },
-            {
-                path: "/admin/not-available-2",
-                icon: <span class="material-symbols-outlined">
-                    person_play
-                </span>,
-                name: "Activities",
-            },
-            {
-                path: "/admin/not-available-3",
-                icon: <span class="material-symbols-outlined">
-                    local_taxi
-                </span>,
-                name: "Cab Bookings",
-            },
-
-        ],
-    },
-    {
-        path: "",
-        icon: <i class="fa-brands fa-adversal"></i>,
-        name: "Sales & Marketing",
-        subMenu: [
-            {
-                path: "/admin/not-available",
-                icon: <span class="material-symbols-outlined">
-                    diversity_3
-                </span>,
-                name: "Leads",
-            },
-            {
-                path: "/admin/not-available",
-                icon: <span class="material-symbols-outlined">
-                    format_quote
-                </span>,
-                name: "Quotations",
-            },
-            {
-                path: "/admin/not-available",
-                icon: <span class="material-symbols-outlined">
-                    featured_seasonal_and_gifts
-                </span>,
-                name: "Offers & Coupons",
-            },
-            {
-                path: "/admin/not-available",
-                icon: <span class="material-symbols-outlined">
-                    local_atm
-                </span>,
-                name: "Banners",
-            },
-
-        ],
-    },
-    {
-        path: "",
-        icon: <i class="fa-solid fa-newspaper"></i>,
-        name: "Sales & Marketing",
-        subMenu: [
-            {
-                path: "/admin/not-available",
-                icon: <span class="material-symbols-outlined">
-                    contract_edit
-                </span>,
-                name: "CMS",
-            },
-            {
-                path: "/admin/not-available",
-                icon: <span class="material-symbols-outlined">
-                    search_gear
-                </span>,
-                name: "SEO Settings",
-            },
-        ],
-    },
-    {
-        path: "",
-        icon: <i class="fa-solid fa-walkie-talkie"></i>,
-        name: "Communication",
-        subMenu: [
-            {
-                path: "/admin/not-available",
-                icon: <i class="fa-solid fa-envelope-circle-check"></i>,
-                name: "Email Marketing",
-            },
-            {
-                path: "/admin/not-available",
-                icon: <i class="fa-brands fa-whatsapp"></i>,
-                name: "Whatsapp Marketing",
-            },
-        ],
-    }, {
-        path: "",
-        icon: <i class="fa-solid fa-gears"></i>,
-        name: "System Settings",
-        subMenu: [
-            {
-                path: "/admin/not-available",
-                icon: <i class="fa-solid fa-wrench"></i>,
-                name: "Settings",
-            },
-            {
-                path: "/admin/not-available",
-                icon: <i class="fa-solid fa-circle-user"></i>,
-                name: "User Roles",
-            },
-        ],
-    },
-]
-
-export const UserMenu = [
-    {
-        path: "/user/user-dashboard",
-        icon: <span className="material-symbols-outlined">dashboard_2
-        </span>,
-        name: "Dashboard",
-    },
 ]
 
