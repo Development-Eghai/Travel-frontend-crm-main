@@ -100,7 +100,7 @@ const DestinationDetail = () => {
                                 <a>{item.name}</a>
                             </div>
                         ))}
-                        <button>Get Free Quaote</button>
+                        <button>Get Free Quote</button>
                     </div>
                 </div>
             </section>

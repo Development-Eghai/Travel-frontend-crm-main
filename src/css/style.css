@@ -6,9 +6,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  --font-base: 'Poppins', sans-serif;
+}
+
 body {
-  font-family: "Inter";
+  font-family: var(--font-base);
   scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
 }
 
 p {
@@ -44,7 +50,7 @@ p {
   padding: 15px 0;
   top: 0;
   z-index: 999;
-  background-color: black;
+  background-color: #eb662b0d !important;
 }
 
 .fixed-header {
@@ -57,12 +63,12 @@ p {
 }
 
 .navbar-brand {
-  color: white;
+  color: black;
   font-size: 17px;
 }
 
 .navbar-brand:hover {
-  color: black;
+  color: orange;
 }
 
 .login-btn {
@@ -5607,4 +5613,90 @@ textarea:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/*NEW*/
+
+/*************** FIX: Dropdown visibility + positioning ***************/
+
+/* ensure each nav-item is a positioning context */
+.header-main .nav-item {
+  position: relative;
+}
+
+/* allow dropdowns to escape wrapper clipping (overrides the utility class) */
+.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* dropdown menu: positioned absolutely and centered under the toggle */
+.header-main .dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);      /* place below the toggle */
+  left: 50%;                  /* center */
+  transform: translateX(-50%) translateY(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, transform 220ms ease, visibility 220ms;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  padding: 6px 0;
+  min-width: 200px;
+  z-index: 3000;              /* sit above other content */
+  display: block;             /* keep block so transform/opacity works */
+}
+
+/* visible state */
+.header-main .dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* dropdown items */
+.header-main .dropdown-item {
+  padding: 10px 18px;
+  font-size: 15px;
+  color: #05073c;
+  font-weight: 500;
+  display: block;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.header-main .dropdown-item:hover {
+  background: #eb662b;
+  color: #fff;
+}
+
+/* arrow rotation when open */
+.header-main .nav-item.dropdown.show > .custom-dropdown .arrow,
+.header-main .nav-item.dropdown .custom-dropdown[aria-expanded="true"] .arrow {
+  transform: rotate(180deg);
+}
+
+/* Responsive: inside mobile collapsed navbar we want dropdowns to behave like normal vertical lists */
+@media (max-width: 991px) {
+  .header-main .dropdown-menu {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    box-shadow: none;
+    padding-left: 12px;
+    padding-right: 12px;
+    min-width: 100%;
+  }
+
+  .header-main .nav-link,
+  .header-main .custom-link {
+    padding: 12px 8px;
+    width: 100%;
+  }
+}
+
+.btn-success:hover {
+  background-color: #1ebe5a !important;
+  border-color: #1ebe5a !important;
 }

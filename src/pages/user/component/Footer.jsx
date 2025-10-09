@@ -117,7 +117,7 @@ const Footer = () => {
               <Link to='/terms-and-conditions' className='mx-1'>Terms&Conditions</Link>
               <Link to='/privacy-policy' className='mx-1'>PrivacyPolicy</Link>
             </div>
-            <div><p className='mt-lg-0 mt-md-0 mt-3'>© Copyright Viatours 2024</p></div>
+            <div><p className='mt-lg-0 mt-md-0 mt-3'>© Copyright Indian Mountain Rovers {new Date().getFullYear()}</p></div>
           </div>
 
         </div>
