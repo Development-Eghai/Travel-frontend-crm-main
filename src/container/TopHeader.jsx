@@ -47,7 +47,7 @@ const TopHeader = () => {
         <div className="d-flex align-items-center">
           <Link to="/" className="d-flex align-items-center text-decoration-none">
             <img
-              src="dist/assets/logo-indian-mountain-rovers.png"
+              src="/assets/logo-indian-mountain-rovers.png"
               alt="IndianMountainRovers-Logo"
               style={{ height: "60px" }}
             />
