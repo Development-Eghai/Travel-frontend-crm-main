@@ -449,7 +449,7 @@ const DestinationCreation = () => {
                         </div>
                     </div>
 
-                    {/* <div className='col-lg-6'>
+                    <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Primary Destination  <span className='required-icon'>*</span></label>
                             <select onChange={(e) => handleChange("primary_destination_id", e.target.value)}
@@ -586,7 +586,7 @@ const DestinationCreation = () => {
                                 options={options}
                             />
                         </div>
-                    </div> */}
+                    </div>
 
                 </div>
 

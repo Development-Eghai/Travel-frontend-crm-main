@@ -168,8 +168,7 @@ p {
 .featured-card-main {
   border-radius: 20px;
   overflow: hidden;
-  margin: 10px;
-  /* height: 415px; */
+  /* margin: 10px; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -178,27 +177,19 @@ p {
   transition: all 0.3s ease;
 }
 
-.popular-card-main {
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-}
-
 .featured-card-main:hover {
   cursor: pointer;
-  box-shadow: 0 0 13px rgba(235, 102, 43, 0.9);
-  transform: scale(1.02);
 }
 
 .featured-card-main img {
   max-width: 100%;
   height: auto;
   object-fit: contain;
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
+  border-radius: 20px;
 }
 
 .featured-content-main {
-  padding: 20px 25px 27px;
-  background-color: white;
+  padding: 20px 0px 27px;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   width: 100%;

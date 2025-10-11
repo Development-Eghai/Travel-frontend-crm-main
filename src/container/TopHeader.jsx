@@ -5,11 +5,13 @@ import { FaSearch, FaCalendarAlt, FaPhoneAlt } from "react-icons/fa";
 import { APIBaseUrl } from "../common/api/api";
 import { useDispatch } from "react-redux";
 import { setAllDestination, setFeaturedTripSice } from "../store/slices/HomePageSlice";
+import ContactForm from "../pages/admin/TripManagement/ContactForm/ContactForm";
 
 const TopHeader = () => {
 
   const dispatch = useDispatch();
-  
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getAllTrips = async () => {
     try {
@@ -48,6 +50,15 @@ const TopHeader = () => {
 
 }
 
+const handleCloseModal = () => {
+  setIsModalOpen(false);
+};
+
+const handleOpenModal = () => {
+  setIsModalOpen(true);
+};
+
+
   useEffect(() => {
     getAllTrips()
     getAllDestination()
@@ -67,9 +78,8 @@ const TopHeader = () => {
         </Link>
 
         {/* Search with icon inside */}
-        <button className="plan-trip-btn">
+        <button className="plan-trip-btn" onClick={handleOpenModal}>
           Plan Your Trip
-
         </button>
 
         {/* Menu links */}
@@ -100,6 +110,10 @@ const TopHeader = () => {
           <FaPhoneAlt className="me-1 ring-over" /> +91-9090403075
         </a>
       </div>
+      <ContactForm
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
