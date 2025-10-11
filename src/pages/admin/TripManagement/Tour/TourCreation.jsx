@@ -98,7 +98,6 @@ export default function TourCreation() {
   const [highlightsInput, setHighlightsInput] = useState("");
   const [inclusionsInput, setInclusionsInput] = useState("");
   const [exclusionsInput, setExclusionsInput] = useState("");
-  const [faqInput, setFaqInput] = useState("");
   const [customPolicyInput, setCustomPolicyInput] = useState("");
 
   const steps = [
@@ -320,15 +319,37 @@ export default function TourCreation() {
     }
   };
 
-  const addFaq = () => {
-    if (faqInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        faqs: [...prev.faqs, faqInput.trim()],
-      }));
-      setFaqInput("");
+  const [faqs, setFaqs] = useState([{ question: "", answer: "" }]);
+  const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
+
+  // Add FAQ
+  const addFaqs = () => {
+    if (faqInput?.question?.trim() && faqInput?.answer?.trim()) {
+      setFaqs([...faqs, faqInput]);
+      setFaqInput({ question: "", answer: "" });
+    } else {
+      alert("Please fill both question and answer!");
     }
   };
+
+
+  console.log(faqInput,"faqInput")
+
+  // Delete FAQ
+  const deleteFaqs = (indexToRemove) => {
+    const updatedFaqs = faqs.filter((_, index) => index !== indexToRemove);
+    setFaqs(updatedFaqs);
+  };
+
+  // const addFaq = () => {
+  //   if (faqInput.trim()) {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       faqs: [...prev.faqs, faqInput.trim()],
+  //     }));
+  //     setFaqInput("");
+  //   }
+  // };
 
   const addCustomPolicy = () => {
     if (customPolicyInput.trim()) {
@@ -344,12 +365,12 @@ export default function TourCreation() {
   };
 
   // Remove items from arrays
-  const removeItem = (field, index) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
-    }));
-  };
+  // const removeItem = (field, index) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [field]: prev[field].filter((_, i) => i !== index),
+  //   }));
+  // };
 
   // File handlers - UPDATED to handle file previews and base64 conversion
   const handleHeroImageChange = (event) => {
@@ -1487,6 +1508,7 @@ export default function TourCreation() {
                 <div
                   style={{
                     display: "flex",
+                    flexDirection: "column",
                     justifyContent: "space-around",
                     marginBottom: "10px",
                   }}
@@ -1494,29 +1516,56 @@ export default function TourCreation() {
                   <input
                     type="text"
                     placeholder="Add FAQ question and answer"
-                    value={faqInput}
+                    value={faqs?.question}
                     onChange={(e) => setFaqInput(e.target.value)}
-                    style={{ width: "70%" }}
+                    style={{ width: "100%" }}
                   />
-                  <button onClick={addFaq}>Add FAQ</button>
+                  <input
+                    type="text"
+                    placeholder="Add FAQ question and answer"
+                    value={faqs?.answer}
+                    onChange={(e) => setFaqInput(e.target.value)}
+                    style={{ width: "100%" }}
+                    className="mt-4"
+                  />
+                  <button onClick={addFaqs} className="mt-2">Add FAQ</button>
                 </div>
                 <div>
-                  {formData.faqs.map((faq, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{faq}</span>
-                      <button onClick={() => removeItem("faqs", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                  {faqs.length > 0 &&
+                    faqs.map((faq, index) =>
+                      faq.question && faq.answer ? (
+                        <div
+                          key={index}
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "8px",
+                            borderBottom: "1px solid #ccc",
+                            paddingBottom: "5px",
+                          }}
+                        >
+                          <div>
+                            <strong>Q:</strong> {faq.question}
+                            <br />
+                            <strong>A:</strong> {faq.answer}
+                          </div>
+                          <button
+                            style={{
+                              color: "white",
+                              background: "red",
+                              border: "none",
+                              padding: "5px 10px",
+                              cursor: "pointer",
+                              borderRadius: "4px",
+                            }}
+                            onClick={() => deleteFaqs(index)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ) : null
+                    )}
                 </div>
               </div>
             </div>
@@ -1638,7 +1687,7 @@ export default function TourCreation() {
               <span
                 className={`step-label ${active ? "step-label-active" : "step-label-inactive"}`}
               >
-                {step.label }
+                {step.label}
               </span>
             </button>
           );

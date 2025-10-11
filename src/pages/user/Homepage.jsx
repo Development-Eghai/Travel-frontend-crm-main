@@ -10,6 +10,7 @@ import "swiper/css/navigation";
 import 'swiper/css/pagination';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { useSelector } from 'react-redux';
+import ContactForm from '../admin/TripManagement/ContactForm/ContactForm';
 
 
 const Homepage = () => {
@@ -136,12 +137,12 @@ const Homepage = () => {
                                             </a>
                                         </div>
                                         <div className='mt-4 trending-card position-relative'>
-                                        <a href={`/destination/${firstSixDestination[1]?.slug}/${firstSixDestination[1]?.id}`} target='_blank'>
+                                            <a href={`/destination/${firstSixDestination[1]?.slug}/${firstSixDestination[1]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_two} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-three'>
-                                                <p className='trending-grid-para'>{firstSixDestination[1]?.title}</p>
+                                                    <p className='trending-grid-para'>{firstSixDestination[1]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
@@ -149,33 +150,33 @@ const Homepage = () => {
                                 </div>
                                 <div className="col-lg-5">
                                     <div className='position-relative trending-card'>
-                                         <a href={`/destination/${firstSixDestination[2]?.slug}/${firstSixDestination[2]?.id}`} target='_blank'>
+                                        <a href={`/destination/${firstSixDestination[2]?.slug}/${firstSixDestination[2]?.id}`} target='_blank'>
                                             <figure>
                                                 <img src={Images.trending_three} alt="trending-one" className='trending-image' />
                                             </figure>
                                             <div className='trending-grid-content-three'>
-                                            <p className='trending-grid-para'>{firstSixDestination[2]?.title}</p>
+                                                <p className='trending-grid-para'>{firstSixDestination[2]?.title}</p>
                                             </div>
                                         </a>
                                     </div>
                                     <div className='d-flex mt-4 justify-content-start justify-content-md-around'>
                                         <div className='position-relative trending-card'>
-                                             <a href={`/destination/${firstSixDestination[3]?.slug}/${firstSixDestination[3]?.id}`} target='_blank'>
+                                            <a href={`/destination/${firstSixDestination[3]?.slug}/${firstSixDestination[3]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_four} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-center-image'>
-                                                <p className='trending-grid-para'>{firstSixDestination[3]?.title}</p>
+                                                    <p className='trending-grid-para'>{firstSixDestination[3]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
                                         <div className='ms-4 position-relative trending-card'>
-                                             <a href={`/destination/${firstSixDestination[4]?.slug}/${firstSixDestination[4]?.id}`} target='_blank'>
+                                            <a href={`/destination/${firstSixDestination[4]?.slug}/${firstSixDestination[4]?.id}`} target='_blank'>
                                                 <figure>
                                                     <img src={Images.trending_five} alt="trending-one" className='trending-image' />
                                                 </figure>
                                                 <div className='trending-grid-content-center-image'>
-                                                <p className='trending-grid-para'>{firstSixDestination[4]?.title}</p>
+                                                    <p className='trending-grid-para'>{firstSixDestination[4]?.title}</p>
                                                 </div>
                                             </a>
                                         </div>
@@ -183,12 +184,12 @@ const Homepage = () => {
                                 </div>
                                 <div className="col-lg-4">
                                     <div className='position-relative trending-card'>
-                                    <a href={`/destination/${firstSixDestination[5]?.slug}/${firstSixDestination[5]?.id}`} target='_blank'>
+                                        <a href={`/destination/${firstSixDestination[5]?.slug}/${firstSixDestination[5]?.id}`} target='_blank'>
                                             <figure>
                                                 <img src={Images.trending_six} alt="trending-one" className='trending-image' />
                                             </figure>
                                             <div className='trending-grid-content-three'>
-                                            <p className='trending-grid-para'>{firstSixDestination[5]?.title}</p>
+                                                <p className='trending-grid-para'>{firstSixDestination[5]?.title}</p>
                                             </div>
                                         </a>
                                     </div>
@@ -230,7 +231,129 @@ const Homepage = () => {
                         </div>
                         <div className='mt-3'>
                             <div className="row">
-                                {lastFourTrips && lastFourTrips.length > 0 ? (
+
+                                <div className='col-lg-3 col-md-6 px-lg-2'>
+                                    <div className="featured-card-main">
+                                        <div>
+                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                        </div>
+
+                                        <div className="featured-content-main">
+                                            <p className="featured-city-para">
+                                                Jibhi & Tirthan Valley
+                                            </p>
+
+                                            <p className="featured-content">₹7500 6500 per person</p>
+
+                                            <div className="featured-bottom-content d-flex gap-2">
+                                                {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
+                                                <div className='trip-card-amount'>
+                                                    <p className="">
+                                                        {/* From <span className="fw-bold"></span>/- */}
+                                                        Trip Detail
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='col-lg-3 col-md-6 px-lg-2'>
+                                    <div className="featured-card-main">
+                                        <div>
+                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                        </div>
+
+                                        <div className="featured-content-main">
+                                            <p className="featured-city-para">
+                                                Jibhi & Tirthan Valley
+                                            </p>
+
+                                            <p className="featured-content">₹7500 6500 per person</p>
+
+                                            <div className="featured-bottom-content d-flex gap-2">
+                                                {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
+                                                <div className='trip-card-amount'>
+                                                    <p className="">
+                                                        {/* From <span className="fw-bold"></span>/- */}
+                                                        Trip Detail
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='col-lg-3 col-md-6 px-lg-2'>
+                                    <div className="featured-card-main">
+                                        <div>
+                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                        </div>
+
+                                        <div className="featured-content-main">
+                                            <p className="featured-city-para">
+                                                Jibhi & Tirthan Valley
+                                            </p>
+
+                                            <p className="featured-content">₹7500 6500 per person</p>
+
+                                            <div className="featured-bottom-content d-flex gap-2">
+                                                {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
+                                                <div className='trip-card-amount'>
+                                                    <p className="">
+                                                        {/* From <span className="fw-bold"></span>/- */}
+                                                        Trip Detail
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='col-lg-3 col-md-6 px-lg-2'>
+                                    <div className="featured-card-main">
+                                        <div>
+                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                        </div>
+
+                                        <div className="featured-content-main">
+                                            <p className="featured-city-para">
+                                                Jibhi & Tirthan Valley
+                                            </p>
+
+                                            <p className="featured-content"> 6500 per person</p>
+
+                                            <div className="featured-bottom-content d-flex gap-2">
+                                                {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
+                                                <div className='trip-card-amount'>
+                                                    <p className="">
+                                                        {/* From <span className="fw-bold"></span>/- */}
+                                                        Trip Detail
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {/* {lastFourTrips && lastFourTrips.length > 0 ? (
                                     lastFourTrips.map((trip, index) => (
                                         <div className='col-lg-3 col-md-6'>
                                             <div className="featured-card-main">
@@ -266,7 +389,7 @@ const Homepage = () => {
                                     ))
                                 ) : (
                                     <p className="text-center py-4">No Popular Tours available</p>
-                                )}
+                                )} */}
                             </div>
                         </div>
                     </div>
@@ -379,7 +502,7 @@ const Homepage = () => {
 
                 </section> */}
 
-                <section className=''>
+                <section className='section-padding-bottom'>
                     <div className="container">
                         <div className='booking-offer-main'>
                             <div className='row'>
@@ -406,6 +529,10 @@ const Homepage = () => {
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <section>
+                    <ContactForm/>
                 </section>
 
                 {/* <section className='section-padding'>

@@ -1240,13 +1240,13 @@ input::placeholder {
     background-color: #d9764b;
     color: white;
     border-radius: 6px;
-    padding: 7px 0px;
+    padding: 8px 0px;
     width: 100%;
 }
 
 .trip-card-amount p {
     font-weight: 700;
-    font-size: 12px;
+    font-size: 15px;
     text-align: center;
     margin-top: 2px;
 }

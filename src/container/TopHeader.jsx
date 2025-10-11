@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaWhatsapp } from "react-icons/fa";
 import { APIBaseUrl } from "../common/api/api";
 import { useDispatch } from "react-redux";
 import { setAllDestination, setFeaturedTripSice } from "../store/slices/HomePageSlice";
+import ContactForm from "../pages/admin/TripManagement/ContactForm/ContactForm";
 
 const TopHeader = () => {
   const dispatch = useDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getAllTrips = async () => {
     try {
@@ -34,41 +36,43 @@ const TopHeader = () => {
     }
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     getAllTrips();
     getAllDestination();
   }, []);
 
   return (
-    <div className="d-none d-md-block border-bottom bg-white">
-      <div className="container-fluid d-flex align-items-center justify-content-between py-2">
+    <>
+      <div className="d-none d-md-block border-bottom bg-white">
+        <div className="container-fluid d-flex align-items-center justify-content-between py-2">
+          {/* Left Section - Logo + Name */}
+          <div className="d-flex align-items-center">
+            <Link to="/" className="d-flex align-items-center text-decoration-none">
+              <img
+                src="/assets/logo-indian-mountain-rovers.png"
+                alt="IndianMountainRovers-Logo"
+                style={{ height: "60px" }}
+              />
+              <span
+                className="ms-2 fw-bold"
+                style={{ fontSize: "1.4rem", color: "#000" }}
+              >
+                Indian Mountain Rovers
+              </span>
+            </Link>
+          </div>
 
-        {/* Left Section - Logo + Name */}
-        <div className="d-flex align-items-center">
-          <Link to="/" className="d-flex align-items-center text-decoration-none">
-            <img
-              src="/assets/logo-indian-mountain-rovers.png"
-              alt="IndianMountainRovers-Logo"
-              style={{ height: "60px" }}
-            />
-            <span
-              className="ms-2 fw-bold"
-              style={{ fontSize: "1.4rem", color: "#000" }}
-            >
-              Indian Mountain Rovers
-            </span>
-          </Link>
-        </div>
-
-        {/* Right Section */}
-        <div className="d-flex align-items-center gap-4">
-          {/* Plan Your Trip button */}
-          <button
-            className="plan-trip-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#travelFormModal"
-          >
-            PLAN YOUR TRIP
+          {/* Plan your trip button */}
+          <button className="plan-trip-btn" onClick={handleOpenModal}>
+            Plan Your Trip
           </button>
 
           {/* Menu links */}
@@ -102,7 +106,13 @@ const TopHeader = () => {
           </a>
         </div>
       </div>
-    </div>
+
+      {/* Contact form modal */}
+      <ContactForm
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 };
 

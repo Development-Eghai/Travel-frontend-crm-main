@@ -98,8 +98,6 @@ const TourPreview = () => {
         window.location.href = url;
     };
 
-    console.log(specificTourData, "specificTourData-specificTourData")
-
     useEffect(() => {
         getSpecificTour()
     }, [])
