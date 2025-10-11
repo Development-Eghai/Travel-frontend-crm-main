@@ -435,7 +435,7 @@ p {
 
 /************************************************************* Footer css ******************************************/
 .footer-main {
-  background-color: #eb662b;
+  background-color: #eb662b0d;
 }
 
 .expert-contact {
@@ -1445,6 +1445,9 @@ button:focus:not(:focus-visible) {
 
 .page-content {
   /* margin: 20px 4px; */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .nav-link.sidebar-menu:focus {
@@ -5699,3 +5702,4 @@ textarea:focus {
 .text-justify {
   text-align: justify;
 }
+
