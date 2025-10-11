@@ -16,16 +16,16 @@ const Header = () => {
     "/trips-bookings",
   ];
 
-  const [openDropdown, setOpenDropdown] = useState(null); // 'domestic' | 'international' | null
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const wrapperRef = useRef(null);
   const location = useLocation();
 
-  // close dropdown on route change
   useEffect(() => {
     setOpenDropdown(null);
+    setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // close when clicking outside
   useEffect(() => {
     const onDocClick = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -41,7 +41,7 @@ const Header = () => {
   };
 
   const handleMouseEnter = (name) => {
-    if (window.innerWidth >= 992) setOpenDropdown(name); // hover only on desktop
+    if (window.innerWidth >= 992) setOpenDropdown(name);
   };
   const handleMouseLeave = () => {
     if (window.innerWidth >= 992) setOpenDropdown(null);
@@ -56,62 +56,75 @@ const Header = () => {
             : "not-fixed-header"
         }`}
       >
-        <nav className="navbar navbar-expand-lg">
-          <div className="container" ref={wrapperRef}>
-            {/* Mobile toggler */}
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
+        <nav className="navbar navbar-expand-lg" ref={wrapperRef}>
+          <div className="container d-flex justify-content-between align-items-center">
 
-            {/* Centered menu */}
+            {/* Logo (only on mobile) */}
+            <Link to="/" className="d-lg-none">
+              <img
+                src={appConfigData?.logo || "/logo-indian-mountain-rovers.png"}
+                alt="Logo"
+                style={{ height: "45px", width: "auto" }}
+              />
+            </Link>
+
+            {/* Desktop Navigation */}
             <div
-              className="collapse navbar-collapse justify-content-center"
+              className="collapse navbar-collapse justify-content-center d-none d-lg-flex"
               id="navbarSupportedContent"
             >
               <ul className="navbar-nav align-items-center gap-3">
-
-                {/* Domestic */}
+                {/* Domestic Dropdown */}
                 <li
-                  className={`nav-item dropdown ${openDropdown === "domestic" ? "show" : ""
-                    }`}
+                  className={`nav-item dropdown ${
+                    openDropdown === "domestic" ? "show" : ""
+                  }`}
                   onMouseEnter={() => handleMouseEnter("domestic")}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {/* Use button so Link anchors don't conflict with toggle behavior */}
                   <button
                     type="button"
                     className="nav-link dropdown-toggle custom-dropdown"
                     onClick={() => toggleDropdown("domestic")}
                     aria-expanded={openDropdown === "domestic"}
                   >
-                    Domestic Trips <span className="arrow" aria-hidden>{openDropdown === "domestic" ? "▲" : "▼"}</span>
+                    Domestic Trips{" "}
+                    <span className="arrow" aria-hidden>
+                      {openDropdown === "domestic" ? "▲" : "▼"}
+                    </span>
                   </button>
 
-                  <ul className={`dropdown-menu ${openDropdown === "domestic" ? "show" : ""}`}>
+                  <ul
+                    className={`dropdown-menu ${
+                      openDropdown === "domestic" ? "show" : ""
+                    }`}
+                  >
                     <li>
-                      <Link to="/domestic/uttarakhand" className="dropdown-item">Uttarakhand</Link>
+                      <Link
+                        to="/domestic/uttarakhand"
+                        className="dropdown-item"
+                      >
+                        Uttarakhand
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/domestic/himachal" className="dropdown-item">Himachal</Link>
+                      <Link to="/domestic/himachal" className="dropdown-item">
+                        Himachal
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/domestic/goa" className="dropdown-item">Goa</Link>
+                      <Link to="/domestic/goa" className="dropdown-item">
+                        Goa
+                      </Link>
                     </li>
                   </ul>
                 </li>
 
-                {/* International */}
+                {/* International Dropdown */}
                 <li
-                  className={`nav-item dropdown ${openDropdown === "international" ? "show" : ""
-                    }`}
+                  className={`nav-item dropdown ${
+                    openDropdown === "international" ? "show" : ""
+                  }`}
                   onMouseEnter={() => handleMouseEnter("international")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -121,49 +134,128 @@ const Header = () => {
                     onClick={() => toggleDropdown("international")}
                     aria-expanded={openDropdown === "international"}
                   >
-                    International Trips <span className="arrow" aria-hidden>{openDropdown === "international" ? "▲" : "▼"}</span>
+                    International Trips{" "}
+                    <span className="arrow" aria-hidden>
+                      {openDropdown === "international" ? "▲" : "▼"}
+                    </span>
                   </button>
 
-                  <ul className={`dropdown-menu ${openDropdown === "international" ? "show" : ""}`}>
+                  <ul
+                    className={`dropdown-menu ${
+                      openDropdown === "international" ? "show" : ""
+                    }`}
+                  >
                     <li>
-                      <Link to="/international/europe" className="dropdown-item">Europe</Link>
+                      <Link to="/international/europe" className="dropdown-item">
+                        Europe
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/international/bali" className="dropdown-item">Bali</Link>
+                      <Link to="/international/bali" className="dropdown-item">
+                        Bali
+                      </Link>
                     </li>
                     <li>
-                      <Link to="/international/dubai" className="dropdown-item">Dubai</Link>
+                      <Link to="/international/dubai" className="dropdown-item">
+                        Dubai
+                      </Link>
                     </li>
                   </ul>
                 </li>
 
-                {/* Plain links */}
+                {/* Other Links */}
                 <li className="nav-item">
-                  <Link to="/blogs" className="nav-link custom-link">Blogs</Link>
+                  <Link to="/blogs" className="nav-link custom-link">
+                    Blogs
+                  </Link>
                 </li>
-                <li className="nav-item">
-                  <Link to="/careers" className="nav-link custom-link">Careers</Link>
-                </li>
-                <li className="nav-item">
-                  <Link to="/contact-us" className="nav-link custom-link">Contact Us</Link>
-                </li>
-                <li className="nav-item">
-                  <Link to="/about-us" className="nav-link custom-link">About Us</Link>
-                </li>
-                    
-                {/* Buttons */}
                 {/* <li className="nav-item">
-                  <Link to="/signup" className="btn-signup">Signup</Link>
+                  <Link to="/careers" className="nav-link custom-link">
+                    Careers
+                  </Link>
+                </li> */}
+                <li className="nav-item">
+                  <Link to="/contact-us" className="nav-link custom-link">
+                    Contact Us
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <Link to="/login" className="btn-login">Login</Link>
-                </li> */}
-                
-
+                  <Link to="/about-us" className="nav-link custom-link">
+                    About Us
+                  </Link>
+                </li>
               </ul>
             </div>
+
+            {/* Mobile Hamburger */}
+            <button
+              className="navbar-toggler d-lg-none border-0"
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
           </div>
         </nav>
+
+        {/* Slide-out Mobile Menu */}
+        <div
+          className={`mobile-menu d-lg-none position-fixed top-0 end-0 h-100 p-4 ${
+            mobileMenuOpen ? "open" : ""
+          }`}
+          style={{
+            width: "70%",
+            backgroundColor: "#eb662b",
+            transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
+            transition: "transform 0.3s ease-in-out",
+            zIndex: 1050,
+            color: "#000",
+          }}
+        >
+          <button
+            className="btn-close mb-4"
+            onClick={() => setMobileMenuOpen(false)}
+          ></button>
+
+          <ul className="list-unstyled d-flex flex-column gap-3 m-0">
+            <li>
+              <Link
+                to="/blogs"
+                className="text-decoration-none"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blogs
+              </Link>
+            </li>
+            {/* <li>
+              <Link
+                to="/careers"
+                className="text-decoration-none"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Careers
+              </Link>
+            </li> */}
+            <li>
+              <Link
+                to="/contact-us"
+                className="text-decoration-none"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/about-us"
+                className="text-decoration-none"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                About Us
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );

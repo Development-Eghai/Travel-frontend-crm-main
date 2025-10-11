@@ -57,7 +57,7 @@ const TopHeader = () => {
           <div className="d-flex align-items-center">
             <Link to="/" className="d-flex align-items-center text-decoration-none">
               <img
-                src="/assets/logo-indian-mountain-rovers.png"
+                src="/logo-indian-mountain-rovers.png" 
                 alt="IndianMountainRovers-Logo"
                 style={{ height: "60px" }}
               />
@@ -90,7 +90,7 @@ const TopHeader = () => {
 
           {/* WhatsApp button */}
           <a
-            href="https://wa.me/919090403075"
+            href="https://wa.me/+918278829941"
             target="_blank"
             rel="noopener noreferrer"
             className="btn rounded-pill d-flex align-items-center justify-content-center"
@@ -102,7 +102,7 @@ const TopHeader = () => {
               padding: "8px 16px",
             }}
           >
-            <FaWhatsapp className="me-2" /> +91 9876543210
+            <FaWhatsapp className="me-2" /> +91 82788 29941
           </a>
         </div>
       </div>

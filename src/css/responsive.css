@@ -1,3 +1,5 @@
+/* Existing media queries */
+
 @media screen and (max-width: 1280px) {
     .break-tag {
         display: none !important;
@@ -29,7 +31,6 @@
     }
 }
 
-
 @media screen and (max-width: 991px) {
     .homepaage-banner-image-1 {
         height: 60vh;
@@ -39,16 +40,36 @@
         margin-top: 30px;
     }
 
+    /* Header Styles */
     .header-main {
-        background-color: rgb(39, 39, 39);
+        background-color: rgb(39, 39, 39); /* Dark background on mobile */
     }
 
     .navbar-toggler {
-        background-color: white;
+        background-color: white; /* White navbar toggler */
     }
 
-    .fixed-header {
-        position: sticky;
+    .navbar-nav {
+        flex-direction: column; /* Stack navigation items on mobile */
+        align-items: center; /* Center the items */
+    }
+
+    .nav-item {
+        padding: 1rem 0; /* Add space between navigation links */
+    }
+
+    .nav-link {
+        font-size: 16px;
+        padding: 1rem; /* Add padding for better clickability */
+    }
+
+    .custom-dropdown {
+        padding: 1rem; /* Add padding inside dropdown button */
+    }
+
+    /* Dropdown menu for mobile */
+    .nav-item.dropdown:hover .dropdown-menu {
+        display: block; /* Make dropdown visible on hover */
     }
 
     .banner-para {
@@ -120,13 +141,11 @@
     .get-in-touch-box {
         margin: 25px 0px;
     }
-    .our-culture-card{
+
+    .our-culture-card {
         padding: 30px 25px;
     }
-
 }
-
-
 
 @media screen and (max-width: 767px) {
     .our-achievements-card {
@@ -150,7 +169,6 @@
         display: flex;
         flex-direction: column;
     }
-
 
     .contact-us-map iframe {
         width: 100%;
@@ -258,7 +276,4 @@
     .dest-package-para {
         padding-right: 40px;
     }
-
-
-
 }

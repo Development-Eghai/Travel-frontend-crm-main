@@ -435,7 +435,7 @@ p {
 
 /************************************************************* Footer css ******************************************/
 .footer-main {
-  background-color: #eb662b0d;
+  background-color: #eb662b;
 }
 
 .expert-contact {
@@ -5690,4 +5690,12 @@ textarea:focus {
 .btn-success:hover {
   background-color: #1ebe5a !important;
   border-color: #1ebe5a !important;
+}
+
+.mobile-menu a {
+  color: #000 !important;
+  text-decoration: none !important;
+}
+.text-justify {
+  text-align: justify;
 }
