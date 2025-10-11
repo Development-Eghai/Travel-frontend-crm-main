@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer
       className="py-5"
-      style={{ backgroundColor: "#fff7f4", color: "#000", overflowX: "hidden" }}
+      style={{ backgroundColor: "#3b2a1a", color: "#fff", overflowX: "hidden" }}
     >
       <div className="container-fluid px-4 px-md-5">
         <div className="row gy-5 gx-5 justify-content-between align-items-start">
@@ -12,14 +12,14 @@ const Footer = () => {
           {/* About Section */}
           <div className="col-lg-5 col-md-12 text-center text-md-start">
             <h5 className="fw-semibold mb-3">About Indian Mountain Rovers</h5>
-            <Link to="/" className="d-inline-block mb-3">
+            {/* <Link to="/" className="d-inline-block mb-3">
               <img
                 src="/logo-indian-mountain-rovers.png"
                 alt="Indian Mountain Rovers Logo"
                 className="img-fluid"
                 style={{ height: "80px", width: "auto" }}
               />
-            </Link>
+            </Link> */}
             <p style={{ maxWidth: "600px", lineHeight: "1.7", margin: "0 auto" }}>
               Explore the heart of the Himalayas with Indian Mountain Rovers! We
               specialize in crafting bespoke adventure tours — from serene nature
@@ -89,13 +89,13 @@ const Footer = () => {
       <style>
         {`
           .footer-link {
-            color: #000;
+            color: #fff;
             text-decoration: none;
             position: relative;
             transition: color 0.3s ease;
           }
           .footer-link:hover {
-            color: #eb662b;
+            color: #25d366;
           }
           .footer-link::after {
             content: '';
@@ -104,7 +104,7 @@ const Footer = () => {
             bottom: -2px;
             width: 0%;
             height: 2px;
-            background-color: #eb662b;
+            background-color: #25d366;
             transition: width 0.3s ease;
           }
           .footer-link:hover::after {

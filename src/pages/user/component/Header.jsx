@@ -163,27 +163,113 @@ const Header = () => {
                   </ul>
                 </li>
 
+                {/* Honeymoon Dropdown */}
+                <li
+                  className={`nav-item dropdown ${
+                    openDropdown === "honeymoon" ? "show" : ""
+                  }`}
+                  onMouseEnter={() => handleMouseEnter("honeymoon")}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle custom-dropdown"
+                    onClick={() => toggleDropdown("honeymoon")}
+                    aria-expanded={openDropdown === "honeymoon"}
+                  >
+                    Honeymoon Trips{" "}
+                    <span className="arrow" aria-hidden>
+                      {openDropdown === "honeymoon" ? "▲" : "▼"}
+                    </span>
+                  </button>
+
+                  <ul
+                    className={`dropdown-menu ${
+                      openDropdown === "honeymoon" ? "show" : ""
+                    }`}
+                  >
+                    <li>
+                      <Link to="/international/europe" className="dropdown-item">
+                        Bali 
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/international/bali" className="dropdown-item">
+                        Kashmir
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/international/dubai" className="dropdown-item">
+                        Himachal
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+
+                {/* Upcoming Group Trips Dropdown */}
+                <li
+                  className={`nav-item dropdown ${
+                    openDropdown === "upcoming" ? "show" : ""
+                  }`}
+                  onMouseEnter={() => handleMouseEnter("upcoming")}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button
+                    type="button"
+                    className="nav-link dropdown-toggle custom-dropdown"
+                    onClick={() => toggleDropdown("upcoming")}
+                    aria-expanded={openDropdown === "upcoming"}
+                  >
+                    Upcoming Group Trips{" "}
+                    <span className="arrow" aria-hidden>
+                      {openDropdown === "upcoming" ? "▲" : "▼"}
+                    </span>
+                  </button>
+
+                  <ul
+                    className={`dropdown-menu ${
+                      openDropdown === "upcoming" ? "show" : ""
+                    }`}
+                  >
+                    <li>
+                      <Link to="/international/europe" className="dropdown-item">
+                        Spiti Valley 
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/international/bali" className="dropdown-item">
+                        Ladakh
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/international/dubai" className="dropdown-item">
+                        Manali
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+
                 {/* Other Links */}
-                <li className="nav-item">
+                {/* <li className="nav-item">
                   <Link to="/blogs" className="nav-link custom-link">
                     Blogs
                   </Link>
-                </li>
+                </li> */}
                 {/* <li className="nav-item">
                   <Link to="/careers" className="nav-link custom-link">
                     Careers
                   </Link>
                 </li> */}
-                <li className="nav-item">
+                {/* <li className="nav-item">
                   <Link to="/contact-us" className="nav-link custom-link">
                     Contact Us
                   </Link>
-                </li>
-                <li className="nav-item">
+                </li> */}
+                {/* <li className="nav-item">
                   <Link to="/about-us" className="nav-link custom-link">
                     About Us
                   </Link>
-                </li>
+                </li> */}
               </ul>
             </div>
 
@@ -205,7 +291,7 @@ const Header = () => {
           }`}
           style={{
             width: "70%",
-            backgroundColor: "#eb662b",
+            backgroundColor: "#3b2a1a",
             transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
             transition: "transform 0.3s ease-in-out",
             zIndex: 1050,
