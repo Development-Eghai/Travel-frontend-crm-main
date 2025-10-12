@@ -551,9 +551,6 @@ export default function TourCreation() {
   const handleSubmit = async () => {
     try {
       const submissionData = await prepareSubmissionData();
-      console.log("Submitting data:", submissionData);
-      console.log("Submitting data json:", JSON.stringify(submissionData, null, 2));
-      // console.log("Media section data:", submissionData.media);
 
       dispatch(createTrip(submissionData))
         .unwrap()
@@ -593,8 +590,6 @@ export default function TourCreation() {
       throw error;
     }
   }
-  console.log(formData, "formData")
-
   useEffect(() => {
     getAllTourCategory()
   }, [])
