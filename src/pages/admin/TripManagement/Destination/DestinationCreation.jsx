@@ -20,10 +20,10 @@ const DestinationCreation = () => {
 
     const [validation, setValidation] = useState({})
 
-    const [customPackage, setCustomPackage] = useState([{ title: "", description: "", trip_packages: [] }]);
+    const [customPackage, setCustomPackage] = useState([{ title: "", description: "", trip_ids: [] }]);
 
     const addCustomPackage = () => {
-        setCustomPackage([...customPackage, { title: "", description: "", trip_packages: [] }]);
+        setCustomPackage([...customPackage, { title: "", description: "", trip_ids: [] }]);
     };
 
     const deleteCustomPackage = (indexToRemove) => {
@@ -136,6 +136,11 @@ const DestinationCreation = () => {
             : { status: true, message: "" };
 
 
+            validate.blog_category_ids = (!createDestination?.blog_category_ids || createDestination.blog_category_ids.length === 0)
+            ? { status: false, message: "Blog Category are required" }
+            : { status: true, message: "" };
+
+
         validate.destination_type = NonEmptyValidation(data?.destination_type);
         validate.overview = NonEmptyValidation(data?.overview);
         // validate.customPackage = NonEmptyFaqArrayValidation(data?.customPackage);
@@ -145,31 +150,10 @@ const DestinationCreation = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        // createDestination.custom_package = customPackage
+
         const cleanedData = normalizeEmptyFields(createDestination);
 
-        cleanedData.custom_packages = [
-            {
-                "title": "Exclusive Honeymoon Package",
-                "description": "Romantic getaways in Kerala, Goa, and Udaipur.",
-                "trip_ids": [
-                    103,
-                    104
-                ]
-            },
-            {
-                "title": "Spiritual Retreats",
-                "description": "Meditation and temple tours in Rishikesh and Varanasi.",
-                "trip_ids": [
-                    105
-                ]
-            }
-        ]
-
-        cleanedData.blog_category_ids = [
-            201,
-            202
-        ]
+        cleanedData.custom_packages = customPackage
 
         cleanedData.testimonial_ids = [
             501,
@@ -195,7 +179,7 @@ const DestinationCreation = () => {
                     navigate(-1)
                     successMsg("Destination created successsfully")
                     setCreateDestination({})
-                    setCustomPackage([{ title: "", description: "", trip_packages: [] }])
+                    setCustomPackage([{ title: "", description: "", trip_ids: [] }])
                 }
 
             } catch (error) {
@@ -257,6 +241,7 @@ const DestinationCreation = () => {
     const [allTrips, setAllTrips] = useState([]);
     const [allBlogPost, setAllBlogPost] = useState([]);
     const [allActivity, setAllActivity] = useState([]);
+    const [allBlogCategory, setAllBlogCategory] = useState([]);
 
 
     const getAllTrip = async () => {
@@ -320,6 +305,27 @@ const DestinationCreation = () => {
         }
     }
 
+    const getAllBlogCategory = async () => {
+        try {
+            const res = await APIBaseUrl.get("blog-categories/", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                const mappedOptions = res?.data?.data?.map((trip) => ({
+                    value: trip?.id,
+                    label: trip?.name,
+                }));
+                setAllBlogCategory(mappedOptions);
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
+        }
+    }
+
     const getAllActivities = async () => {
         try {
             const res = await APIBaseUrl.get("activities/", {
@@ -341,6 +347,7 @@ const DestinationCreation = () => {
         }
     }
 
+
     const getSpecificDestination = async (id) => {
 
         try {
@@ -351,7 +358,7 @@ const DestinationCreation = () => {
             });
             if (res?.data?.success === true) {
                 setCreateDestination(res?.data?.data)
-                setCustomPackage(res?.data?.data?.custom_packages || [{ title: "", description: "", trip_packages: [] }])
+                setCustomPackage(res?.data?.data?.custom_packages || [{ title: "", description: "", trip_ids: [] }])
             }
 
         } catch (error) {
@@ -368,8 +375,8 @@ const DestinationCreation = () => {
         getAllTrip()
         getAllBlogPost()
         getAllActivities()
+        getAllBlogCategory()
     }, [])
-
 
     return (
         <>
@@ -421,7 +428,7 @@ const DestinationCreation = () => {
                                 <p className='error-para'>Banner Images {validation.hero_image.message}</p>
                             )}
 
-                        {/* {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
+                            {/* {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
                                 <div className="d-flex flex-wrap">
                                     {createDestination?.hero_image?.map((image, index) => (
                                         <div className='upload-image-div destination-image-div'>
@@ -434,7 +441,7 @@ const DestinationCreation = () => {
                                 </div>
                             )}  */}
                         </div>
-                    </div> 
+                    </div>
 
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>
@@ -487,7 +494,6 @@ const DestinationCreation = () => {
                             <label>Select Popular Trip Packages</label>
                             <Select
                                 isMulti
-                                placeholder="Select Trip Packages"
                                 value={allTrips?.filter((opt) =>
                                     (createDestination?.popular_trip_ids || []).includes(opt.value)
                                 )}
@@ -508,14 +514,22 @@ const DestinationCreation = () => {
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Blogs Category</label>
-                            <select>
-                                <option value="">Select Category</option>
-                                <option value="Fixed Price">Blogs Category 1</option>
-                                <option value="Price Per Person">Blogs Category 2</option>
-                                <option value="Price Per Person">Blogs Category 3</option>
-                                <option value="Price Per Person">Blogs Category 4</option>
-                                <option value="Price Per Person">Blogs Category 5</option>
-                            </select>
+                            <Select
+                                isMulti
+                                value={allBlogCategory?.filter((opt) =>
+                                    (createDestination?.blog_category_ids || []).includes(opt.value)
+                                )}
+                                onChange={(selectedOptions) =>
+                                    handleDropdown(
+                                        "blog_category_ids",
+                                        selectedOptions ? selectedOptions.map((opt) => opt?.value) : []
+                                    )
+                                }
+                                options={allBlogCategory}
+                            />
+                            {validation?.blog_category_ids?.status === false && validation?.blog_category_ids?.message && (
+                                <p className='error-para'>{validation.blog_category_ids.message}</p>
+                            )}
                         </div>
                     </div>
 
@@ -544,7 +558,6 @@ const DestinationCreation = () => {
                             <label>Select Activities</label>
                             <Select
                                 isMulti
-                                placeholder="Select Trip Packages"
                                 value={allActivity.filter((opt) =>
                                     (createDestination?.activity_ids || []).includes(opt.value)
                                 )}
@@ -562,7 +575,7 @@ const DestinationCreation = () => {
                         </div>
                     </div>
 
-                    <div className='col-lg-6'>
+                    {/* <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Testimonial</label>
                             <Select
@@ -573,9 +586,9 @@ const DestinationCreation = () => {
                                 options={options}
                             />
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className='col-lg-6'>
+                    {/* <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Related Blogs</label>
                             <Select
@@ -586,7 +599,7 @@ const DestinationCreation = () => {
                                 options={options}
                             />
                         </div>
-                    </div>
+                    </div> */}
 
                 </div>
 
@@ -616,11 +629,12 @@ const DestinationCreation = () => {
                     </div>
                 </div>
 
-                <div className='admin-input-div'>
-                    <label>Create Custom Package</label>
-                </div>
+
 
                 <div className="mt-3 destination-faq">
+                    <div className='admin-input-div'>
+                        <label>Create Custom Package</label>
+                    </div>
                     <div className="accordion" id="accordionExample">
                         {customPackage.map((trip, index) => (
                             <div className='mt-4'>
@@ -663,6 +677,7 @@ const DestinationCreation = () => {
                                                 <input
                                                     type="text"
                                                     className="form-control"
+                                                    placeholder="Eter title"
                                                     value={trip?.title}
                                                     onChange={(e) =>
                                                         updateCustomPackage(index, "title", e.target.value)
@@ -675,6 +690,7 @@ const DestinationCreation = () => {
                                                 <textarea
                                                     className="form-control"
                                                     value={trip?.description}
+                                                    placeholder="Eter Description"
                                                     onChange={(e) =>
                                                         updateCustomPackage(index, "description", e.target.value)
                                                     }
@@ -686,10 +702,10 @@ const DestinationCreation = () => {
                                                     <label>Select Trip Packages</label>
                                                     <Select
                                                         isMulti
-                                                        value={allTrips?.filter(opt => trip?.trip_packages?.includes(opt.value))}
+                                                        value={allTrips?.filter(opt => trip?.trip_ids?.includes(opt.value))}
                                                         placeholder="Select Packages Here..."
                                                         onChange={(selectedOptions) =>
-                                                            updateCustomPackage(index, "trip_packages", selectedOptions.map((opt) => opt?.value))
+                                                            updateCustomPackage(index, "trip_ids", selectedOptions.map((opt) => opt?.value))
                                                         }
                                                         options={allTrips}
                                                     />

@@ -161,7 +161,7 @@ const DestinationList = () => {
         getAllDestination()
     }, [])
 
-
+console.log(destinationList,"destinationList")
 
     return (
         <div className='admin-content-main'>

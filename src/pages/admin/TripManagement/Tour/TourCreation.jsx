@@ -467,7 +467,7 @@ export default function TourCreation() {
       highlights: formData.highlights.join("; "),
       inclusions: formData.inclusions.join("; "),
       exclusions: formData.exclusions.join("; "),
-      faqs: faqs,
+      faqs: faqs?.[0],
       terms: formData.terms,
       privacy_policy: formData.privacy_policy,
       payment_terms: formData.payment_terms,
@@ -558,8 +558,11 @@ export default function TourCreation() {
       dispatch(createTrip(submissionData))
         .unwrap()
         .then((result) => {
+         
           // console.log("Trip created successfully:", result);
           toast.success("Trip created successfully!");
+          setFormData({});
+          navigate("/admin/tour-list")
         })
         .catch((err) => {
           console.error("Error creating trip:", err);

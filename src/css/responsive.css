@@ -26,6 +26,7 @@
     .latest-blogs-left .blogs-card-img {
         object-fit: cover;
     }
+
     .our-achievements-content p {
         width: auto;
     }
@@ -42,34 +43,42 @@
 
     /* Header Styles */
     .header-main {
-        background-color: rgb(39, 39, 39); /* Dark background on mobile */
+        background-color: rgb(39, 39, 39);
+        /* Dark background on mobile */
     }
 
     .navbar-toggler {
-        background-color: white; /* White navbar toggler */
+        background-color: white;
+        /* White navbar toggler */
     }
 
     .navbar-nav {
-        flex-direction: column; /* Stack navigation items on mobile */
-        align-items: center; /* Center the items */
+        flex-direction: column;
+        /* Stack navigation items on mobile */
+        align-items: center;
+        /* Center the items */
     }
 
     .nav-item {
-        padding: 1rem 0; /* Add space between navigation links */
+        padding: 1rem 0;
+        /* Add space between navigation links */
     }
 
     .nav-link {
         font-size: 16px;
-        padding: 1rem; /* Add padding for better clickability */
+        padding: 1rem;
+        /* Add padding for better clickability */
     }
 
     .custom-dropdown {
-        padding: 1rem; /* Add padding inside dropdown button */
+        padding: 1rem;
+        /* Add padding inside dropdown button */
     }
 
     /* Dropdown menu for mobile */
     .nav-item.dropdown:hover .dropdown-menu {
-        display: block; /* Make dropdown visible on hover */
+        display: block;
+        /* Make dropdown visible on hover */
     }
 
     .banner-para {
@@ -275,5 +284,30 @@
 
     .dest-package-para {
         padding-right: 40px;
+    }
+
+    .trip-pickup-parent {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .trip-detail-section h3 {
+        font-size: 20px !important;
+    }
+
+    .trip-detail-contact-input-container {
+        height: 100% !important;
+    }
+
+    .trip-detail-section {
+        padding: 25px 18px;
+    }
+
+    .trip-detail-tabs-main{
+        flex-direction: column !important;
+    }
+
+    .plan-trip-btn{
+        background-color: white !important;
     }
 }

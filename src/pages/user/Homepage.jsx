@@ -20,7 +20,7 @@ const Homepage = () => {
     const allDestination = useSelector((state) => state.home_page_slice.all_destination);
     const lastFourTrips = allTrips.slice(-4);
     const firstSixDestination = allDestination.slice(0, 6);
-    console.log(allDestination, "allDestination");
+    console.log(allTrips, "allTrips");
 
 
     return (
@@ -71,8 +71,15 @@ const Homepage = () => {
                                     allTrips.map((trip, index) => (
                                         <SwiperSlide key={trip.id || index}>
                                             <div className="featured-card-main">
-                                                <div>
-                                                    <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                                <div className='position-relative'>
+                                                    <div>
+                                                        <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                                    </div>
+
+                                                    <div className='featured-card-day-card'>
+                                                        <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
+                                                    </div>
+
                                                 </div>
 
                                                 <div className="featured-content-main">
@@ -80,20 +87,20 @@ const Homepage = () => {
                                                         {trip?.pickup_location} → {trip?.drop_location}
                                                     </p>
 
-                                                    <p className="featured-content">{trip?.title}</p>
-
+                                                    <p className="featured-content">
+                                                        <span>₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price} </span>
+                                                        ₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price}
+                                                    </p>
                                                     <div className="featured-bottom-content d-flex gap-2">
-                                                        <div className='trip-card-amount button'>
-                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, '_blank')}>
-                                                                Trip Detail
-                                                            </p>
-                                                        </div>
+                                                        {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
                                                         <div className='trip-card-amount'>
-                                                            <p className="">
-                                                                From <span className="fw-bold">{
-                                                                    trip?.pricing?.fixed_departure?.fixed_departure?.[0]
-                                                                        ?.final_price || "N/A"
-                                                                }</span>/-
+                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
+                                                                {/* From <span className="fw-bold"></span>/- */}
+                                                                Trip Detail
                                                             </p>
                                                         </div>
                                                     </div>
@@ -231,134 +238,19 @@ const Homepage = () => {
                         </div>
                         <div className='mt-3'>
                             <div className="row">
-
-                                <div className='col-lg-3 col-md-6 px-lg-2'>
-                                    <div className="featured-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">
-                                                Jibhi & Tirthan Valley
-                                            </p>
-
-                                            <p className="featured-content">₹7500 6500 per person</p>
-
-                                            <div className="featured-bottom-content d-flex gap-2">
-                                                {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
-                                                <div className='trip-card-amount'>
-                                                    <p className="">
-                                                        {/* From <span className="fw-bold"></span>/- */}
-                                                        Trip Detail
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='col-lg-3 col-md-6 px-lg-2'>
-                                    <div className="featured-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">
-                                                Jibhi & Tirthan Valley
-                                            </p>
-
-                                            <p className="featured-content">₹7500 6500 per person</p>
-
-                                            <div className="featured-bottom-content d-flex gap-2">
-                                                {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
-                                                <div className='trip-card-amount'>
-                                                    <p className="">
-                                                        {/* From <span className="fw-bold"></span>/- */}
-                                                        Trip Detail
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='col-lg-3 col-md-6 px-lg-2'>
-                                    <div className="featured-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">
-                                                Jibhi & Tirthan Valley
-                                            </p>
-
-                                            <p className="featured-content">₹7500 6500 per person</p>
-
-                                            <div className="featured-bottom-content d-flex gap-2">
-                                                {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
-                                                <div className='trip-card-amount'>
-                                                    <p className="">
-                                                        {/* From <span className="fw-bold"></span>/- */}
-                                                        Trip Detail
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='col-lg-3 col-md-6 px-lg-2'>
-                                    <div className="featured-card-main">
-                                        <div>
-                                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
-                                        </div>
-
-                                        <div className="featured-content-main">
-                                            <p className="featured-city-para">
-                                                Jibhi & Tirthan Valley
-                                            </p>
-
-                                            <p className="featured-content"> 6500 per person</p>
-
-                                            <div className="featured-bottom-content d-flex gap-2">
-                                                {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
-                                                <div className='trip-card-amount'>
-                                                    <p className="">
-                                                        {/* From <span className="fw-bold"></span>/- */}
-                                                        Trip Detail
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                {/* {lastFourTrips && lastFourTrips.length > 0 ? (
+                                {lastFourTrips && lastFourTrips.length > 0 ? (
                                     lastFourTrips.map((trip, index) => (
                                         <div className='col-lg-3 col-md-6'>
                                             <div className="featured-card-main">
-                                                <div>
-                                                    <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                                <div className='position-relative'>
+                                                    <div>
+                                                        <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                                    </div>
+
+                                                    <div className='featured-card-day-card'>
+                                                    <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
+                                                    </div>
+
                                                 </div>
 
                                                 <div className="featured-content-main">
@@ -366,30 +258,31 @@ const Homepage = () => {
                                                         {trip?.pickup_location} → {trip?.drop_location}
                                                     </p>
 
-                                                    <p className="featured-content">{trip?.title}</p>
-
+                                                    <p className="featured-content">
+                                                        <span>₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price} </span>
+                                                        ₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price}
+                                                    </p>
                                                     <div className="featured-bottom-content d-flex gap-2">
-                                                        <div className='trip-card-amount button'>
-                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, '_blank')}>
-                                                                Trip Detail
-                                                            </p>
-                                                        </div>
+                                                        {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
                                                         <div className='trip-card-amount'>
-                                                            <p className="">
-                                                                From <span className="fw-bold">{
-                                                                    trip?.pricing?.fixed_departure?.fixed_departure?.[0]
-                                                                        ?.final_price || "N/A"
-                                                                }</span>/-
+                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
+                                                                Trip Detail
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+
+
                                         </div>
                                     ))
                                 ) : (
                                     <p className="text-center py-4">No Popular Tours available</p>
-                                )} */}
+                                )}
                             </div>
                         </div>
                     </div>
@@ -532,7 +425,7 @@ const Homepage = () => {
                 </section>
 
                 <section>
-                    <ContactForm/>
+                    <ContactForm />
                 </section>
 
                 {/* <section className='section-padding'>

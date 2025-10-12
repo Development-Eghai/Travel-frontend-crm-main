@@ -1,9 +1,35 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { Images } from '../../../../helpers/Images/images';
+import { APIBaseUrl } from '../../../../common/api/api';
 
 const CategoryPreview = () => {
   const { id } = useParams();
+
+  const [trips, setAllTrips] = useState([])
+
+  const getAllTrips = async (id) => {
+    try {
+      const res = await APIBaseUrl.get(`categories/trip_details/${id}`, {
+        headers: {
+          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+        },
+      });
+      if (res?.data?.success === true) {
+        setAllTrips(res?.data?.data)
+      }
+
+    } catch (error) {
+      console.error("Error fetching trips:", error?.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  useEffect(() => {
+    getAllTrips(id)
+  }, []);
+
+  console.log(trips, "trips")
 
   return (
     <div>
@@ -14,145 +40,46 @@ const CategoryPreview = () => {
           <div className='category-preview-parent section-padding'>
             <div className='row'>
 
-              <div className="col-lg-3 col-md-6">
-                <div className="featured-card-main popular-card-main m-0">
-                  <a
-                    href="destination-list"
-                    className="text-decoration-none"
-                  >
-                    <div>
-                      <img
-                        className="featured-card-img"
-                        src={Images.featured_card}
-                        alt="featured"
-                      />
-                    </div>
-                    <div className="featured-content-main">
-                      <p className="featured-city-para">Paris, France</p>
-                      <p className="featured-content">
-                        Centipede Tour - Guided Arizona Desert Tour by ATV
-                      </p>
-                      <div className="featured-bottom-content d-flex gap-2">
-                        <div className='trip-card-amount button'>
-                        <p className="">
-                            Trip Detail
-                          </p>
+              {trips && trips.length > 0 ? (
+                trips.map((trip, index) => (
+                  <div className='col-lg-3 col-md-6'>
+                    <div className="featured-card-main">
+                      <div className='position-relative'>
+                        <div>
+                          <img className="featured-card-img" src={Images.featured_card} alt="featured" />
                         </div>
-                        <div className='trip-card-amount'>
-                          <p className="">
-                            From <span className="fw-bold">₹ 1200rs</span>/-
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
 
-              <div className="col-lg-3 col-md-6">
-                <div className="featured-card-main popular-card-main m-0">
-                  <a
-                    href="destination-list"
-                    className="text-decoration-none"
-                  >
-                    <div>
-                      <img
-                        className="featured-card-img"
-                        src={Images.featured_card}
-                        alt="featured"
-                      />
-                    </div>
-                    <div className="featured-content-main">
-                      <p className="featured-city-para">Paris, France</p>
-                      <p className="featured-content">
-                        Centipede Tour - Guided Arizona Desert Tour by ATV
-                      </p>
-                      <div className="featured-bottom-content d-flex gap-2">
-                        <div className='trip-card-amount button'>
-                          <p className="">
-                            Trip Detail
-                          </p>
+                        <div className='featured-card-day-card'>
+                          <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
                         </div>
-                        <div className='trip-card-amount'>
-                          <p className="">
-                            From <span className="fw-bold">₹ 1200rs</span>/-
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
 
-              <div className="col-lg-3 col-md-6">
-                <div className="featured-card-main popular-card-main m-0">
-                  <a
-                    href="destination-list"
-                    className="text-decoration-none"
-                  >
-                    <div>
-                      <img
-                        className="featured-card-img"
-                        src={Images.featured_card}
-                        alt="featured"
-                      />
-                    </div>
-                    <div className="featured-content-main">
-                      <p className="featured-city-para">Paris, France</p>
-                      <p className="featured-content">
-                        Centipede Tour - Guided Arizona Desert Tour by ATV
-                      </p>
-                      <div className="featured-bottom-content d-flex gap-2">
-                        <div className='trip-card-amount button'>
-                        <p className="">
-                            Trip Detail
-                          </p>
-                        </div>
-                        <div className='trip-card-amount'>
-                          <p className="">
-                            From <span className="fw-bold">₹ 1200rs</span>/-
-                          </p>
-                        </div>
                       </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
 
-              <div className="col-lg-3 col-md-6">
-                <div className="featured-card-main popular-card-main m-0">
-                  <a
-                    href="destination-list"
-                    className="text-decoration-none"
-                  >
-                    <div>
-                      <img
-                        className="featured-card-img"
-                        src={Images.featured_card}
-                        alt="featured"
-                      />
-                    </div>
-                    <div className="featured-content-main">
-                      <p className="featured-city-para">Paris, France</p>
-                      <p className="featured-content">
-                        Centipede Tour - Guided Arizona Desert Tour by ATV
-                      </p>
-                      <div className="featured-bottom-content d-flex gap-2">
-                        <div className='trip-card-amount button'>
-                          <p className="">
-                            Trip Detail
-                          </p>
-                        </div>
-                        <div className='trip-card-amount'>
-                          <p className="">
-                            From <span className="fw-bold">₹ 1200rs</span>/-
-                          </p>
+                      <div className="featured-content-main">
+                        <p className="featured-city-para">
+                          {trip?.pickup_location} → {trip?.drop_location}
+                        </p>
+
+                        <p className="featured-content">
+                          <span>₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price} </span>
+                          ₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price}
+                        </p>
+                        <div className="featured-bottom-content d-flex gap-2">
+                          <div className='trip-card-amount'>
+                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}>
+                              Trip Detail
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </a>
-                </div>
-              </div>
+
+
+                  </div>
+                ))
+              ) : (
+                <p className="text-center py-4 no-trip-available">No Tours available 😞</p>
+              )}
 
 
             </div>

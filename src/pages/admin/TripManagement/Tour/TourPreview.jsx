@@ -103,7 +103,7 @@ const TourPreview = () => {
     }, [])
 
     return (
-        <div className=''>
+        <div className='overflow-hidden-page'>
             {/* <section className="destination-detail-banner-main">
                 <Swiper
                     modules={[EffectFade, Autoplay, Navigation]}
@@ -145,7 +145,7 @@ const TourPreview = () => {
                                 <h2 className='trip-detail-heading'>{specificTourData?.short_description}</h2>
 
                                 <div className='d-flex trip-pickup-parent'>
-                                    <div className='trip-pickup-drop me-4'>
+                                    <div className='trip-pickup-drop me-lg-4 me-0'>
                                         <div>
                                             <i class="fa-solid fa-location-dot"></i>
                                         </div>
@@ -154,7 +154,7 @@ const TourPreview = () => {
                                             <h3>{specificTourData?.pickup_location} - {specificTourData?.drop_location}</h3>
                                         </div>
                                     </div>
-                                    <div className='trip-pickup-drop'>
+                                    <div className='trip-pickup-drop mt-lg-0 mt-3'>
                                         <div>
                                             <i class="fa-solid fa-clock"></i>
                                         </div>
@@ -268,7 +268,6 @@ const TourPreview = () => {
                                         ))}
                                     </div>
                                 </div>
-
 
                             </div>
                         </div>

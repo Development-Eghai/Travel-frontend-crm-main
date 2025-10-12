@@ -116,6 +116,7 @@ const TourList = () => {
         getAllTrips()
     }, [])
 
+    console.log(tripList,"tripList--tripList")
 
     return (
         <div className='admin-content-main'>

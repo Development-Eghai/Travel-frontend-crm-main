@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MemorizedSelector } from "../../../helpers/memorizedSelector";
+import ContactForm from "../../admin/TripManagement/ContactForm/ContactForm";
 
 const Header = () => {
   const { appConfigData } = MemorizedSelector();
@@ -47,14 +48,23 @@ const Header = () => {
     if (window.innerWidth >= 992) setOpenDropdown(null);
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="overflow-hidden">
       <div
-        className={`header-main ${
-          !no_fixed_header_for?.includes(window.location.pathname)
-            ? ""
-            : "not-fixed-header"
-        }`}
+        className={`header-main ${!no_fixed_header_for?.includes(window.location.pathname)
+          ? ""
+          : "not-fixed-header"
+          }`}
       >
         <nav className="navbar navbar-expand-lg" ref={wrapperRef}>
           <div className="container d-flex justify-content-between align-items-center">
@@ -76,9 +86,8 @@ const Header = () => {
               <ul className="navbar-nav align-items-center gap-3">
                 {/* Domestic Dropdown */}
                 <li
-                  className={`nav-item dropdown ${
-                    openDropdown === "domestic" ? "show" : ""
-                  }`}
+                  className={`nav-item dropdown ${openDropdown === "domestic" ? "show" : ""
+                    }`}
                   onMouseEnter={() => handleMouseEnter("domestic")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -95,9 +104,8 @@ const Header = () => {
                   </button>
 
                   <ul
-                    className={`dropdown-menu ${
-                      openDropdown === "domestic" ? "show" : ""
-                    }`}
+                    className={`dropdown-menu ${openDropdown === "domestic" ? "show" : ""
+                      }`}
                   >
                     <li>
                       <Link
@@ -122,9 +130,8 @@ const Header = () => {
 
                 {/* International Dropdown */}
                 <li
-                  className={`nav-item dropdown ${
-                    openDropdown === "international" ? "show" : ""
-                  }`}
+                  className={`nav-item dropdown ${openDropdown === "international" ? "show" : ""
+                    }`}
                   onMouseEnter={() => handleMouseEnter("international")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -141,9 +148,8 @@ const Header = () => {
                   </button>
 
                   <ul
-                    className={`dropdown-menu ${
-                      openDropdown === "international" ? "show" : ""
-                    }`}
+                    className={`dropdown-menu ${openDropdown === "international" ? "show" : ""
+                      }`}
                   >
                     <li>
                       <Link to="/international/europe" className="dropdown-item">
@@ -165,9 +171,8 @@ const Header = () => {
 
                 {/* Honeymoon Dropdown */}
                 <li
-                  className={`nav-item dropdown ${
-                    openDropdown === "honeymoon" ? "show" : ""
-                  }`}
+                  className={`nav-item dropdown ${openDropdown === "honeymoon" ? "show" : ""
+                    }`}
                   onMouseEnter={() => handleMouseEnter("honeymoon")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -184,13 +189,12 @@ const Header = () => {
                   </button>
 
                   <ul
-                    className={`dropdown-menu ${
-                      openDropdown === "honeymoon" ? "show" : ""
-                    }`}
+                    className={`dropdown-menu ${openDropdown === "honeymoon" ? "show" : ""
+                      }`}
                   >
                     <li>
                       <Link to="/international/europe" className="dropdown-item">
-                        Bali 
+                        Bali
                       </Link>
                     </li>
                     <li>
@@ -208,9 +212,8 @@ const Header = () => {
 
                 {/* Upcoming Group Trips Dropdown */}
                 <li
-                  className={`nav-item dropdown ${
-                    openDropdown === "upcoming" ? "show" : ""
-                  }`}
+                  className={`nav-item dropdown ${openDropdown === "upcoming" ? "show" : ""
+                    }`}
                   onMouseEnter={() => handleMouseEnter("upcoming")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -227,13 +230,12 @@ const Header = () => {
                   </button>
 
                   <ul
-                    className={`dropdown-menu ${
-                      openDropdown === "upcoming" ? "show" : ""
-                    }`}
+                    className={`dropdown-menu ${openDropdown === "upcoming" ? "show" : ""
+                      }`}
                   >
                     <li>
                       <Link to="/international/europe" className="dropdown-item">
-                        Spiti Valley 
+                        Spiti Valley
                       </Link>
                     </li>
                     <li>
@@ -286,42 +288,43 @@ const Header = () => {
 
         {/* Slide-out Mobile Menu */}
         <div
-          className={`mobile-menu d-lg-none position-fixed top-0 end-0 h-100 p-4 ${
-            mobileMenuOpen ? "open" : ""
-          }`}
+          className={`mobile-menu d-lg-none position-fixed top-0 end-0 h-100 p-4 ${mobileMenuOpen ? "open" : ""
+            }`}
           style={{
             width: "70%",
             backgroundColor: "#3b2a1a",
             transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
             transition: "transform 0.3s ease-in-out",
             zIndex: 1050,
-            color: "#000",
           }}
         >
+
           <button
-            className="btn-close mb-4"
+            className="btn-close mb-4 text-white btn-close-mobile"
             onClick={() => setMobileMenuOpen(false)}
           ></button>
 
+
+
           <ul className="list-unstyled d-flex flex-column gap-3 m-0">
+
+            <li>
+              <button className="plan-trip-btn" onClick={handleOpenModal}>
+                Plan Your Trip
+              </button>
+            </li>
+
+
             <li>
               <Link
                 to="/blogs"
-                className="text-decoration-none"
+                className="text-decoration-none text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Blogs
               </Link>
             </li>
-            {/* <li>
-              <Link
-                to="/careers"
-                className="text-decoration-none"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Careers
-              </Link>
-            </li> */}
+
             <li>
               <Link
                 to="/contact-us"
@@ -340,9 +343,18 @@ const Header = () => {
                 About Us
               </Link>
             </li>
+
           </ul>
+
+
         </div>
       </div>
+
+      <ContactForm
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+
     </div>
   );
 };
