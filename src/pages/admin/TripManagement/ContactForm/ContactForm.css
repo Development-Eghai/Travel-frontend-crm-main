@@ -56,7 +56,7 @@
 /* Left Panel Styles */
 .contact-form-left-panel {
   flex: 0 0 40%;
-  background: linear-gradient(180deg, #EB662B 0%, #f28d5c 100%);
+  background: linear-gradient(180deg, #3b2a1a 0%, #f28d5c 100%);
   padding: 40px;
   color: white;
   display: flex;
@@ -164,7 +164,7 @@
 
 .form-control:focus {
   outline: none;
-  border-color: #EB662B;
+  border-color: #3b2a1a;
   box-shadow: 0 0 0 2px rgba(235, 102, 43, 0.1);
 }
 
@@ -208,9 +208,9 @@
 }
 
 .toggle-btn.active {
-  background: #EB662B;
+  background: #3b2a1a;
   color: white;
-  border-color: #EB662B;
+  border-color: #3b2a1a;
 }
 
 /* Date Fields */
@@ -250,7 +250,7 @@
 .submit-btn {
   width: 100%;
   padding: 15px;
-  background: #EB662B;
+  background: #3b2a1a;
   color: white;
   border: none;
   border-radius: 6px;
@@ -289,7 +289,7 @@
 
 .success-close-btn {
   padding: 12px 30px;
-  background: #EB662B;
+  background: #3b2a1a;
   color: white;
   border: none;
   border-radius: 6px;

@@ -1,129 +1,124 @@
-import { Link } from 'react-router-dom';
-import { MemorizedSelector } from '../../../helpers/memorizedSelector';
+import { Link } from "react-router-dom";
 
 const Footer = () => {
-  const { appConfigData } = MemorizedSelector();
-
   return (
-    <div>
-      <footer className='footer-main section-padding-top'>
-        <div className='container'>
-
-          <div className='footer-top-main position-relative'>
-            <div className='d-flex my-auto'>
-              <p>Speak to our expert at</p>
-              <a className='expert-contact' href='tel:+9345841519'>{appConfigData?.config_data?.phone1}</a>
-            </div>
-
-            {appConfigData?.config_data?.social_links &&
-              <div className='footer-social-icon mt-lg-0 mt-3'>
-                <p>Follow Us :</p>
-                <ul className='social-hover'>
-
-                  {appConfigData?.config_data?.social_links?.instagram?.url &&
-                    appConfigData?.config_data?.social_links?.instagram?.show && (
-                      <li>
-                        <a href={appConfigData?.config_data.social_links.instagram.url} target="_blank"><i className="fa-brands fa-instagram icon"></i></a>
-                      </li>
-                    )}
-
-                  {appConfigData?.config_data?.social_links?.facebook?.url &&
-                    appConfigData?.config_data?.social_links?.facebook?.show && (
-                      <li>
-                        <a href={appConfigData?.config_data?.social_links?.facebook.url} target="_blank"><i class="fa-brands fa-facebook-f icon"></i></a>
-                      </li>
-                    )}
-
-                  {appConfigData?.config_data?.social_links?.linkedin?.url &&
-                    appConfigData?.config_data?.social_links?.linkedin?.show && (
-                      <li>
-                        <a href={appConfigData?.config_data?.social_links?.linkedin.url} target="_blank"><i class="fa-brands fa-linkedin-in icon"></i></a>
-                      </li>
-                    )}
-
-                  {appConfigData?.config_data?.social_links?.youtube?.url &&
-                    appConfigData?.config_data?.social_links?.youtube?.show && (
-                      <li>
-                        <a href={appConfigData?.config_data?.social_links?.youtube.url} target="_blank"><i class="fa-brands fa-youtube icon"></i></a>
-                      </li>
-                    )}
-
-
-                  {appConfigData?.config_data?.social_links?.twitter?.url &&
-                    appConfigData?.config_data?.social_links?.twitter?.show && (
-                      <li>
-                        <a href={appConfigData?.config_data.social_links.twitter.url} target="_blank">
-                          <i class="fa-brands fa-x-twitter icon"></i>
-                        </a>
-                      </li>
-                    )}
-
-                </ul>
-              </div>
-            }
-
+    <footer
+      className="py-5"
+      style={{ backgroundColor: "#3b2a1a", color: "#fff", overflowX: "hidden" }}
+    >
+      <div className="container-fluid px-4 px-md-5">
+        <div className="row gy-5 gx-5 justify-content-between align-items-start">
+          
+          {/* About Section */}
+          <div className="col-lg-5 col-md-12 text-center text-md-start">
+            <h5 className="fw-semibold mb-3">About Indian Mountain Rovers</h5>
+            {/* <Link to="/" className="d-inline-block mb-3">
+              <img
+                src="/logo-indian-mountain-rovers.png"
+                alt="Indian Mountain Rovers Logo"
+                className="img-fluid"
+                style={{ height: "80px", width: "auto" }}
+              />
+            </Link> */}
+            <p style={{ maxWidth: "600px", lineHeight: "1.7", margin: "0 auto" }}>
+              Explore the heart of the Himalayas with Indian Mountain Rovers! We
+              specialize in crafting bespoke adventure tours — from serene nature
+              trails to thrilling expeditions. Our commitment to excellence ensures
+              every journey is unforgettable.
+            </p>
           </div>
 
-          <div className='footer-bottom-main'>
-            <div className='row'>
-              <div className="col-lg-4 col-md-4 col-6">
-                <div className='footer-column-one d-flex flex-column'>
-                  <h5 className='footer-column-heading'>Contact</h5>
-                  <p className='mb-2'>{appConfigData?.config_data?.address}</p>
-                  <a href={`mailto:${appConfigData?.config_data?.email}`}>{appConfigData?.config_data?.email}</a>
-                  <a href={`tel:${appConfigData?.config_data?.phone1}`} className='mt-3'>{appConfigData?.config_data?.phone1}</a>
-                  <a href={`tel:${appConfigData?.config_data?.phone2}`} className='mt-3'>{appConfigData?.config_data?.phone2}</a>
-                </div>
-              </div>
-
-              <div className="col-lg-2 col-md-3 col-6">
-                <div className='footer-column-two footer-anchor-main d-flex flex-column'>
-                  <h5 className='footer-column-heading'>Company</h5>
-                  <a href='emailto:john@gmail.com'>About Us</a>
-                  <a href='emailto:john@gmail.com'>Tourz Reviews</a>
-                  <a href='emailto:john@gmail.com'>Contact Us</a>
-                  <a href='emailto:john@gmail.com'>Cookie Policy</a>
-                </div>
-              </div>
-
-              <div className="col-lg-2 col-md-3 col-6">
-                <div className='footer-column-two footer-anchor-main d-flex flex-column'>
-                  <h5 className='footer-column-heading'>Support</h5>
-                  <a href='emailto:john@gmail.com'>Get in Touch</a>
-                  <a href='emailto:john@gmail.com'>Help center</a>
-                  <a href='emailto:john@gmail.com'>Live chat</a>
-                  <a href='emailto:john@gmail.com'>How it works</a>
-                </div>
-              </div>
-
-              <div className="col-lg-4 col-md-4 col-12">
-                <div className='footer-column-two footer-anchor-main d-flex flex-column'>
-                  <h5 className='footer-column-heading'>Newsletter</h5>
-                  <p className='mb-2'>Subscribe to the free newsletter and stay
-                    up to date</p>
-                  <div className='subscribe-main mt-2'>
-                    <input type="text" placeholder='Email Address' />
-                    <button className='subscribe-btn'>Subscribe</button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+          {/* Email Support */}
+          <div className="col-lg-3 col-md-6 text-center text-md-start pe-lg-4">
+            <h5 className="fw-semibold mb-3">Email Support</h5>
+            <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+              <li>
+                <a href="mailto:info@indianmountainrovers.com" className="footer-link">
+                  info@indianmountainrovers.com
+                </a>
+              </li>
+              <li>
+                <a href="mailto:indianmountainrovers@gmail.com" className="footer-link">
+                  indianmountainrovers@gmail.com
+                </a>
+              </li>
+              <li>
+                <a href="mailto:mountainroversshimla@gmail.com" className="footer-link">
+                  mountainroversshimla@gmail.com
+                </a>
+              </li>
+            </ul>
           </div>
 
-          <div className='pb-5 footer-last'>
-            <div>
-              <Link to='/Payments' className='mx-1'>Payments</Link>
-              <Link to='/terms-and-conditions' className='mx-1'>Terms&Conditions</Link>
-              <Link to='/privacy-policy' className='mx-1'>PrivacyPolicy</Link>
-            </div>
-            <div><p className='mt-lg-0 mt-md-0 mt-3'>© Copyright Viatours 2024</p></div>
+          {/* Phone Support */}
+          <div className="col-lg-2 col-md-6 text-center text-md-start">
+            <h5 className="fw-semibold mb-3">Phone Support</h5>
+            <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+              <li><a href="tel:+919418344227" className="footer-link">+91 9418344227</a></li>
+              <li><a href="tel:+918278829941" className="footer-link">+91 8278829941</a></li>
+              <li><a href="tel:+918350970984" className="footer-link">+91 8350970984</a></li>
+              <li><a href="tel:+918679623792" className="footer-link">+91 8679623792</a></li>
+            </ul>
           </div>
 
+          {/* Explore Links */}
+          <div className="col-lg-2 col-md-6 text-center text-md-start">
+            <h5 className="fw-semibold mb-3">Explore</h5>
+            <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+              <li><Link to="/" className="footer-link">Home</Link></li>
+              <li><Link to="/about-us" className="footer-link">About Us</Link></li>
+              <li><Link to="/contact-us" className="footer-link">Contact Us</Link></li>
+            </ul>
+          </div>
         </div>
-      </footer>
-    </div>
-  )
-}
 
-export default Footer
+        {/* Footer Bottom */}
+        <div className="text-center pt-5">
+          <div className="mb-2 d-flex flex-wrap justify-content-center gap-3">
+            <Link to="/Payments" className="footer-link">Payments</Link>
+            <Link to="/terms-and-conditions" className="footer-link">Terms & Conditions</Link>
+            <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>
+          </div>
+          <p className="mb-0">
+            © Copyright Indian Mountain Rovers {new Date().getFullYear()}
+          </p>
+        </div>
+      </div>
+
+      {/* Inline styles for hover and responsiveness */}
+      <style>
+        {`
+          .footer-link {
+            color: #fff;
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+          }
+          .footer-link:hover {
+            color: #25d366;
+          }
+          .footer-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 0%;
+            height: 2px;
+            background-color: #25d366;
+            transition: width 0.3s ease;
+          }
+          .footer-link:hover::after {
+            width: 100%;
+          }
+          @media (max-width: 767px) {
+            .footer-link::after {
+              display: none;
+            }
+          }
+        `}
+      </style>
+    </footer>
+  );
+};
+
+export default Footer;

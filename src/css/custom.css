@@ -25,7 +25,7 @@
     margin: auto 0px;
     margin-right: 15px;
     font-size: 28px;
-    color: #EB662B;
+    color: #3b2a1a;
     margin-top: 13px;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .trip-detail-tabs-main {
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     border-radius: 5px;
     width: 100%;
     display: flex;
@@ -78,7 +78,7 @@
 .trip-detail-section .read-more {
     margin-top: 10px;
     text-align: right;
-    color: #EB662B;
+    color: #3b2a1a;
     font-weight: 600;
     cursor: pointer;
 }
@@ -142,7 +142,7 @@
 .trip-detail-price-card .trip-price {
     font-size: 30px;
     font-weight: 600;
-    color: #EB662B;
+    color: #3b2a1a;
 }
 
 .trip-detail-price-card .trip-price-per {
@@ -154,18 +154,18 @@
 .trip-detail-price-card button {
     padding: 12px 40px 14px;
     font-size: 16px;
-    border: 1px solid #EB662B;
+    border: 1px solid #3b2a1a;
     border-radius: 50px;
     background-color: white;
     margin-top: 12px;
     color: white;
     font-weight: 700;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     width: 100%;
 }
 
 .trip-detail-price-card button:hover {
-    background-color: #d9764b;
+    background-color: #3b2a1a;
 }
 
 .booking-center-card .dates-cost {
@@ -181,7 +181,7 @@
 }
 
 .booking-center-card .booking-trip-name {
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     padding: 3px 30px;
     border-bottom-left-radius: 20px;
     color: white;
@@ -223,7 +223,7 @@
 }
 
 .booking-left-accrodion-content {
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     display: flex;
     justify-content: space-between;
     border-radius: 5px;
@@ -267,7 +267,7 @@
 
 .costing-head-table table th {
     padding: 12px 0px;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     color: white;
     font-weight: 600;
     text-align: center;
@@ -350,13 +350,13 @@
     box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
     border-radius: 5px;
     margin-top: 50px;
-    border: 1px solid #EB662B;
+    border: 1px solid #3b2a1a;
     position: sticky;
 
 }
 
 .trip-detail-contact-form-head .head-1 {
-    color: #EB662B;
+    color: #3b2a1a;
     font-weight: 600;
     font-size: 19px;
     border-radius: 5px;
@@ -403,7 +403,7 @@
 }
 
 .trip-detail-contact-form button {
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     color: white;
     border-radius: 50px;
     margin-top: 20xp;
@@ -417,7 +417,7 @@
 /****************************************************** Admin Login Page ******************************************/
 .admin-login-left .icon-div i {
     font-size: 28px;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     border-radius: 9px;
     color: white;
     margin-bottom: 15px;
@@ -450,7 +450,7 @@
 }
 
 .bottom-icon-div-main i {
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     width: fit-content;
     padding: 15px 17px;
     color: white;
@@ -518,7 +518,7 @@
     width: 100%;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     border: none;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     color: white;
     font-weight: 700;
     margin: 20px 0px;
@@ -695,8 +695,8 @@
 }
 
 .booking-personal-detail-button.active {
-    background-color: #EB662B;
-    border: 1px solid #EB662B;
+    background-color: #3b2a1a;
+    border: 1px solid #3b2a1a;
 }
 
 
@@ -723,12 +723,12 @@
 
 .booking-personal-trip-detail .trip-duration {
     padding: 0px 20px;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     color: white;
 }
 
 .booking-personal-trip-detail-main .trip-duration-div {
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     border-bottom-right-radius: 12px;
     border-top-right-radius: 12px;
 }
@@ -783,7 +783,7 @@
 
 .booking-center-card .circle {
     font-size: 20px;
-    color: #EB662B;
+    color: #3b2a1a;
     background: white;
     border-radius: 50%;
     z-index: 2;
@@ -817,7 +817,7 @@
 }
 
 .room-div i {
-    color: #EB662B;
+    color: #3b2a1a;
     font-size: 23px;
     margin-right: 10px;
 }
@@ -852,11 +852,11 @@
     align-items: center;
     gap: 15px;
     border-radius: 8px;
-    border: 1px solid #EB662B;
+    border: 1px solid #3b2a1a;
 }
 
 .indicator-main i {
-    color: #EB662B;
+    color: #3b2a1a;
     cursor: pointer;
 }
 
@@ -897,25 +897,25 @@
 .total-cost-pament {
     display: flex;
     justify-content: space-between;
-    border-top: 1px dotted #EB662B;
+    border-top: 1px dotted #3b2a1a;
 }
 
 .total-cost-pament .amount {
     font-size: 30px;
     font-weight: 700;
-    color: #EB662B;
+    color: #3b2a1a;
 }
 
 .booking-common-btn {
     padding: 12px 100px 14px;
     font-size: 16px;
-    border: 1px solid #EB662B;
+    border: 1px solid #3b2a1a;
     border-radius: 50px;
     background-color: white;
     margin-top: 12px;
     color: white;
     font-weight: 700;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     width: fit-content;
     position: absolute;
     bottom: 0px;
@@ -949,11 +949,11 @@
 }
 
 .booking-confirm-detail .inner-div i {
-    color: #EB662B;
+    color: #3b2a1a;
 }
 
 .booking-confirm-detail .total-cost-pament {
-    border-top: 1px dotted #EB662B;
+    border-top: 1px dotted #3b2a1a;
     padding-top: 10px;
 }
 
@@ -969,7 +969,7 @@
 
 .pay-full-amount p {
     font-size: 30px;
-    color: #EB662B;
+    color: #3b2a1a;
     font-weight: 600;
 }
 
@@ -1002,13 +1002,13 @@
 .pay-now-amount {
     padding: 12px 100px 14px;
     font-size: 16px;
-    border: 1px solid #EB662B;
+    border: 1px solid #3b2a1a;
     border-radius: 50px;
     background-color: white;
     margin-top: 30px !important;
     color: white;
     font-weight: 700;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     width: 100%;
 }
 
@@ -1028,13 +1028,13 @@
 .pay-now-amount-2 {
     padding: 12px 100px 14px;
     font-size: 16px;
-    border: 1px solid #EB662B;
+    border: 1px solid #3b2a1a;
     border-radius: 50px;
     background-color: white;
     margin-top: 30px !important;
     color: white;
     font-weight: 700;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
     width: fit-content;
 }
 
@@ -1133,7 +1133,7 @@
 
 .inventory-item button:hover {
     color: white;
-    background-color: #EB662B;
+    background-color: #3b2a1a;
 
 }
 
@@ -1237,7 +1237,7 @@ input::placeholder {
 }
 
 .trip-card-amount {
-    background-color: #d9764b;
+    background-color: #3b2a1a;
     color: white;
     border-radius: 6px;
     padding: 8px 0px;
@@ -1252,7 +1252,7 @@ input::placeholder {
 }
 
 .trip-card-amount.button{
-    border: 2px solid #d9764b;
+    border: 2px solid #3b2a1a;
     background-color: white;
     border-radius: 6px;
     padding: 7px 0px;
@@ -1260,8 +1260,8 @@ input::placeholder {
 }
 
 .trip-card-amount.button:hover{
-    background-color:  #007bff;
-    border: 2px solid #007bff;
+    background-color:  #25d366;
+    border: 2px solid #25d366;
 }
 
 
@@ -1270,7 +1270,7 @@ input::placeholder {
 }
 
 .trip-card-amount.button p{
-    color: #d9764b;
+    color: #3b2a1a;
     font-weight: 600;
     text-align: center;
     margin-top: 0px;

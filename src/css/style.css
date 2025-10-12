@@ -6,9 +6,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  --font-base: 'Poppins', sans-serif;
+}
+
 body {
-  font-family: "Inter";
+  font-family: var(--font-base);
   scroll-behavior: smooth;
+  margin: 0;
+  padding: 0;
 }
 
 p {
@@ -44,7 +50,7 @@ p {
   padding: 15px 0;
   top: 0;
   z-index: 999;
-  background-color: black;
+  background-color: #3b2a1a !important;
 }
 
 .fixed-header {
@@ -53,16 +59,16 @@ p {
 
 .not-fixed-header {
   position: sticky;
-  background-color: #eb662b;
+  background-color: #3b2a1a;
 }
 
 .navbar-brand {
-  color: white;
+  color: black;
   font-size: 17px;
 }
 
 .navbar-brand:hover {
-  color: black;
+  color: orange;
 }
 
 .login-btn {
@@ -128,7 +134,7 @@ p {
 }
 
 .featured-trips-section {
-  background-color: #eb662b0d;
+  background-color: #3b2a1a0d;
 }
 
 .common-section-heading {
@@ -152,7 +158,7 @@ p {
 }
 
 .nav-btn {
-  background-color: #007bff;
+  background-color: #25d366;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -282,7 +288,7 @@ p {
 
 /************************************************************* offer css ******************************************/
 .offer-left {
-  background-color: #eb662b0d;
+  background-color: #3b2a1a0d;
   padding-left: 100px;
   border-radius: 10px;
   display: flex;
@@ -304,15 +310,15 @@ p {
 }
 
 .offer-button {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 8px 25px 10px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 10px;
 }
 
 .offer-span-head {
-  color: #eb662b;
+  color: #3b2a1a;
 }
 
 /************************************************************* reviews css ******************************************/
@@ -321,7 +327,7 @@ p {
 }
 
 .reviews-para {
-  color: #eb662b;
+  color: #3b2a1a;
   text-align: center;
 }
 
@@ -350,7 +356,7 @@ p {
 }
 
 .booking-offer-main {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   padding: 70px;
   border-radius: 10px;
 }
@@ -429,11 +435,11 @@ p {
 
 /************************************************************* Footer css ******************************************/
 .footer-main {
-  background-color: #eb662b0d;
+  background-color: #3b2a1a0d;
 }
 
 .expert-contact {
-  color: #eb662b;
+  color: #3b2a1a;
   margin-left: 10px;
   text-decoration: none;
 }
@@ -660,7 +666,7 @@ p {
 .discount-price-banner {
   font-size: 18px;
   font-weight: 600;
-  color: #eb662b;
+  color: #3b2a1a;
 }
 
 .starting-price {
@@ -670,12 +676,12 @@ p {
 }
 
 .destination-banner-btn {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 8px 25px 10px;
   font-weight: 500;
   font-size: 15px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 20px;
 }
 
@@ -688,7 +694,7 @@ p {
 }
 
 .destination-read-less-btn {
-  background-color: #007bff;
+  background-color: #25d366;
   color: white;
   padding: 4px 15px;
   font-size: 13px;
@@ -745,22 +751,22 @@ p {
 }
 
 .destination-viewall {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 8px 40px 10px;
   font-weight: 500;
   font-size: 16px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 20px;
 }
 
 .filter-card-offer {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 6px 18px 7px;
   font-weight: 500;
   font-size: 10px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 10px;
   position: absolute;
   top: 15px;
@@ -808,7 +814,7 @@ p {
   background-color: #ffe7dd;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
 }
 
 .destination-enquiry-input-div input::placeholder {
@@ -816,17 +822,17 @@ p {
 }
 
 .destination-enquiry-button {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 8px 60px 10px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 25px;
   font-weight: 600;
 }
 
 .destination-enquiry-button:hover {
   background-color: #ff8d5c;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
 }
 
 .destination-enquiry-input-main {
@@ -856,18 +862,18 @@ p {
 }
 
 .destination-tabs:hover {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
 }
 
 .destination-tabs.active {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
 }
 
 .destination-tabsection button {
   padding: 0px 25px;
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   border: none;
   margin: 7px 0px;
@@ -897,8 +903,8 @@ p {
 }
 
 .destination-filter-main-left-top {
-  background-color: #eb662b;
-  border: 1px solid #eb662b;
+  background-color: #3b2a1a;
+  border: 1px solid #3b2a1a;
   padding: 30px 40px;
   border-top-left-radius: 13px;
   border-top-right-radius: 13px;
@@ -978,7 +984,7 @@ input[type="checkbox"] {
 }
 
 .filter-card-features p {
-  color: #eb662b;
+  color: #3b2a1a;
   margin-top: 10px;
 }
 
@@ -996,19 +1002,19 @@ input[type="checkbox"] {
   padding: 12px 40px 14px;
   font-weight: 500;
   font-size: 16px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 10px;
   background-color: white;
   margin-top: 20px;
 }
 
 .filter-card-view-main button a {
-  color: #eb662b !important;
+  color: #3b2a1a !important;
 }
 
 .filter-card-view-main button:hover,
 .filter-card-view-main button:hover a {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white !important;
 }
 
@@ -1019,7 +1025,7 @@ input[type="checkbox"] {
 /************************************************************* overview page css ******************************************/
 .overview-best {
   background-color: #fff4ef;
-  color: #eb662b;
+  color: #3b2a1a;
   padding: 8px 18px 9px;
   font-weight: 500;
   font-size: 13px;
@@ -1219,7 +1225,7 @@ input[type="checkbox"] {
 .comments-overview-btn {
   margin-bottom: 0px !important;
   margin-top: 0px !important;
-  background-color: #eb662b !important;
+  background-color: #3b2a1a !important;
   color: white !important;
 }
 
@@ -1320,7 +1326,7 @@ input[type="checkbox"] {
   font-size: 16px;
   border-radius: 30px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   border: none;
 }
@@ -1372,16 +1378,16 @@ input[type="checkbox"] {
 
 .see-more-review {
   background-color: white;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   border-radius: 10px;
   padding: 14px 30px;
-  color: #eb662b;
+  color: #3b2a1a;
   cursor: pointer;
   margin: 50px 0px;
 }
 
 .see-more-review:hover {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
 }
 
@@ -1397,16 +1403,16 @@ input[type="checkbox"] {
 .sidebar-menu:hover,
 .sidebar-menu:hover button {
   background-color: white;
-  color: #eb662b !important;
+  color: #3b2a1a !important;
 }
 
 button:focus:not(:focus-visible) {
-  /* color: #EB662B; */
+  /* color: #3b2a1a; */
 }
 
 .sidebar-menu.active {
   background-color: white;
-  color: #eb662b !important;
+  color: #3b2a1a !important;
 }
 
 .sidebar-icon {
@@ -1424,7 +1430,7 @@ button:focus:not(:focus-visible) {
   display: flex;
   overflow-y: scroll;
   flex-direction: column;
-  background-color: #eb662b !important;
+  background-color: #3b2a1a !important;
   box-shadow:
     rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
@@ -1439,6 +1445,9 @@ button:focus:not(:focus-visible) {
 
 .page-content {
   /* margin: 20px 4px; */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .nav-link.sidebar-menu:focus {
@@ -1446,7 +1455,7 @@ button:focus:not(:focus-visible) {
 }
 
 .nav-link.sidebar-menu:hover {
-  color: #eb662b !important;
+  color: #3b2a1a !important;
 }
 
 .submenu-list {
@@ -1471,13 +1480,13 @@ button:focus:not(:focus-visible) {
 .submenu-menus:hover,
 .submenu-menus:hover a {
   background-color: white;
-  color: #eb662b;
+  color: #3b2a1a;
 }
 
 .submenu-menus.active,
 .submenu-menus.active a {
   background-color: white;
-  color: #eb662b !important;
+  color: #3b2a1a !important;
 }
 
 .header-div-main {
@@ -1615,13 +1624,13 @@ button:focus:not(:focus-visible) {
 }
 
 .comments-para {
-  color: #eb662b;
+  color: #3b2a1a;
   font-size: 12px;
   margin-top: 10px;
 }
 
 .blogs-read-more-para a {
-  color: #eb662b;
+  color: #3b2a1a;
   font-size: 16px;
   font-weight: 600;
   text-decoration: underline;
@@ -1677,7 +1686,7 @@ button:focus:not(:focus-visible) {
 }
 
 .blogs-subscribe {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
 }
 
 .blogs-subscribe input {
@@ -1700,18 +1709,18 @@ button:focus:not(:focus-visible) {
   margin-bottom: 10px;
   text-align: center;
   margin-top: 20px;
-  color: #eb662b;
-  border: 1px solid #eb662b;
+  color: #3b2a1a;
+  border: 1px solid #3b2a1a;
 }
 
 .blogs-subscribe-btn:hover {
   border: 1px solid white;
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
 }
 
 .tags-main {
-  color: #eb662b;
+  color: #3b2a1a;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -1719,7 +1728,7 @@ button:focus:not(:focus-visible) {
 }
 
 .tags-main a {
-  color: #eb662b;
+  color: #3b2a1a;
   /* padding: 0px 10px; */
   margin-bottom: 10px;
   text-align: center;
@@ -1727,7 +1736,7 @@ button:focus:not(:focus-visible) {
 
 /************************************************************* Blogs Detail css ******************************************/
 .blogs-detail-cat {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 4px 13px;
   width: fit-content;
@@ -1764,7 +1773,7 @@ button:focus:not(:focus-visible) {
 }
 
 .blogs-detail-left-head {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   width: fit-content;
   padding: 8px 4px;
@@ -1773,7 +1782,7 @@ button:focus:not(:focus-visible) {
 }
 
 .blogs-detail-categories {
-  border-bottom: 1px dotted #eb662b;
+  border-bottom: 1px dotted #3b2a1a;
   display: flex;
   justify-content: space-between;
   padding-bottom: 8px;
@@ -1792,14 +1801,14 @@ button:focus:not(:focus-visible) {
 }
 
 .blogs-detail-tags a:hover {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
 }
 
 .blogs-detail-tags a.active {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
 }
 
 .blogs-detail-tags {
@@ -1810,7 +1819,7 @@ button:focus:not(:focus-visible) {
 
 /************************************************************* Contact Us css ******************************************/
 .contact-us-main {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   padding: 60px 0px;
 }
 
@@ -1873,7 +1882,7 @@ button:focus:not(:focus-visible) {
 }
 
 .contact-submit-btn {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   padding: 8px 0px 8px 0px;
   width: 100%;
@@ -1883,7 +1892,7 @@ button:focus:not(:focus-visible) {
 }
 
 .contact-submit-btn:hover {
-  background-color: #007bff;
+  background-color: #25d366;
 }
 
 .contact-us-map iframe {
@@ -1922,7 +1931,7 @@ button:focus:not(:focus-visible) {
 }
 
 .our-leader-section {
-  background-color: #eb662b0d;
+  background-color: #3b2a1a0d;
 }
 
 .aboutus-head-one-common {
@@ -1951,7 +1960,7 @@ button:focus:not(:focus-visible) {
 }
 
 .our-footprint-section {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
 }
 
 .our-footprint-number {
@@ -1971,7 +1980,7 @@ button:focus:not(:focus-visible) {
 
 .our-footprint-card:hover {
   transform: translateY(-10px);
-  background-color: #007bff;
+  background-color: #25d366;
   color: white;
 }
 
@@ -2169,7 +2178,7 @@ button:focus:not(:focus-visible) {
 }
 
 .dashboard-bottom-card.card-4 {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
 }
 
 .data-percent {
@@ -2294,8 +2303,8 @@ button:focus:not(:focus-visible) {
 .create-common-btn {
   width: 100%;
   padding: 10px;
-  border: 1px solid #eb662b;
-  background-color: #eb662b;
+  border: 1px solid #3b2a1a;
+  background-color: #3b2a1a;
   color: white;
   border-radius: 5px;
   cursor: pointer;
@@ -2311,7 +2320,7 @@ button:focus:not(:focus-visible) {
 .admin-add-button {
   width: fit-content;
   padding: 12px 25px;
-  border: 1px solid #eb662b;
+  border: 1px solid #3b2a1a;
   color: white;
   border-radius: 13px;
   cursor: pointer;
@@ -2319,7 +2328,7 @@ button:focus:not(:focus-visible) {
   font-weight: 600;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease-in-out;
-  background: linear-gradient(to right, #f0803f, #eb662b);
+  background: linear-gradient(to right, #f0803f, #3b2a1a);
 }
 
 .admin-add-button:hover {
@@ -2388,7 +2397,7 @@ button:focus:not(:focus-visible) {
   top: 12px;
   right: 12px;
   font-size: 1.1rem;
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
   width: 30px;
   height: 30px;
@@ -2453,8 +2462,8 @@ button:focus:not(:focus-visible) {
 .model-submit-button {
   padding: 8px 30px;
   border-radius: 5px;
-  border: 1px solid #eb662b !important;
-  background-color: #eb662b;
+  border: 1px solid #3b2a1a !important;
+  background-color: #3b2a1a;
   color: white;
   cursor: pointer;
   margin-top: 25px;
@@ -2527,7 +2536,7 @@ button:focus:not(:focus-visible) {
 }
 
 .creta-tour-parent {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   padding: 10px 20px;
   border-radius: 10px;
   margin-top: 30px;
@@ -2674,7 +2683,7 @@ input:checked + .slider:before {
 }
 
 .trip-creation-steps .steps-main.active {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
   color: white;
 }
 
@@ -2721,7 +2730,7 @@ input:checked + .slider:before {
 
 .trip-type-card:hover {
   transform: translateY(-5px);
-  border: 2px solid #eb662b;
+  border: 2px solid #3b2a1a;
   box-shadow:
     rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em,
     rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em,
@@ -2729,7 +2738,7 @@ input:checked + .slider:before {
 }
 
 .trip-type-card.active {
-  background: linear-gradient(135deg, #eb662b 0%, #ff8a4c 100%);
+  background: linear-gradient(135deg, #3b2a1a 0%, #ff8a4c 100%);
   color: white;
 }
 
@@ -2739,14 +2748,14 @@ input:checked + .slider:before {
 
 .itenary-main {
   padding: 20px 30px;
-  border-left: 4px solid #eb662b;
+  border-left: 4px solid #3b2a1a;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
 }
 
 .itenary-list-main {
   padding: 30px 30px 35px;
-  border: 2px dotted #eb662b;
+  border: 2px dotted #3b2a1a;
   border-radius: 15px;
 }
 
@@ -2948,7 +2957,7 @@ input:checked + .slider:before {
 }
 
 .delete-btn:hover {
-  background-color: #eb662b;
+  background-color: #3b2a1a;
 }
 
 .delete-btn:active {
@@ -3563,7 +3572,7 @@ textarea:focus {
 }
 
 .search-results-search-bar .search-button {
-  background: #007bff;
+  background: #25d366;
   border: none;
   border-radius: 50px;
   padding: 1rem 1.5rem;
@@ -3625,7 +3634,7 @@ textarea:focus {
 }
 
 .filter-group select:focus {
-  border-color: #007bff;
+  border-color: #25d366;
 }
 
 .search-results-grid {
@@ -3684,7 +3693,7 @@ textarea:focus {
 .search-result-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border-color: #007bff;
+  border-color: #25d366;
 }
 
 .result-image {
@@ -3703,7 +3712,7 @@ textarea:focus {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #007bff;
+  background: #25d366;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -3739,7 +3748,7 @@ textarea:focus {
 }
 
 .result-meta i {
-  color: #007bff;
+  color: #25d366;
 }
 
 .loading-container {
@@ -5354,7 +5363,7 @@ textarea:focus {
 /* topnavbar */
 
 .nav-link:hover {
-  color: #eb662b;
+  color: #3b2a1a;
 }
 
 .nav-link {
@@ -5373,7 +5382,7 @@ textarea:focus {
   left: 50%;
   width: 0;
   height: 2px;
-  background-color: #ff6600; /* orange underline */
+  background-color: #25d366; /* orange underline */
   transition: all 0.3s ease;
   transform: translateX(-50%);
 }
@@ -5414,7 +5423,7 @@ textarea:focus {
   position: relative;
   padding: 5px 15px;
   border-radius: 30px;
-  background-color: #fff;
+  background-color: #3b2a1a;
   color: #fff;
   font-weight: bold;
   text-transform: uppercase;
@@ -5434,11 +5443,10 @@ textarea:focus {
   bottom: -2px;
   background: conic-gradient(
     from 0deg,
-    #ff7300,
-    #ff9d00,
-    #ff7300,
-    #ff9d00,
-    #ff7300
+    rgb(37, 211, 102),
+    rgb(37, 211, 102),
+    rgb(37, 211, 102),
+    rgb(37, 211, 102)
   );
   border-radius: 5px;
   z-index: -1;
@@ -5452,7 +5460,7 @@ textarea:focus {
   left: 3px;
   right: 3px;
   bottom: 3px;
-  background: #111; /* same as button background */
+  background: #3b2a1a; /* same as button background */
   border-radius: 30px;
   z-index: -1;
 }
@@ -5599,3 +5607,108 @@ textarea:focus {
   justify-content: space-between;
   align-items: center;
 }
+
+/*NEW*/
+
+/*************** FIX: Dropdown visibility + positioning ***************/
+
+/* ensure each nav-item is a positioning context */
+.header-main .nav-item {
+  position: relative;
+}
+
+/* allow dropdowns to escape wrapper clipping (overrides the utility class) */
+.overflow-hidden {
+  overflow: visible !important;
+}
+
+/* dropdown menu: positioned absolutely and centered under the toggle */
+
+.header-main .dropdown-menu {
+  position: absolute;
+  top: 0px;      /* place below the toggle */
+  transform: translateX(50%) translateY(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, transform 220ms ease, visibility 220ms;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  padding: 6px 0;
+  min-width: 200px;
+  z-index: 3000;              /* sit above other content */
+  display: block;  
+       /* keep block so transform/opacity works */
+}
+
+/* visible state */
+.header-main .dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* dropdown items */
+.header-main .dropdown-item {
+  padding: 10px 18px;
+  font-size: 15px;
+  color: #3b2a1a;
+  font-weight: 500;
+  display: block;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.header-main .dropdown-item:hover {
+  background: #25d366;
+  color: #fff;
+}
+/* 1. Desktop Navigation Buttons (Domestic Trips, etc.) */
+.header-main .custom-dropdown {
+    color: #ffffff; /* Sets the button text color to white */
+}
+
+/* 2. Mobile Menu Links (Blogs, Contact Us, etc.) */
+.mobile-menu ul a {
+    color: #ffffff; /* Sets the mobile menu link color to white */
+}
+/* arrow rotation when open */
+.header-main .nav-item.dropdown.show > .custom-dropdown .arrow,
+.header-main .nav-item.dropdown .custom-dropdown[aria-expanded="true"] .arrow {
+  transform: rotate(180deg);
+  color: #fff;
+}
+
+/* Responsive: inside mobile collapsed navbar we want dropdowns to behave like normal vertical lists */
+@media (max-width: 991px) {
+  .header-main .dropdown-menu {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    box-shadow: none;
+    padding-left: 12px;
+    padding-right: 12px;
+    min-width: 100%;
+  }
+
+  .header-main .nav-link,
+  .header-main .custom-link {
+    padding: 12px 8px;
+    width: 100%;
+  }
+}
+
+.btn-success:hover {
+  background-color: #1ebe5a !important;
+  border-color: #1ebe5a !important;
+}
+
+.mobile-menu a {
+  color: #000 !important;
+  text-decoration: none !important;
+}
+.text-justify {
+  text-align: justify;
+}
+
