@@ -97,7 +97,7 @@ const TourList = () => {
 
     const getAllTrips = async () => {
         try {
-            const res = await APIBaseUrl.get("trips/", {
+            const res = await APIBaseUrl.get("trips", {
                 headers: {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
                 },

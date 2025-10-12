@@ -16,6 +16,7 @@ import { createTrip } from "../../../../store/slices/tripSlices";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { APIBaseUrl } from "../../../../common/api/api";
 
 export default function TourCreation() {
   const [activeStep, setActiveStep] = useState("basic");
@@ -29,7 +30,7 @@ export default function TourCreation() {
     overview: "",
     destination_id: "",
     destination_type: "",
-    categories: [],
+    category_id: null,
     themes: [],
     hotel_category: "",
     pickup_location: "",
@@ -319,7 +320,7 @@ export default function TourCreation() {
     }
   };
 
-  const [faqs, setFaqs] = useState([{ question: "", answer: "" }]);
+  const [faqs, setFaqs] = useState([]);
   const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
 
   // Add FAQ
@@ -327,29 +328,20 @@ export default function TourCreation() {
     if (faqInput?.question?.trim() && faqInput?.answer?.trim()) {
       setFaqs([...faqs, faqInput]);
       setFaqInput({ question: "", answer: "" });
+
     } else {
       alert("Please fill both question and answer!");
     }
   };
 
 
-  console.log(faqInput,"faqInput")
+
 
   // Delete FAQ
   const deleteFaqs = (indexToRemove) => {
     const updatedFaqs = faqs.filter((_, index) => index !== indexToRemove);
     setFaqs(updatedFaqs);
   };
-
-  // const addFaq = () => {
-  //   if (faqInput.trim()) {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       faqs: [...prev.faqs, faqInput.trim()],
-  //     }));
-  //     setFaqInput("");
-  //   }
-  // };
 
   const addCustomPolicy = () => {
     if (customPolicyInput.trim()) {
@@ -363,6 +355,8 @@ export default function TourCreation() {
       setCustomPolicyInput("");
     }
   };
+
+
 
   // Remove items from arrays
   // const removeItem = (field, index) => {
@@ -460,7 +454,7 @@ export default function TourCreation() {
       overview: formData.overview,
       destination_id: parseInt(formData.destination_id),
       destination_type: formData.destination_type,
-      categories: formData.categories,
+      category_id: formData?.category_id,
       themes: formData.themes,
       hotel_category: parseInt(formData.hotel_category) || 0,
       pickup_location: formData.pickup_location,
@@ -473,7 +467,7 @@ export default function TourCreation() {
       highlights: formData.highlights.join("; "),
       inclusions: formData.inclusions.join("; "),
       exclusions: formData.exclusions.join("; "),
-      faqs: formData.faqs.join("; "),
+      faqs: faqs,
       terms: formData.terms,
       privacy_policy: formData.privacy_policy,
       payment_terms: formData.payment_terms,
@@ -557,7 +551,8 @@ export default function TourCreation() {
   const handleSubmit = async () => {
     try {
       const submissionData = await prepareSubmissionData();
-      // console.log("Submitting data:", JSON.stringify(submissionData, null, 2));
+      console.log("Submitting data:", submissionData);
+      console.log("Submitting data json:", JSON.stringify(submissionData, null, 2));
       // console.log("Media section data:", submissionData.media);
 
       dispatch(createTrip(submissionData))
@@ -575,6 +570,31 @@ export default function TourCreation() {
       toast.error("Error preparing trip data. Please try again.");
     }
   };
+
+  const [categoryList, setcategoryList] = useState([])
+
+  const getAllTourCategory = async () => {
+    try {
+      const res = await APIBaseUrl.get("categories/", {
+        headers: {
+          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+        },
+      });
+      if (res?.data?.success === true) {
+
+        setcategoryList(res?.data?.data)
+      }
+
+    } catch (error) {
+      console.error("Error fetching trips:", error?.response?.data || error.message);
+      throw error;
+    }
+  }
+  console.log(formData, "formData")
+
+  useEffect(() => {
+    getAllTourCategory()
+  }, [])
 
   const renderStepContent = () => {
     switch (activeStep) {
@@ -664,28 +684,25 @@ export default function TourCreation() {
               <div className="col-md-6">
                 <div className="mb-3">
                   <label className="form-label d-block">Categories *</label>
-                  {[
-                    "Honeymoon Packages",
-                    "Family Packages",
-                    "Friends",
-                    "Group Packages",
-                    "Solo Trips",
-                    "All-Girls Trips",
-                    "All-Boys Trips",
-                    "Volunteer Trips",
-                  ].map((cat) => (
-                    <div className="form-check" key={cat}>
-                      <input
-                        type="checkbox"
-                        className="form-check-input"
-                        checked={formData.categories.includes(cat)}
-                        onChange={(e) =>
-                          handleArrayChange("categories", cat, e.target.checked)
-                        }
-                      />
-                      <label className="form-check-label">{cat}</label>
-                    </div>
-                  ))}
+                  {categoryList?.length > 0 &&
+                    categoryList.map((cat) => (
+                      <div className="form-check" key={cat.id}>
+                        <input
+                          type="radio"
+                          name="category"
+                          className="form-check-input"
+                          checked={Number(formData?.category_id) === Number(cat?.id)}
+                          onChange={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              category_id: Number(cat?.id),
+                            }))
+                          }
+                        />
+                        <label className="form-check-label">{cat.name}</label>
+                      </div>
+                    ))}
+
                 </div>
 
                 <div className="mb-3">
@@ -1516,15 +1533,19 @@ export default function TourCreation() {
                   <input
                     type="text"
                     placeholder="Add FAQ question and answer"
-                    value={faqs?.question}
-                    onChange={(e) => setFaqInput(e.target.value)}
+                    value={faqInput?.question}
+                    onChange={(e) =>
+                      setFaqInput({ ...faqInput, question: e.target.value })
+                    }
                     style={{ width: "100%" }}
                   />
                   <input
                     type="text"
                     placeholder="Add FAQ question and answer"
-                    value={faqs?.answer}
-                    onChange={(e) => setFaqInput(e.target.value)}
+                    value={faqInput?.answer}
+                    onChange={(e) =>
+                      setFaqInput({ ...faqInput, answer: e.target.value })
+                    }
                     style={{ width: "100%" }}
                     className="mt-4"
                   />
@@ -1568,6 +1589,8 @@ export default function TourCreation() {
                     )}
                 </div>
               </div>
+
+
             </div>
           </div>
         );
@@ -1650,6 +1673,8 @@ export default function TourCreation() {
         return <div>Step Not Found</div>;
     }
   };
+
+
 
   return (
     <div className="tour-container">
