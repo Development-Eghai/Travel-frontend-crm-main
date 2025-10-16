@@ -58,8 +58,9 @@ export default function TourCreation() {
     gallery_previews: [],
 
     // Pricing
-    pricing_model: "",
-    pricing_data: {
+
+    pricing: {
+      pricing_model: "",
       fixed_departure: [
         {
           from_date: "",
@@ -194,9 +195,9 @@ export default function TourCreation() {
   const handlePricingChange = (field, value, index = 0) => {
     setFormData((prev) => ({
       ...prev,
-      pricing_data: {
-        ...prev.pricing_data,
-        fixed_departure: prev.pricing_data.fixed_departure.map((item, i) =>
+      pricing: {
+        ...prev.pricing,
+        fixed_departure: prev.pricing.fixed_departure.map((item, i) =>
           i === index ? { ...item, [field]: value } : item
         ),
       },
@@ -206,10 +207,10 @@ export default function TourCreation() {
   const handleCustomPricingChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      pricing_data: {
-        ...prev.pricing_data,
+      pricing: {
+        ...prev.pricing,
         customized: {
-          ...prev.pricing_data.customized,
+          ...prev.pricing.customized,
           [field]: value,
         },
       },
@@ -334,9 +335,6 @@ export default function TourCreation() {
     }
   };
 
-
-
-
   // Delete FAQ
   const deleteFaqs = (indexToRemove) => {
     const updatedFaqs = faqs.filter((_, index) => index !== indexToRemove);
@@ -355,8 +353,6 @@ export default function TourCreation() {
       setCustomPolicyInput("");
     }
   };
-
-
 
   // Remove items from arrays
   // const removeItem = (field, index) => {
@@ -467,7 +463,7 @@ export default function TourCreation() {
       highlights: formData.highlights.join("; "),
       inclusions: formData.inclusions.join("; "),
       exclusions: formData.exclusions.join("; "),
-      faqs: faqs?.[0],
+      faqs: faqs,
       terms: formData.terms,
       privacy_policy: formData.privacy_policy,
       payment_terms: formData.payment_terms,
@@ -504,9 +500,9 @@ export default function TourCreation() {
       },
 
       pricing: {
-        pricing_model: formData.pricing_model,
+        pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
         ...(formData.pricing_model === "fixed" && {
-          fixed_departure: formData.pricing_data.fixed_departure.map(
+          fixed_departure: fixedPackage?.map(
             (item) => ({
               from_date: `${item.from_date}T00:00:00`,
               to_date: `${item.to_date}T00:00:00`,
@@ -523,10 +519,10 @@ export default function TourCreation() {
         }),
         ...(formData.pricing_model === "custom" && {
           customized: {
-            pricing_type: formData.pricing_data.customized.pricing_type,
-            base_price: parseInt(formData.pricing_data.customized.base_price),
-            discount: parseInt(formData.pricing_data.customized.discount) || 0,
-            final_price: parseInt(formData.pricing_data.customized.final_price),
+            pricing_type: formData.pricing.customized.pricing_type,
+            base_price: parseInt(formData.pricing.customized.base_price),
+            discount: parseInt(formData.pricing.customized.discount) || 0,
+            final_price: parseInt(formData.pricing.customized.final_price),
           },
         }),
       },
@@ -551,15 +547,15 @@ export default function TourCreation() {
   const handleSubmit = async () => {
     try {
       const submissionData = await prepareSubmissionData();
+      console.log("submissionData normal:", submissionData);
+      // console.log("submissionData json:", submissionData.json());
 
       dispatch(createTrip(submissionData))
         .unwrap()
         .then((result) => {
-         
-          // console.log("Trip created successfully:", result);
           toast.success("Trip created successfully!");
-          setFormData({});
-          navigate("/admin/tour-list")
+          // setFormData({});
+          // navigate("/admin/tour-list")
         })
         .catch((err) => {
           console.error("Error creating trip:", err);
@@ -593,6 +589,31 @@ export default function TourCreation() {
   useEffect(() => {
     getAllTourCategory()
   }, [])
+
+  const [fixedPackage, setFixedPackage] = useState([{
+    from_date: "", to_date: "", description: "",
+    available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
+  }]);
+
+  const addFixedPackage = () => {
+    setFixedPackage([...fixedPackage, {
+      from_date: "", to_date: "", description: "",
+      available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
+    }]);
+  };
+
+  const deleteFixedPackage = (indexToRemove) => {
+    if (indexToRemove !== 0) {
+      const updatedFaqs = fixedPackage.filter((_, index) => index !== indexToRemove);
+      setFixedPackage(updatedFaqs);
+    }
+  };
+
+  const updateFixedPackage = (index, key, value) => {
+    const updatedFaqs = [...fixedPackage];
+    updatedFaqs[index][key] = value;
+    setFixedPackage(updatedFaqs);
+  };
 
   const renderStepContent = () => {
     switch (activeStep) {
@@ -1143,14 +1164,15 @@ export default function TourCreation() {
 
             {selectedPricing === "fixed" && (
               <>
-                <h6 className="fw-bold mb-2">Available Slots</h6>
+                {/* <h6 className="fw-bold mb-2">Available Slots</h6>
+
                 <div className="row mb-3">
                   <div className="col-md-4">
                     <label className="form-label">From Date *</label>
                     <input
                       type="date"
                       className="form-control"
-                      value={formData.pricing_data.fixed_departure[0].from_date}
+                      value={formData.pricing.fixed_departure[0].from_date}
                       onChange={(e) =>
                         handlePricingChange("from_date", e.target.value)
                       }
@@ -1161,7 +1183,7 @@ export default function TourCreation() {
                     <input
                       type="date"
                       className="form-control"
-                      value={formData.pricing_data.fixed_departure[0].to_date}
+                      value={formData.pricing.fixed_departure[0].to_date}
                       onChange={(e) =>
                         handlePricingChange("to_date", e.target.value)
                       }
@@ -1174,7 +1196,7 @@ export default function TourCreation() {
                       className="form-control"
                       placeholder="10"
                       value={
-                        formData.pricing_data.fixed_departure[0].available_slots
+                        formData.pricing.fixed_departure[0].available_slots
                       }
                       onChange={(e) =>
                         handlePricingChange("available_slots", e.target.value)
@@ -1191,7 +1213,7 @@ export default function TourCreation() {
                       type="text"
                       className="form-control"
                       placeholder="e.g. Triple Occupancy"
-                      value={formData.pricing_data.fixed_departure[0].title}
+                      value={formData.pricing.fixed_departure[0].title}
                       onChange={(e) =>
                         handlePricingChange("title", e.target.value)
                       }
@@ -1203,7 +1225,7 @@ export default function TourCreation() {
                       type="number"
                       className="form-control"
                       value={
-                        formData.pricing_data.fixed_departure[0].base_price
+                        formData.pricing.fixed_departure[0].base_price
                       }
                       onChange={(e) =>
                         handlePricingChange("base_price", e.target.value)
@@ -1215,7 +1237,7 @@ export default function TourCreation() {
                     <input
                       type="number"
                       className="form-control"
-                      value={formData.pricing_data.fixed_departure[0].discount}
+                      value={formData.pricing.fixed_departure[0].discount}
                       onChange={(e) =>
                         handlePricingChange("discount", e.target.value)
                       }
@@ -1229,7 +1251,7 @@ export default function TourCreation() {
                       type="number"
                       className="form-control"
                       value={
-                        formData.pricing_data.fixed_departure[0].final_price
+                        formData.pricing.fixed_departure[0].final_price
                       }
                       onChange={(e) =>
                         handlePricingChange("final_price", e.target.value)
@@ -1242,7 +1264,7 @@ export default function TourCreation() {
                       type="number"
                       className="form-control"
                       value={
-                        formData.pricing_data.fixed_departure[0].booking_amount
+                        formData.pricing.fixed_departure[0].booking_amount
                       }
                       onChange={(e) =>
                         handlePricingChange("booking_amount", e.target.value)
@@ -1255,12 +1277,172 @@ export default function TourCreation() {
                       type="number"
                       className="form-control"
                       value={
-                        formData.pricing_data.fixed_departure[0].gst_percentage
+                        formData.pricing.fixed_departure[0].gst_percentage
                       }
                       onChange={(e) =>
                         handlePricingChange("gst_percentage", e.target.value)
                       }
                     />
+                  </div>
+                </div> */}
+
+                <div className="mt-3 destination-faq">
+                  {/* <div className='admin-input-div'>
+                    <label>Create Slots</label>
+                  </div> */}
+                  <div className="accordion" id="accordionExample">
+                    {fixedPackage.map((trip, index) => (
+                      <div className='mt-4'>
+                        <div className="accordion-item" key={index} >
+                          <h2 className="accordion-header d-flex align-items-center justify-content-between">
+                            <button
+                              className="accordion-button flex-grow-1 fw-bold"
+                              type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target={`#collapse${index}`}
+                              aria-expanded="true"
+                              aria-controls={`collapse${index}`}
+                            >
+                              Available Slots {index + 1}
+                            </button>
+                            <div className="ms-3 d-flex gap-2">
+                              <button className={`destination-faq-add ${index === 0 && "me-3"}`} onClick={addFixedPackage}>
+                                Add
+                              </button>
+                              {index !== 0 && (
+                                <button
+                                  className="destination-faq-add faq-delete me-3"
+                                  onClick={() => deleteFixedPackage(index)}
+                                >
+                                  Delete
+                                </button>
+                              )}
+                            </div>
+                          </h2>
+
+                          <div
+                            id={`collapse${index}`}
+                            className="accordion-collapse collapse show"
+                            data-bs-parent="#accordionExample"
+                          >
+                            <div className="accordion-body">
+
+                              <div className="row mb-3">
+                                <div className="col-md-4">
+                                  <label className="form-label">From Date *</label>
+                                  <input
+                                    type="date"
+                                    className="form-control"
+                                    value={trip?.from_date}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "from_date", e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="col-md-4">
+                                  <label className="form-label">To Date *</label>
+                                  <input
+                                    type="date"
+                                    className="form-control"
+                                    value={trip?.to_date}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "to_date", e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="col-md-4">
+                                  <label className="form-label">Available Slots *</label>
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    placeholder="10"
+                                    value={trip?.available_slots}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "available_slots", e.target.value)
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <h6 className="fw-bold mb-4 mt-5">Costing Packages</h6>
+                              <div className="row mb-3">
+                                <div className="col-md-6">
+                                  <label className="form-label">Package Title *</label>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="e.g. Triple Occupancy"
+                                    value={trip?.title}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "title", e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="col-md-3">
+                                  <label className="form-label">Base Price (₹) *</label>
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={trip?.base_price}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "base_price", e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="col-md-3">
+                                  <label className="form-label">Discount (₹)</label>
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={trip?.discount}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "discount", e.target.value)
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="row mb-3">
+                                <div className="col-md-4">
+                                  <label className="form-label">Final Price (₹)</label>
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={trip?.final_price}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "final_price", e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="col-md-4">
+                                  <label className="form-label">Booking Amount (₹)</label>
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={trip?.booking_amount}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "booking_amount", e.target.value)
+                                    }
+                                  />
+                                </div>
+                                <div className="col-md-4">
+                                  <label className="form-label">GST Percentage (%)</label>
+                                  <input
+                                    type="number"
+                                    className="form-control"
+                                    value={trip?.gst_percentage}
+                                    onChange={(e) =>
+                                      updateFixedPackage(index, "gst_percentage", e.target.value)
+                                    }
+                                  />
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </>
@@ -1278,7 +1460,7 @@ export default function TourCreation() {
                         name="pricingType"
                         className="form-check-input"
                         checked={
-                          formData.pricing_data.customized.pricing_type ===
+                          formData.pricing.customized.pricing_type ===
                           "Price Per Person"
                         }
                         onChange={() =>
@@ -1298,7 +1480,7 @@ export default function TourCreation() {
                         name="pricingType"
                         className="form-check-input"
                         checked={
-                          formData.pricing_data.customized.pricing_type ===
+                          formData.pricing.customized[0]?.pricing_type ===
                           "Price Per Package"
                         }
                         onChange={() =>
@@ -1321,7 +1503,7 @@ export default function TourCreation() {
                     <input
                       type="number"
                       className="form-control"
-                      value={formData.pricing_data.customized.base_price}
+                      value={formData.pricing?.customized?.base_price}
                       onChange={(e) =>
                         handleCustomPricingChange("base_price", e.target.value)
                       }
@@ -1332,7 +1514,7 @@ export default function TourCreation() {
                     <input
                       type="number"
                       className="form-control"
-                      value={formData.pricing_data.customized.discount}
+                      value={formData.pricing.customized?.discount}
                       onChange={(e) =>
                         handleCustomPricingChange("discount", e.target.value)
                       }
@@ -1343,7 +1525,7 @@ export default function TourCreation() {
                     <input
                       type="number"
                       className="form-control"
-                      value={formData.pricing_data.customized.final_price}
+                      value={formData.pricing.customized?.final_price}
                       onChange={(e) =>
                         handleCustomPricingChange("final_price", e.target.value)
                       }
@@ -1632,7 +1814,7 @@ export default function TourCreation() {
               ></textarea>
             </div>
 
-            <div className="form-group">
+            {/* <div className="form-group">
               <label>Custom Policy</label>
               <textarea
                 rows="3"
@@ -1663,7 +1845,7 @@ export default function TourCreation() {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
         );
 
@@ -1672,7 +1854,7 @@ export default function TourCreation() {
     }
   };
 
-
+  console.log(formData, "formData-formData")
 
   return (
     <div className="tour-container">

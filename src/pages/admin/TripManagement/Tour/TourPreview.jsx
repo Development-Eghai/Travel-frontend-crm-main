@@ -102,6 +102,8 @@ const TourPreview = () => {
         getSpecificTour()
     }, [])
 
+    console.log(specificTourData, 'specificTourData')
+
     return (
         <div className='overflow-hidden-page'>
             {/* <section className="destination-detail-banner-main">
@@ -189,7 +191,6 @@ const TourPreview = () => {
                                     <div className="container">
                                         <div className='trip-detail-faqs mt-4'>
                                             <div className="accordion" id="accordionExample">
-
                                                 {specificTourData?.itinerary?.map((item, index) => (
                                                     <div className="accordion-item" key={index}>
                                                         <h2 className="accordion-header" id={`day_wise_itenary${index}`}>
@@ -234,6 +235,38 @@ const TourPreview = () => {
                                     </div>
                                 </div>
 
+                                <div className='trip-detail-section' ref={itineraryRef}>
+                                    <h3>Frequently Asked Questions</h3>
+                                    <div className="container">
+                                        <div className='trip-detail-faqs mt-4'>
+                                            <div className="accordion" id="accordionExample">
+                                                {/* {specificTourData?.faqs?.map((item, index) => (
+                                                    <div className="accordion-item" key={index}>
+                                                        <h2 className="accordion-header" id={`day_wise_itenary${index}`}>
+                                                            <button className="accordion-button" type="button" data-bs-toggle="collapse"
+                                                                data-bs-target={`#itenarys${index}`} aria-expanded={index === 0 ? 'true' : 'false'}
+                                                                aria-controls={`itenarys${index}`}>
+                                                                <p className=''>{item?.question}</p>
+                                                            </button>
+                                                        </h2>
+                                                        <div id={`itenarys${index}`}
+                                                            className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
+                                                            aria-labelledby={`day_wise_itenary${index}`}
+                                                            data-bs-parent="#accordionExample">
+                                                            <div className="accordion-body">
+                                                                <p className=''>{item?.answer}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))} */}
+
+                                                <p className=''>{specificTourData?.faqs?.question}</p>
+                                                <p className=''>{specificTourData?.faqs?.answer}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className='trip-detail-section inclusion' ref={inclusionRef}>
                                     <h3>Inclusions</h3>
 
@@ -253,7 +286,7 @@ const TourPreview = () => {
                                 <div className='trip-detail-section' ref={highlightsRef}>
                                     <h3>Key Highlights</h3>
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.key_highlights || "<p>No description available</p>" }}></p>
+                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.highlights || "<p>No description available</p>" }}></p>
                                     </div>
                                 </div>
 
@@ -367,6 +400,9 @@ const TourPreview = () => {
                             </div>
 
                         </div>
+
+
+
                     </div>
                 </div>
             </div>

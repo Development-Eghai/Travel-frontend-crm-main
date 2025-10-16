@@ -5,9 +5,13 @@ import { GetAllDestination, GetAllTrip } from '../../../../common/api/ApiService
 import { capitalizeWords } from '../../../../common/Validation';
 import { getAllTrips } from '../../../../store/slices/tripSlices';
 import { APIBaseUrl } from '../../../../common/api/api';
+import { successMsg } from '../../../../common/Toastify';
+import CustomModal from '../../../../component/CustomModel';
 
 const TourList = () => {
     const [tripList, setTripList] = useState([])
+    const [openDeleteModal, setOpenDeleteModal] = useState(false)
+    const [deleteId, setDeleteId] = useState("");
 
     const navigate = useNavigate();
 
@@ -75,6 +79,8 @@ const TourList = () => {
 
                 return (
                     <div className='admin-actions'>
+                        <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
+
                         <i
                             className="fa-solid fa-eye ms-3"
                             style={{ cursor: "pointer" }}
@@ -93,7 +99,7 @@ const TourList = () => {
         }))
         : [];
 
-  
+
 
     const getAllTrips = async () => {
         try {
@@ -112,11 +118,34 @@ const TourList = () => {
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            const res = await APIBaseUrl.delete(`trips/${deleteId}`, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true) {
+                successMsg("Trip Deleted Successsfully")
+                setOpenDeleteModal(false)
+                getAllTrips()
+                setDeleteId('')
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
+        }
+
+    }
+
+
     useEffect(() => {
         getAllTrips()
     }, [])
 
-    console.log(tripList,"tripList--tripList")
+    console.log(tripList, "tripList--tripList")
+    console.log(deleteId, "deleteId--deleteId")
 
     return (
         <div className='admin-content-main'>
@@ -129,10 +158,34 @@ const TourList = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    // getRowId={(row) => row._id}
-                    // isLoading={isLoading}
+                // getRowId={(row) => row._id}
+                // isLoading={isLoading}
                 />
             </div>
+
+            <CustomModal
+                open={openDeleteModal}
+                onClickOutside={() => {
+                    setOpenDeleteModal(false);
+                }}
+            >
+                <>
+                    <div className='delete-model-view-main'>
+                        <p className="text-center">
+                            Are you sure do you want to delete?
+                        </p>
+                        <div className="row">
+                            <div className="col-6">
+                                <button className="delete-btn yes" onClick={handleDelete}>Yes</button>
+                            </div>
+                            <div className="col-6">
+                                <button className="delete-btn no" onClick={() => setOpenDeleteModal(false)}>No</button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+
+            </CustomModal>
         </div>
     )
 }

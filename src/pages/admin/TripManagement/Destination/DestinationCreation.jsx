@@ -136,7 +136,7 @@ const DestinationCreation = () => {
             : { status: true, message: "" };
 
 
-            validate.blog_category_ids = (!createDestination?.blog_category_ids || createDestination.blog_category_ids.length === 0)
+        validate.blog_category_ids = (!createDestination?.blog_category_ids || createDestination.blog_category_ids.length === 0)
             ? { status: false, message: "Blog Category are required" }
             : { status: true, message: "" };
 
@@ -168,7 +168,7 @@ const DestinationCreation = () => {
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
         if (Object.values(isValide).every((data) => data?.status === true)) {
-
+            console.log(cleanedData, "cleanedDatacleanedData")
             try {
                 const res = await APIBaseUrl.post("destinations", cleanedData, {
                     headers: {
@@ -377,6 +377,8 @@ const DestinationCreation = () => {
         getAllActivities()
         getAllBlogCategory()
     }, [])
+
+    console.log(createDestination, "createDestination")
 
     return (
         <>
