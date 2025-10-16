@@ -20,6 +20,7 @@ const TourType = () => {
     const [isUpdate, setIsUpdate] = useState(false);
     const [deleteId, setDeleteId] = useState("");
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
+    const [isLoading, setIsLoading] = useState(true);
 
     const columns = [
         { field: 'sno', headerName: 'SNO', flex: 1 },
@@ -90,6 +91,7 @@ const TourType = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+
         const cleanedData = normalizeEmptyFields(activityData);
         cleanedData.tenant_id = 1;
         const isValide = validateDetails(cleanedData)
@@ -117,36 +119,42 @@ const TourType = () => {
         }
 
     }
-
     const handleFileUpload = async (e, key) => {
         const file = e.target.files[0];
-
         if (!file) return;
-        let image_name = e?.target?.files[0]?.name;
-        let image_type = image_name?.split(".");
-        let type = image_type?.pop();
-        if (type !== "jpeg" && type !== "png" && type !== "jpg" && type !== "pdf" && type !== "webp") {
-            errorMsg("Unsupported file type")
+
+        const imageName = file.name;
+        const type = imageName.split(".").pop().toLowerCase();
+
+        if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
+            errorMsg("Unsupported file type");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("storage", "local");
-        // const response = await SingleFileUpload(formData);
-
-        // if (response?.statusCode !== 200) {
-        //     errorMsg("Failed to upload file")
-        //     return;
-        // }
-
-        const path = image_name;
-        successMsg("File upload successfully")
-        if (validation[key]) {
-            setValidation({ ...validation, [key]: false })
+        const maxSize = 5 * 1024 * 1024; 
+        if (file.size > maxSize) {
+          errorMsg("File size should not exceed 5MB.");
+          return;
         }
-        setActivityData({ ...activityData, [key]: path })
+
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("storage", "local");
+
+        try {
+            const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
+            console.log(res.data, "res?.data");
+
+            if (res?.data?.message === "Upload successful") {
+                successMsg("Image uploaded successfully");
+                setActivityData({ ...activityData, [key]: res.data.url });
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            errorMsg("File upload failed");
+        }
     };
+
 
     const getSpecificActivity = async (id) => {
         try {
@@ -218,13 +226,14 @@ const TourType = () => {
 
     const getAllActivity = async () => {
         try {
+            setIsLoading(true);
             const res = await APIBaseUrl.get("activities/", {
                 headers: {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
                 },
             });
             if (res?.data?.success === true) {
-
+                setIsLoading(false);
                 setActivityList(res?.data?.data)
             }
 
@@ -250,7 +259,7 @@ const TourType = () => {
                     rows={numberedRows}
                     columns={columns}
                 // getRowId={(row) => row._id}
-                // isLoading={isLoading}
+                isLoading={isLoading}
                 />
             </div>
 
@@ -328,7 +337,7 @@ const TourType = () => {
                             )}
                             {activityData?.image && (
                                 <div className='upload-image-div'>
-                                    <img src={`${BACKEND_DOMAIN}${activityData?.image}`} alt="Category-Preview" />
+                                    <img src={`${activityData?.image}`} alt="Category-Preview" />
                                 </div>
                             )}
 

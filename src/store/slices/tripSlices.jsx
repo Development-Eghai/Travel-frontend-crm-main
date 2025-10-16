@@ -13,7 +13,9 @@ export const createTrip = createAsyncThunk(
         "trips",
         tripData,
       );
+      console.log(res.data,"in slices")
       return res.data;
+     
     } catch (err) {
       return rejectWithValue(err?.response?.data || err.message);
     }

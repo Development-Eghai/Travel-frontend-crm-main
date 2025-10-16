@@ -17,6 +17,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { APIBaseUrl } from "../../../../common/api/api";
+import { errorMsg, successMsg } from "../../../../common/Toastify";
 
 export default function TourCreation() {
   const [activeStep, setActiveStep] = useState("basic");
@@ -378,6 +379,92 @@ export default function TourCreation() {
     }
   };
 
+
+  const handleFileUpload = async (e, key) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const imageName = file.name;
+    const type = imageName.split(".").pop().toLowerCase();
+
+    if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
+      errorMsg("Unsupported file type");
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      errorMsg("File size should not exceed 5MB.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("storage", "local");
+
+    try {
+      const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
+      console.log(res.data, "res?.data");
+
+      if (res?.data?.message === "Upload successful") {
+        successMsg("Image uploaded successfully");
+        setFormData((prev) => ({
+          ...prev,
+          hero_image: res.data.url,
+        }));
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      errorMsg("File upload failed");
+    }
+  };
+
+  const handleMultipleFileUpload = async (e, key) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+    let image_name = e?.target?.files[0]?.name;
+    let image_type = image_name?.split(".");
+    let type = image_type?.pop();
+    if (type !== "jpeg" && type !== "png" && type !== "jpg" && type !== "pdf" && type !== "webp") {
+      errorMsg
+        ("Unsupported file type")
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      errorMsg("File size should not exceed 5MB.");
+      return;
+    }
+
+    const form_Data = new FormData();
+    form_Data.append("gallery_images", file);
+    form_Data.append("storage", "local");
+    try {
+      const res = await APIBaseUrl.post("https://api.yaadigo.com/multiple", form_Data);
+      if (res?.data?.message === "Files uploaded") {
+        successMsg("Image uploaded successfully");
+        const path = res.data.files;
+        const existingImages = formData?.gallery_images || [];
+
+        const newPaths = Array.isArray(path)
+          ? path.flat()
+          : [path];
+
+        const updatedImages = [...existingImages, ...newPaths];
+        setFormData((prev) => ({
+          ...prev,
+          gallery_images: updatedImages,
+        }));
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      errorMsg("File upload failed");
+    }
+
+  };
+
   const handleGalleryImagesChange = (event) => {
     const files = Array.from(event.target.files);
     const newPreviews = [];
@@ -431,19 +518,19 @@ export default function TourCreation() {
   // Prepare data for API submission - UPDATED to include images
   const prepareSubmissionData = async () => {
     // Convert images to base64 or prepare for upload
-    let heroImageBase64 = null;
-    let galleryImagesBase64 = [];
+    // let heroImageBase64 = null;
+    // let galleryImagesBase64 = [];
 
-    if (formData.hero_image) {
-      heroImageBase64 = await fileToBase64(formData.hero_image);
-    }
+    // if (formData.hero_image) {
+    //   heroImageBase64 = await fileToBase64(formData.hero_image);
+    // }
 
-    if (formData.gallery_images.length > 0) {
-      for (const file of formData.gallery_images) {
-        const base64 = await fileToBase64(file);
-        galleryImagesBase64.push(base64);
-      }
-    }
+    // if (formData.gallery_images.length > 0) {
+    //   for (const file of formData.gallery_images) {
+    //     const base64 = await fileToBase64(file);
+    //     galleryImagesBase64.push(base64);
+    //   }
+    // }
 
     const submissionData = {
       title: formData.title,
@@ -468,6 +555,9 @@ export default function TourCreation() {
       privacy_policy: formData.privacy_policy,
       payment_terms: formData.payment_terms,
 
+      // gallery_images:formData.gallery_images,
+      // hero_image:formData.hero_image,
+
       itinerary: formData.itineraryDays.map((day) => ({
         day_number: day.day_number,
         title: day.title,
@@ -479,24 +569,30 @@ export default function TourCreation() {
       })),
 
       // UPDATED: Include actual image data in the media section
-      media: {
-        hero_image: heroImageBase64, // Base64 string of hero image
-        hero_image_name: formData.hero_image ? formData.hero_image.name : null,
-        hero_image_type: formData.hero_image ? formData.hero_image.type : null,
-        gallery_images: galleryImagesBase64, // Array of base64 strings
-        gallery_image_names: formData.gallery_images.map((file) => file.name),
-        gallery_image_types: formData.gallery_images.map((file) => file.type),
+      // media: {
+      //   hero_image: formData.hero_image, // Base64 string of hero image
+      //   hero_image_name: "dummy name",
+      //   hero_image_type: "dummy type",
+      //   gallery_images: formData.gallery_images, // Array of base64 strings
+      //   gallery_image_names: "dummy gallery_image_names",
+      //   gallery_image_types: "gallery_image_types",
 
-        // Also include URL fields for backward compatibility
-        hero_image_url: formData.hero_image
-          ? `https://example.com/images/${formData.hero_image.name}`
-          : "https://example.com/images/hero.jpg",
-        thumbnail_url: formData.hero_image
-          ? `https://example.com/images/thumb_${formData.hero_image.name}`
-          : "https://example.com/images/thumb.jpg",
-        gallery_urls: formData.gallery_images.map(
-          (file, index) => `https://example.com/images/gallery${index + 1}.jpg`
-        ),
+      //   // Also include URL fields for backward compatibility
+      //   hero_image_url: formData.hero_image
+      //     ? `${formData?.hero_image}`
+      //     : "https://example.com/images/hero.jpg",
+      //   thumbnail_url: formData.hero_image
+      //     ? `${formData?.hero_image}`
+      //     : "https://example.com/images/thumb.jpg",
+      //   gallery_urls: formData?.gallery_images,
+      // },
+
+      media: {
+        hero_image_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
+        thumbnail_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
+        gallery_urls: [
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII="
+        ]
       },
 
       pricing: {
@@ -550,17 +646,37 @@ export default function TourCreation() {
       console.log("submissionData normal:", submissionData);
       // console.log("submissionData json:", submissionData.json());
 
-      dispatch(createTrip(submissionData))
-        .unwrap()
-        .then((result) => {
+      // dispatch(createTrip(submissionData))
+      //   .unwrap()
+      //   .then((result) => {
+      //     toast.success("Trip created successfully!");
+      //     // setFormData({});
+      //     // navigate("/admin/tour-list")
+      //   })
+      //   .catch((err) => {
+      //     console.error("Error creating trip:", err);
+      //     toast.error("Error creating trip. Please try again.");
+      //   });
+
+
+      try {
+        const res = await APIBaseUrl.post("trips/", submissionData, {
+          headers: {
+            "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+          },
+        });
+        if (res?.data?.success === true) {
+          console.log(res?.data, "response dataa")
           toast.success("Trip created successfully!");
           // setFormData({});
           // navigate("/admin/tour-list")
-        })
-        .catch((err) => {
-          console.error("Error creating trip:", err);
-          toast.error("Error creating trip. Please try again.");
-        });
+        }
+
+      } catch (error) {
+        console.error("Error fetching trips:", error?.response?.data || error.message);
+        throw error;
+      }
+
     } catch (error) {
       console.error("Error preparing data:", error);
       toast.error("Error preparing trip data. Please try again.");
@@ -1032,16 +1148,17 @@ export default function TourCreation() {
                   <div className="upload-text">
                     <h4>Upload Hero Image</h4>
                     <p>Drag and drop or click to browse</p>
-                    {formData.hero_image && (
-                      <p>Selected: {formData.hero_image.name}</p>
+                    {formData?.hero_image && (
+                      <p>Selected: {formData?.hero_image}</p>
                     )}
                   </div>
                   <input
                     type="file"
-                    id="heroImage"
+                    id='heroImage'
+                    name='hero_image'
+                    accept='.png,.jpeg,.jpg,.pdf,.webp'
                     className="file-input"
-                    accept="image/*"
-                    onChange={handleHeroImageChange}
+                    onChange={(e) => { handleFileUpload(e, "image"); }}
                   />
                 </div>
                 <div className="file-restrictions">
@@ -1053,6 +1170,12 @@ export default function TourCreation() {
                   <br />• This will be the main image that represents your trip
                   package
                 </div>
+
+                {formData?.hero_image && (
+                  <div className='upload-image-div'>
+                    <img src={`${formData?.hero_image}`} alt="Category-Preview" />
+                  </div>
+                )}
               </div>
               <div className="media-section">
                 <div className="section-title">
@@ -1068,17 +1191,14 @@ export default function TourCreation() {
                   <div className="upload-text">
                     <h4>Image Gallery</h4>
                     <p>Add multiple images</p>
-                    {formData.gallery_images.length > 0 && (
-                      <p>Selected: {formData.gallery_images.length} files</p>
-                    )}
                   </div>
                   <input
                     type="file"
                     id="galleryImages"
+                    name='gallery_images'
+                    accept='.png,.jpeg,.jpg,.pdf,.webp'
                     className="file-input"
-                    accept="image/*"
-                    multiple
-                    onChange={handleGalleryImagesChange}
+                    onChange={(e) => { handleMultipleFileUpload(e, "image"); }}
                   />
                 </div>
                 <div className="file-restrictions">
@@ -1091,6 +1211,17 @@ export default function TourCreation() {
                   • Maintain consistent quality and style
                   <br />• Recommended size: 1200x800px minimum
                 </div>
+                {formData?.gallery_images && formData?.gallery_images?.length > 0 && (
+                  <div className="d-flex flex-wrap">
+                    {formData?.gallery_images?.map((image, index) => (
+                      <div className='upload-image-div destination-image-div'>
+                        <div>
+                          <img src={`${image}`} alt="Category-Preview" key={index} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

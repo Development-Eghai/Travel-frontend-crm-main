@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
+import { CircularProgress } from "@mui/material";
 
 const MyDataTable = ({ rows = [], columns = [], getRowId, isLoading = false }) => {
     const [paginationModel, setPaginationModel] = useState({
@@ -12,7 +13,7 @@ const MyDataTable = ({ rows = [], columns = [], getRowId, isLoading = false }) =
         <Box sx={{ width: '100%', overflowX: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {isLoading ? (
                 <Box sx={{ textAlign: 'center' }}>
-                    <h1>Loading....</h1>
+                     <CircularProgress />
                 </Box>
             ) : (
                 <Box sx={{ width: 'max-content', minWidth: '100%' }}>

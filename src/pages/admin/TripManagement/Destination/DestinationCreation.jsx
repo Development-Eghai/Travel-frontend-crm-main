@@ -8,12 +8,14 @@ import Select from 'react-select';
 import { NonEmptyArrayValidation, NonEmptyValidation, normalizeEmptyFields, SlugValidation, StringValidation } from "../../../../common/Validation";
 import { errorMsg, successMsg } from "../../../../common/Toastify";
 import { APIBaseUrl } from "../../../../common/api/api";
+import { CircularProgress } from "@mui/material";
 
 
 const DestinationCreation = () => {
 
     const navigate = useNavigate();
     const { id } = useParams();
+    const [isLoading, setIsLoading] = useState(true);
 
     const [createDestination, setCreateDestination] = useState({});
     const [destinationList, setDestinationList] = useState([])
@@ -75,39 +77,36 @@ const DestinationCreation = () => {
         }
 
         const formData = new FormData();
-        formData.append("files", file);
+        formData.append("gallery_images", file);
         formData.append("storage", "local");
-        // const response = await MultipleFileUpload(formData);
-        // console.log(response, "response")
+        try {
+            const res = await APIBaseUrl.post("https://api.yaadigo.com/multiple", formData);
+            if (res?.data?.message === "Files uploaded") {
+                successMsg("Image uploaded successfully");
+                const path = res.data.files;
+                const existingImages = createDestination?.hero_image || [];
 
-        // if (response?.statusCode !== 200) {
-        //     errorMsg("Failed to upload file")
-        //     return;
-        // }
+                const newPaths = Array.isArray(path)
+                    ? path.flat()
+                    : [path];
 
-        const path = image_name;
-        const existingImages = createDestination?.hero_image || [];
+                const updatedImages = [...existingImages, ...newPaths];
+                if (validation?.hero_image?.status === false) {
+                    setValidation((prev) => ({
+                        ...prev,
+                        hero_image: { status: true, message: "" },
+                    }));
+                }
 
-        const newPaths = Array.isArray(path)
-            ? path.flat()
-            : [path];
-
-        const updatedImages = [...existingImages, ...newPaths];
-
-        if (validation?.hero_image?.status === false) {
-            setValidation((prev) => ({
-                ...prev,
-                hero_image: { status: true, message: "" },
-            }));
+                setCreateDestination({
+                    ...createDestination,
+                    hero_image: updatedImages,
+                });
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            errorMsg("File upload failed");
         }
-
-        setCreateDestination({
-            ...createDestination,
-            hero_image: updatedImages,
-        });
-
-        successMsg("File uploaded successfully");
-
 
     };
 
@@ -170,6 +169,7 @@ const DestinationCreation = () => {
         if (Object.values(isValide).every((data) => data?.status === true)) {
             console.log(cleanedData, "cleanedDatacleanedData")
             try {
+                setIsLoading(true);
                 const res = await APIBaseUrl.post("destinations", cleanedData, {
                     headers: {
                         "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
@@ -177,6 +177,7 @@ const DestinationCreation = () => {
                 });
                 if (res?.data?.success === true) {
                     navigate(-1)
+                    setIsLoading(false);
                     successMsg("Destination created successsfully")
                     setCreateDestination({})
                     setCustomPackage([{ title: "", description: "", trip_ids: [] }])
@@ -348,6 +349,7 @@ const DestinationCreation = () => {
     }
 
 
+
     const getSpecificDestination = async (id) => {
 
         try {
@@ -430,18 +432,18 @@ const DestinationCreation = () => {
                                 <p className='error-para'>Banner Images {validation.hero_image.message}</p>
                             )}
 
-                            {/* {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
+                            {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
                                 <div className="d-flex flex-wrap">
                                     {createDestination?.hero_image?.map((image, index) => (
                                         <div className='upload-image-div destination-image-div'>
                                             <div>
-                                                <img src={`${BACKEND_DOMAIN}${image}`} alt="Category-Preview" key={index} />
+                                                <img src={`${image}`} alt="Category-Preview" key={index} />
                                             </div>
                                         </div>
                                     ))}
 
                                 </div>
-                            )}  */}
+                            )}
                         </div>
                     </div>
 
@@ -750,8 +752,8 @@ const DestinationCreation = () => {
                     </div>
                 </div>
 
-                {id ? <button className="create-common-btn" onClick={(e) => handleUpdate(e)}>Update</button> :
-                    <button className="create-common-btn" onClick={(e) => handleSubmit(e)}>Create</button>}
+                {id ? <button className="create-common-btn" onClick={(e) => handleUpdate(e)}>{isLoading ? <CircularProgress/>: "Update"}</button> :
+                    <button className="create-common-btn" onClick={(e) => handleSubmit(e)}>{isLoading ? <CircularProgress/>: "Create"}</button>}
 
 
             </div>

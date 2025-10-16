@@ -123,7 +123,7 @@ const TourPreview = () => {
                             <div
                                 className="destination-slide"
                                 style={{
-                                    backgroundImage: `url(${BACKEND_DOMAIN}${imageUrl})`,
+                                    backgroundImage: `url($${imageUrl})`,
                                 }}
                             >
                                 <div className="destination-overlay"></div>

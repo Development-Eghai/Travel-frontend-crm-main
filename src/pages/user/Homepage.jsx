@@ -84,12 +84,28 @@ const Homepage = () => {
 
                                                 <div className="featured-content-main">
                                                     <p className="featured-city-para">
-                                                        {trip?.pickup_location} → {trip?.drop_location}
+                                                        <p className="featured-city-para">
+                                                            {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
+                                                                ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
+                                                                : `${trip?.pickup_location} → ${trip?.drop_location}`}
+                                                        </p>
+                                                        {/* {trip?.drop_location} */}
                                                     </p>
 
                                                     <p className="featured-content">
-                                                        <span>₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price} </span>
-                                                        ₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price}
+                                                        {trip?.pricing?.pricing_model === "customized" ? (
+
+                                                            <>
+                                                                <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
+                                                                ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                                                            </>
+
+                                                        ) : (
+                                                            <>
+                                                                <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
+                                                                ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                                                            </>
+                                                        )}
                                                     </p>
                                                     <div className="featured-bottom-content d-flex gap-2">
                                                         {/* <div className='trip-card-amount button'>
@@ -248,7 +264,7 @@ const Homepage = () => {
                                                     </div>
 
                                                     <div className='featured-card-day-card'>
-                                                    <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
+                                                        <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
                                                     </div>
 
                                                 </div>

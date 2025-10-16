@@ -11,6 +11,7 @@ const DestinationList = () => {
     const [destinationList, setDestinationList] = useState([])
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [deleteId, setDeleteId] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -103,13 +104,14 @@ const DestinationList = () => {
     const getAllDestination = async () => {
 
         try {
+            setIsLoading(true);
             const res = await APIBaseUrl.get("destinations/", {
                 headers: {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
                 },
             });
             if (res?.data?.success === true) {
-
+                setIsLoading(false);
                 setDestinationList(res?.data?.data)
             }
 
@@ -175,7 +177,7 @@ console.log(destinationList,"destinationList")
                     rows={numberedRows}
                     columns={columns}
                 // getRowId={(row) => row._id}
-                // isLoading={isLoading}
+                isLoading={isLoading}
                 />
             </div>
 

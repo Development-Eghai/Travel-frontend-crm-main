@@ -12,6 +12,7 @@ const TourList = () => {
     const [tripList, setTripList] = useState([])
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [deleteId, setDeleteId] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -103,6 +104,7 @@ const TourList = () => {
 
     const getAllTrips = async () => {
         try {
+            setIsLoading(true);
             const res = await APIBaseUrl.get("trips", {
                 headers: {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
@@ -110,6 +112,7 @@ const TourList = () => {
             });
             if (res?.data?.success === true && res?.data?.error_code === 0) {
                 setTripList(res?.data?.data)
+                setIsLoading(false);
             }
 
         } catch (error) {
@@ -159,7 +162,7 @@ const TourList = () => {
                     rows={numberedRows}
                     columns={columns}
                 // getRowId={(row) => row._id}
-                // isLoading={isLoading}
+                isLoading={isLoading}
                 />
             </div>
 

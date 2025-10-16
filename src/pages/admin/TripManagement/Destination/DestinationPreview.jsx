@@ -16,6 +16,7 @@ import { BACKEND_DOMAIN } from "../../../../common/api/ApiClient";
 import TopHeader from "../../../../container/TopHeader";
 import ContactForm from "../ContactForm/ContactForm";
 import { APIBaseUrl } from "../../../../common/api/api";
+import { de } from "date-fns/locale";
 
 const DestinationPreview = () => {
   const navigate = useNavigate();
@@ -101,18 +102,27 @@ const DestinationPreview = () => {
   console.log(destinationContent, "destinationContent");
 
 
-  const [visibleCount, setVisibleCount] = useState(4);
+  const trips = destinationContent?.popular_trips || [];
+  const [visibleCount, setVisibleCount] = useState(4); // 👈 show 4 trips initially
 
-  const handleShowMore = () => {
-    setVisibleCount((prev) => prev + 4); // show next 4
+  const handleToggle = () => {
+    if (visibleCount >= trips.length) {
+      // 👇 If all shown → collapse back to 4
+      setVisibleCount(4);
+    } else {
+      // 👇 Show 4 more each click
+      setVisibleCount((prev) => prev + 4);
+    }
   };
 
-  const handleShowLess = () => {
-    setVisibleCount(4); // reset to first 4
-  };
+  const [expandedSections, setExpandedSections] = useState({});
 
-  // slice array dynamically
-  const visibleTrips = destinationContent?.popular_trip_ids?.slice(0, visibleCount);
+  const toggleViewMore = (index) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
 
   return (
     <div className="">
@@ -128,21 +138,21 @@ const DestinationPreview = () => {
           loop={true}
           className="destination-swiper"
         >
-          {destinationContent?.banner_images?.map((imageUrl) => (
+          {destinationContent?.hero_images?.map((imageUrl) => (
             <SwiperSlide>
               <div
                 className="destination-slide"
                 style={{
-                  backgroundImage: `url(${BACKEND_DOMAIN}${imageUrl})`,
+                  backgroundImage: `url(${imageUrl})`,
                 }}
               >
                 <div className="destination-overlay"></div>
                 <div className="destination-slide-content">
                   <h3 className="dest-package-name text-center">
-                    {destinationContent?.destination_name}
+                    {destinationContent?.title}
                   </h3>
                   <p className="dest-package-para">
-                    {destinationContent?.description}
+                    {destinationContent?.subtitle}
                   </p>
                 </div>
               </div>
@@ -224,61 +234,79 @@ const DestinationPreview = () => {
               </div>
 
               <div className="mt-4">
+
                 <div className="row">
-                  {visibleTrips?.map((trip, index) => (
+                  {trips.slice(0, visibleCount).map((trip, index) => (
                     <div className="col-lg-3 col-md-6" key={index}>
-                      <div className="featured-card-main popular-card-main m-0">
-                        <a
-                          href={`/destination-list/${trip?.slug || ""}`}
-                          className="text-decoration-none"
-                        >
+                      <div className="featured-card-main">
+                        <div className='position-relative'>
                           <div>
-                            <img
-                              className="featured-card-img"
-                              src={trip?.image || Images.featured_card}
-                              alt={trip?.name || "featured"}
-                            />
+                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
                           </div>
-                          <div className="featured-content-main">
-                            <p className="featured-city-para">{trip?.city || "Paris, France"}</p>
-                            <p className="featured-content">{trip?.title || "Centipede Tour - Guided Arizona Desert Tour by ATV"}</p>
-                            <div className="featured-bottom-content d-flex gap-2">
-                              <div
-                                className="trip-card-amount button"
-                                onClick={() =>
-                                  window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank")
-                                }
-                              >
-                                <p>Trip Detail</p>
-                              </div>
-                              <div className="trip-card-amount">
-                                <p>
-                                  From <span className="fw-bold">₹ {trip?.price || 1200}</span>/-
-                                </p>
-                              </div>
+
+                          <div className='featured-card-day-card'>
+                            <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
+                          </div>
+
+                        </div>
+
+                        <div className="featured-content-main">
+                          <p className="featured-city-para">
+                            <p className="featured-city-para">
+                              {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
+                                ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
+                                : `${trip?.pickup_location} → ${trip?.drop_location}`}
+                            </p>
+                            {/* {trip?.drop_location} */}
+                          </p>
+
+                          <p className="featured-content">
+                            {trip?.pricing?.pricing_model === "customized" ? (
+
+                              <>
+                                <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
+                                ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                              </>
+
+                            ) : (
+                              <>
+                                <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
+                                ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                              </>
+                            )}
+                          </p>
+                          <div className="featured-bottom-content d-flex gap-2">
+                            {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
+                            <div className='trip-card-amount'>
+                              <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
+                                {/* From <span className="fw-bold"></span>/- */}
+                                Trip Detail
+                              </p>
                             </div>
                           </div>
-                        </a>
+                        </div>
                       </div>
                     </div>
                   ))}
 
-                  {/* --- Show More / Less Buttons --- */}
-                  {visibleCount < destinationContent?.popular_trip_ids?.length ? (
-                    <div className="destination-viewall-main d-flex">
-                      <button className="destination-viewall" onClick={handleShowMore}>
-                        Show More <i className="fa-solid fa-arrow-right ms-2"></i>
+                  {trips.length > 4 && (
+                    <div className="destination-viewall-main d-flex justify-content-center mt-4">
+                      <button className="destination-viewall" onClick={handleToggle}>
+                        {visibleCount >= trips.length ? "Show Less" : "Show More"}
+                        <i
+                          className={`fa-solid ms-2 ${visibleCount >= trips.length ? "fa-arrow-up" : "fa-arrow-right"
+                            }`}
+                        ></i>
                       </button>
                     </div>
-                  ) : (
-                    destinationContent?.popular_trip_ids?.length > 4 && (
-                      <div className="destination-viewall-main d-flex">
-                        <button className="destination-viewall" onClick={handleShowLess}>
-                          Show Less <i className="fa-solid fa-arrow-right ms-2"></i>
-                        </button>
-                      </div>
-                    )
                   )}
+
+
+
                 </div>
               </div>
             </div>
@@ -286,1003 +314,104 @@ const DestinationPreview = () => {
 
           <section className="section-padding-bottom">
             <div className="container">
-              <div>
-                <h4 className="common-section-heading">
-                  Honeymoon Trip Packages
-                </h4>
-              </div>
+              {destinationContent?.custom_packages?.map((pkg, pkgIndex) => {
+                const isExpanded = expandedSections[pkgIndex];
+                const tripsToShow = isExpanded
+                  ? pkg.trips
+                  : pkg.trips.slice(0, 4); // show first 4 initially
 
-              <div className="mt-4">
-                <div className="row">
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content d-flex justifyContent-between alignItems-center">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
+                return (
+                  <div key={pkgIndex} className="mb-5">
+                    <div>
+                      <h4 className="common-section-heading">{pkg.title}</h4>
                     </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div
-                    className={`destination-viewall-main ${viewMore ? "d-none" : "d-flex"}`}
-                  >
-                    <button
-                      className="destination-viewall"
-                      onClick={() => setViewMore(!viewMore)}
-                    >
-                      Show More <i className="fa-solid fa-arrow-right ms-2"></i>
-                    </button>
-                  </div>
 
-                  {viewMore && (
-                    <>
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>
-                                  <i class="fa-regular fa-clock"></i> 4 days
+                    <div className="mt-4">
+                      <div className="row">
+                        {tripsToShow.map((trip, index) => (
+                          <div className="col-lg-3 col-md-6 mb-4" key={index}>
+                            <div className="featured-card-main">
+                              <div className='position-relative'>
+                                <div>
+                                  <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                </div>
+
+                                <div className='featured-card-day-card'>
+                                  <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
+                                </div>
+
+                              </div>
+
+                              <div className="featured-content-main">
+                                <p className="featured-city-para">
+                                  <p className="featured-city-para">
+                                    {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
+                                      ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
+                                      : `${trip?.pickup_location} → ${trip?.drop_location}`}
+                                  </p>
+                                  {/* {trip?.drop_location} */}
                                 </p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
+
+                                <p className="featured-content">
+                                  {trip?.pricing?.pricing_model === "customized" ? (
+
+                                    <>
+                                      <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
+                                      ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                                    </>
+
+                                  ) : (
+                                    <>
+                                      <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
+                                      ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                                    </>
+                                  )}
                                 </p>
+                                <div className="featured-bottom-content d-flex gap-2">
+                                  {/* <div className='trip-card-amount button'>
+                                                    <p className="">
+                                                        Trip Detail
+                                                    </p>
+                                                </div> */}
+                                  <div className='trip-card-amount'>
+                                    <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
+                                      {/* From <span className="fw-bold"></span>/- */}
+                                      Trip Detail
+                                    </p>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </a>
-                        </div>
-                      </div>
 
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-                      <div
-                        className={`destination-viewall-main ${viewMore ? "d-flex" : "d-none"}`}
-                      >
-                        <button
-                          className="destination-viewall"
-                          onClick={() => setViewMore(!viewMore)}
-                        >
-                          Show Less{" "}
-                          <i className="fa-solid fa-arrow-right ms-2"></i>
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="section-padding-bottom">
-            <div className="container">
-              <div>
-                <h4 className="common-section-heading">
-                  Fixed Departure Packages
-                </h4>
-              </div>
-
-              <div className="mt-4">
-                <div className="row">
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content d-flex justifyContent-between alignItems-center">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
                           </div>
+                        ))}
+
+                        {/* Show More / Show Less */}
+                        <div className="d-flex justify-content-center">
+                          {pkg.trips.length > 4 && (
+                            <button
+                              className="destination-viewall btn btn-outline-dark mt-3"
+                              onClick={() => toggleViewMore(pkgIndex)}
+                            >
+                              {isExpanded ? (
+                                <>
+                                  Show Less{" "}
+                                  <i className="fa-solid fa-arrow-up ms-2"></i>
+                                </>
+                              ) : (
+                                <>
+                                  Show More{" "}
+                                  <i className="fa-solid fa-arrow-down ms-2"></i>
+                                </>
+                              )}
+                            </button>
+                          )}
                         </div>
-                      </a>
+                      </div>
                     </div>
                   </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div
-                    className={`destination-viewall-main ${viewMore ? "d-none" : "d-flex"}`}
-                  >
-                    <button
-                      className="destination-viewall"
-                      onClick={() => setViewMore(!viewMore)}
-                    >
-                      Show More <i className="fa-solid fa-arrow-right ms-2"></i>
-                    </button>
-                  </div>
-
-                  {viewMore && (
-                    <>
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>
-                                  <i class="fa-regular fa-clock"></i> 4 days
-                                </p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-                      <div
-                        className={`destination-viewall-main ${viewMore ? "d-flex" : "d-none"}`}
-                      >
-                        <button
-                          className="destination-viewall"
-                          onClick={() => setViewMore(!viewMore)}
-                        >
-                          Show Less{" "}
-                          <i className="fa-solid fa-arrow-right ms-2"></i>
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="section-padding-bottom">
-            <div className="container">
-              <div>
-                <h4 className="common-section-heading">
-                  Family Departure Packages
-                </h4>
-              </div>
-
-              <div className="mt-4">
-                <div className="row">
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content d-flex justifyContent-between alignItems-center">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6">
-                    <div className="featured-card-main popular-card-main">
-                      <a
-                        href="destination-list"
-                        className="text-decoration-none"
-                      >
-                        <div>
-                          <img
-                            className="featured-card-img"
-                            src={Images.featured_card}
-                            alt="featured"
-                          />
-                        </div>
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">Paris, France</p>
-                          <p className="featured-content">
-                            Centipede Tour - Guided Arizona Desert Tour by ATV
-                          </p>
-                          <div className="featured-bottom-content">
-                            <p className="btn btn-outline-primary">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M5 8h14V6H5zm0 0V6zm0 14q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V2h2v2h8V2h2v2h1q.825 0 1.413.588T21 6v5.675q-.475-.225-.975-.375T19 11.075V10H5v10h6.3q.175.55.413 1.05t.562.95zm13 1q-2.075 0-3.537-1.463T13 18t1.463-3.537T18 13t3.538 1.463T23 18t-1.463 3.538T18 23m1.675-2.625l.7-.7L18.5 17.8V15h-1v3.2z"
-                                />
-                              </svg>
-                              4 days
-                            </p>
-                            <p className="btn btn-warning">
-                              from <span className="fw-bold  ₹">1200rs</span>/-
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-                  <div
-                    className={`destination-viewall-main ${viewMore ? "d-none" : "d-flex"}`}
-                  >
-                    <button
-                      className="destination-viewall"
-                      onClick={() => setViewMore(!viewMore)}
-                    >
-                      Show More <i className="fa-solid fa-arrow-right ms-2"></i>
-                    </button>
-                  </div>
-
-                  {viewMore && (
-                    <>
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>
-                                  <i class="fa-regular fa-clock"></i> 4 days
-                                </p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-
-                      <div className="col-lg-3 col-md-6">
-                        <div className="featured-card-main popular-card-main">
-                          <a
-                            href="destination-list"
-                            className="text-decoration-none"
-                          >
-                            <div>
-                              <img
-                                className="featured-card-img"
-                                src={Images.featured_card}
-                                alt="featured"
-                              />
-                            </div>
-                            <div className="featured-content-main">
-                              <p className="featured-city-para">
-                                Paris, France
-                              </p>
-                              <p className="featured-content">
-                                Centipede Tour - Guided Arizona Desert Tour by
-                                ATV
-                              </p>
-                              <div className="featured-bottom-content">
-                                <p>4 days</p>
-                                <p>
-                                  from <span className="fw-bold">1200rs</span>
-                                </p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-                      <div
-                        className={`destination-viewall-main ${viewMore ? "d-flex" : "d-none"}`}
-                      >
-                        <button
-                          className="destination-viewall"
-                          onClick={() => setViewMore(!viewMore)}
-                        >
-                          Show Less{" "}
-                          <i className="fa-solid fa-arrow-right ms-2"></i>
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+                );
+              })}
             </div>
           </section>
 

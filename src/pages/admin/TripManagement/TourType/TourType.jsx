@@ -120,43 +120,50 @@ const TourType = () => {
 
     const handleFileUpload = async (e, key) => {
         const file = e.target.files[0];
-
         if (!file) return;
-        let image_name = e?.target?.files[0]?.name;
-        let image_type = image_name?.split(".");
-        let type = image_type?.pop();
-        if (type !== "jpeg" && type !== "png" && type !== "jpg" && type !== "pdf" && type !== "webp") {
-            errorMsg("Unsupported file type")
+
+        const imageName = file.name;
+        const type = imageName.split(".").pop().toLowerCase();
+
+        if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
+            errorMsg("Unsupported file type");
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("storage", "local");
-        // const response = await SingleFileUpload(formData);
-
-        // if (response?.statusCode !== 200) {
-        //     errorMsg("Failed to upload file")
-        //     return;
-        // }
-
-        const path = image_name;
-        successMsg("File upload successfully")
-        if (validation[key]) {
-            setValidation({ ...validation, [key]: false })
+        const maxSize = 5 * 1024 * 1024; 
+        if (file.size > maxSize) {
+          errorMsg("File size should not exceed 5MB.");
+          return;
         }
-        setTourTypeData({ ...tourTypeData, [key]: path })
+
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("storage", "local");
+
+        try {
+            const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
+            console.log(res.data, "res?.data");
+
+            if (res?.data?.message === "Upload successful") {
+                successMsg("Image uploaded successfully");
+                setTourTypeData({ ...tourTypeData, [key]: res.data.url });
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            errorMsg("File upload failed");
+        }
     };
 
     const getAllTourTypes = async () => {
         try {
+            setIsLoading(true);
             const res = await APIBaseUrl.get("trip-types/", {
                 headers: {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
                 },
             });
             if (res?.data?.success === true) {
-
+                setIsLoading(false);
                 setTourTypeList(res?.data?.data)
             }
 
@@ -246,7 +253,7 @@ const TourType = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                // isLoading={isLoading}
+                isLoading={isLoading}
                 />
             </div>
 
@@ -324,7 +331,7 @@ const TourType = () => {
                             )}
                             {tourTypeData?.image && (
                                 <div className='upload-image-div'>
-                                    <img src={`${BACKEND_DOMAIN}${tourTypeData?.image}`} alt="Category-Preview" />
+                                    <img src={`${tourTypeData?.image}`} alt="Category-Preview" />
                                 </div>
                             )}
 
