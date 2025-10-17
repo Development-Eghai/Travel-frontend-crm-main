@@ -18,6 +18,8 @@ const TourPreview = () => {
     const [isFixedPackage, setIsFixedPackage] = useState(false)
     const [showReadMore, setShowReadMore] = useState(false);
     const [activeTab, setActiveTab] = useState(1);
+    const [tripList, setTripList] = useState([])
+
 
     const TripTab = [
         {
@@ -93,6 +95,24 @@ const TourPreview = () => {
         }
     }
 
+    const getAlltrip = async () => {
+        try {
+            const res = await APIBaseUrl.get("trips", {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+            if (res?.data?.success === true && res?.data?.error_code === 0) {
+                setTripList(res?.data?.data)
+            }
+
+        } catch (error) {
+            console.error("Error fetching trips:", error?.response?.data || error.message);
+            throw error;
+        }
+    };
+
+
     const handlePreview = (id) => {
         const url = `/booking/${specificTourData?.slug}/${id}`;
         window.location.href = url;
@@ -100,47 +120,37 @@ const TourPreview = () => {
 
     useEffect(() => {
         getSpecificTour()
+        getAlltrip()
     }, [])
+
+
+    const [visibleCount, setVisibleCount] = useState(4); // 👈 show 4 trips initially
+
+    const handleToggle = () => {
+        if (visibleCount >= trip.length) {
+            // 👇 If all shown → collapse back to 4
+            setVisibleCount(4);
+        } else {
+            // 👇 Show 4 more each click
+            setVisibleCount((prev) => prev + 4);
+        }
+    };
+
+    const [expandedSections, setExpandedSections] = useState({});
+
+    const toggleViewMore = (index) => {
+        setExpandedSections((prev) => ({
+            ...prev,
+            [index]: !prev[index],
+        }));
+    };
 
     console.log(specificTourData, 'specificTourData')
 
     return (
         <div className='overflow-hidden-page'>
+
             {/* <section className="destination-detail-banner-main">
-                <Swiper
-                    modules={[EffectFade, Autoplay, Navigation]}
-                    effect="fade"
-                    autoplay={{
-                        delay: 4000,
-                        disableOnInteraction: false,
-                    }}
-                    loop={true}
-                    className="destination-swiper"
-                >
-                    {specificTourData?.gallery_images?.map((imageUrl, index) => (
-                        <SwiperSlide key={index}>
-                            <div
-                                className="destination-slide"
-                                style={{
-                                    backgroundImage: `url(${imageUrl})`,
-                                }}
-                            >
-                                <div className="destination-overlay"></div>
-                                <div className='destination-slide-content'>
-                                    <h1 className="dest-package-name">{specificTourData?.title}</h1>
-                                    <p className="dest-package-para">
-                                        {specificTourData?.overview}
-                                    </p>
-                                </div>
-                            </div>
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-            </section> */}
-
-
-
-            <section className="destination-detail-banner-main">
                 <Swiper
                     modules={[EffectFade, Autoplay, Navigation]}
                     // navigation={true}
@@ -173,6 +183,49 @@ const TourPreview = () => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
+            </section> */}
+
+
+
+            <section className="destination-detail-banner-main">
+                {specificTourData?.gallery_images?.length > 0 && (
+                    <Swiper
+                        modules={[EffectFade, Autoplay, Navigation]}
+                        navigation={true}
+                        effect="fade"
+                        autoplay={{
+                            delay: 4000,
+                            disableOnInteraction: false,
+                        }}
+                        loop={true}
+                        className="destination-swiper"
+                    >
+                        {specificTourData?.gallery_images?.map((imageUrl, index) => (
+                            <SwiperSlide key={index}>
+                                <div
+                                    className="destination-slide swiper-slider-banners"
+                                    style={{
+                                        backgroundImage: `url(${encodeURI(imageUrl)})`,
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
+                                    }}
+                                >
+                                    <div className="destination-overlay"></div>
+                                    <div className="destination-slide-content">
+                                        <h3 className="dest-package-name text-center">
+                                            {specificTourData?.title}
+                                        </h3>
+                                        <p className="dest-package-para">
+                                            {specificTourData?.overview}
+                                        </p>
+                                    </div>
+                                </div>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                )}
+
+
             </section>
 
             <div className='trip-detail-content-main'>
@@ -242,26 +295,42 @@ const TourPreview = () => {
                                                             data-bs-parent="#accordionExample">
                                                             <div className="accordion-body">
                                                                 <p>{item?.description}</p>
-                                                                <p className='mt-3 fw-bold'>Activity : </p>
-                                                                <ul>
-                                                                    {item?.activities?.map((item, index) => (
-                                                                        <li key={index}>{item}</li>))}
-                                                                </ul>
-                                                                <p className='mt-3'><span className='fw-bold'>Hotel Name :</span> {item?.hotel_name}</p>
 
-                                                                <p className='mt-3 fw-bold'>Meal Plan : </p>
-                                                                <ul>
-                                                                    {item?.meal_plan?.map((item, index) => (
-                                                                        <li key={index}>{item}</li>))}
-                                                                </ul>
+                                                                {item?.activities && item?.activities.length > 0 && (
+                                                                    <>
+                                                                        <p className='mt-3 fw-bold'>Activity : </p>
+                                                                        <ul>
+                                                                            {item?.activities?.map((item, index) => (
+                                                                                <li key={index}>{item}</li>))}
+                                                                        </ul>
+                                                                    </>
+                                                                )}
 
-                                                                <div className='d-flex flex-wrap'>
+                                                                {item?.hotel_name && item?.hotel_name !== "" && (
+                                                                    <>
+                                                                        <p className='mt-3'><span className='fw-bold'>Hotel Name :</span> {item?.hotel_name}</p>
+
+                                                                    </>
+                                                                )}
+
+                                                                {item?.meal_plan && item?.meal_plan.length > 0 && (
+                                                                    <>
+                                                                        <p className='mt-3 fw-bold'>Meal Plan : </p>
+                                                                        <ul>
+                                                                            {item?.meal_plan?.map((item, index) => (
+                                                                                <li key={index}>{item}</li>))}
+                                                                        </ul>
+                                                                    </>
+                                                                )}
+
+                                                                {/* <div className='d-flex flex-wrap'>
                                                                     {item?.day_images?.map((img, index) => (
                                                                         <div key={index} className='trip-day-image'>
                                                                             <img src={`${BACKEND_DOMAIN}${img}`} alt={`Day Image ${index + 1}`} />
                                                                         </div>
                                                                     ))}
-                                                                </div>
+                                                                </div> */}
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -342,20 +411,27 @@ const TourPreview = () => {
                         </div>
 
                         <div className='col-lg-4'>
-                            {/* {specificTourData?.pricing?.pricing_model==="fixed" && (
                             <div className='trip-detail-right'>
                                 <div className='trip-detail-price-card'>
                                     <p className='mb-1'>Starting from</p>
 
                                     <div className='d-flex'>
-                                        <p className='trip-price'>₹ {specificTourData?.pricing?.pricing_model==="fixed" && specificTourData?.pricing?.fixed_departure?.fixed_departure[0]?.base_price}/-</p>
+                                        <p className='trip-price'>
+                                            ₹
+
+                                            {specificTourData?.pricing?.pricing_model === "fixed_departure" ? specificTourData?.pricing?.fixed_departure[0]?.final_price :
+                                                specificTourData?.pricing?.customized?.final_price}
+
+                                            /-</p>
                                         <p className='trip-price-per'>Per Person</p>
                                     </div>
 
-                                    <button onClick={() => handlePreview(id)}>Dates & Pricing</button>
+                                    {/* <button onClick={() => handlePreview(id)} >Dates & Pricing</button> */}
+                                    <button >Dates & Pricing</button>
+
+
                                 </div>
                             </div>
-                            )} */}
 
                             <div className='trip-detail-right'>
                                 {!isFixedPackage && (
@@ -437,6 +513,85 @@ const TourPreview = () => {
 
                         </div>
 
+                        <section className="section-padding">
+                            <div className="container">
+                                <div>
+                                    <h4 className="common-section-heading">
+                                        Related Trip Packages
+                                    </h4>
+                                </div>
+
+                                <div className="mt-4">
+
+                                    <div className="row">
+                                        {tripList?.slice(0, visibleCount).map((trip, index) => (
+                                            <div className="col-lg-3 col-md-6" key={index}>
+                                                <div className="featured-card-main">
+                                                    <div className='position-relative'>
+                                                        <div>
+                                                            <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
+                                                        </div>
+
+                                                        <div className='featured-card-day-card'>
+                                                            <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div className="featured-content-main">
+                                                        <p className="featured-city-para">
+                                                            <p className="featured-city-para">
+                                                                {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
+                                                                    ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
+                                                                    : `${trip?.pickup_location} → ${trip?.drop_location}`}
+                                                            </p>
+                                                        </p>
+
+                                                        <p className="featured-content">
+                                                            {trip?.pricing?.pricing_model === "customized" ? (
+
+                                                                <>
+                                                                    <span>₹{trip?.pricing?.customized?.base_price}</span>
+                                                                    ₹{trip?.pricing?.customized?.final_price}
+                                                                </>
+
+                                                            ) : (
+                                                                <>
+                                                                    <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
+                                                                    ₹{trip?.pricing?.fixed_departure[0]?.final_price}
+                                                                </>
+                                                            )}
+                                                        </p>
+                                                        <div className="featured-bottom-content d-flex gap-2">
+                                                            <div className='trip-card-amount'>
+                                                                <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
+                                                                    Trip Detail
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        {tripList.length > 4 && (
+                                            <div className="destination-viewall-main d-flex justify-content-center mt-4">
+                                                <button className="destination-viewall" onClick={handleToggle}>
+                                                    {visibleCount >= tripList.length ? "Show Less" : "Show More"}
+                                                    <i
+                                                        className={`fa-solid ms-2 ${visibleCount >= tripList.length ? "fa-arrow-up" : "fa-arrow-right"
+                                                            }`}
+                                                    ></i>
+                                                </button>
+                                            </div>
+                                        )}
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
 
 
                     </div>

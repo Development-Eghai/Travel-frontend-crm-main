@@ -88,6 +88,10 @@
     border: 0.5px solid rgb(117, 117, 117);
     padding: 4px 20px;
     border-radius: 4px;
+    background-color: #3b2a1a;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .trip-detail-faqs .accordion-button::after {

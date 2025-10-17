@@ -241,7 +241,7 @@ const DestinationPreview = () => {
                       <div className="featured-card-main">
                         <div className='position-relative'>
                           <div>
-                            <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                          <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
                           </div>
 
                           <div className='featured-card-day-card'>
@@ -326,7 +326,7 @@ const DestinationPreview = () => {
                             <div className="featured-card-main">
                               <div className='position-relative'>
                                 <div>
-                                  <img className="featured-card-img" src={Images.featured_card} alt="featured" />
+                                <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
                                 </div>
 
                                 <div className='featured-card-day-card'>
@@ -449,7 +449,7 @@ const DestinationPreview = () => {
             <div className="container">
               <div>
                 <h4 className="common-section-heading travel-guidence-head">
-                  Europe Travel Guidelines
+                  {destinationContent?.title} Travel Guidelines
                 </h4>
               </div>
 

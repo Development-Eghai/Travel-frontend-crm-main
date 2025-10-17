@@ -465,7 +465,7 @@ const DestinationCreation = () => {
 
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>
-                            <label>Select Primary Destination  <span className='required-icon'>*</span></label>
+                            <label>Select Primary Destination </label>
                             <select onChange={(e) => handleChange("primary_destination_id", e.target.value)}
                                 onBlur={(e) => handleBlur("primary_destination_id", e.target.value)}
                                 value={createDestination?.primary_destination_id || ""}>
@@ -474,15 +474,15 @@ const DestinationCreation = () => {
                                     <option key={index} value={item?.id}>{item?.title}</option>
                                 ))}
                             </select>
-                            {validation?.primary_destination_id?.status === false && validation?.primary_destination_id?.message && (
+                            {/* {validation?.primary_destination_id?.status === false && validation?.primary_destination_id?.message && (
                                 <p className='error-para'>{validation?.primary_destination_id?.message}</p>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>
-                            <label>Domestic / International  <span className='required-icon'>*</span></label>
+                            <label>Domestic / International</label>
                             <select onChange={(e) => handleChange("destination_type", e.target.value)}
                                 onBlur={(e) => handleBlur("destination_type", e.target.value)}
                                 value={createDestination?.destination_type}>
@@ -490,9 +490,9 @@ const DestinationCreation = () => {
                                 <option value="domestic">Domestic</option>
                                 <option value="international">International</option>
                             </select>
-                            {validation?.destination_type?.status === false && validation?.destination_type?.message && (
+                            {/* {validation?.destination_type?.status === false && validation?.destination_type?.message && (
                                 <p className='error-para'>Destination Type {validation.destination_type.message}</p>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
@@ -512,9 +512,9 @@ const DestinationCreation = () => {
                                 }
                                 options={allTrips}
                             />
-                            {validation?.popular_trip_ids?.status === false && validation?.popular_trip_ids?.message && (
+                            {/* {validation?.popular_trip_ids?.status === false && validation?.popular_trip_ids?.message && (
                                 <p className='error-para'>{validation.popular_trip_ids.message}</p>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
@@ -534,13 +534,13 @@ const DestinationCreation = () => {
                                 }
                                 options={allBlogCategory}
                             />
-                            {validation?.blog_category_ids?.status === false && validation?.blog_category_ids?.message && (
+                            {/* {validation?.blog_category_ids?.status === false && validation?.blog_category_ids?.message && (
                                 <p className='error-para'>{validation.blog_category_ids.message}</p>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
-                    <div className='col-lg-6'>
+                    {/* <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Featured Blogs</label>
                             <Select
@@ -558,7 +558,7 @@ const DestinationCreation = () => {
                                 <p className='error-para'>{validation.featured_blog_ids.message}</p>
                             )}
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>
@@ -576,9 +576,9 @@ const DestinationCreation = () => {
                                 }
                                 options={allActivity}
                             />
-                            {validation?.activity_ids?.status === false && validation?.activity_ids?.message && (
+                            {/* {validation?.activity_ids?.status === false && validation?.activity_ids?.message && (
                                 <p className='error-para'>{validation.activity_ids.message}</p>
-                            )}
+                            )} */}
                         </div>
                     </div>
 
@@ -629,9 +629,9 @@ const DestinationCreation = () => {
                             tabIndex={1}
                             onBlur={(newContent) => handleChange("overview", newContent)}
                         />
-                        {validation?.overview?.status === false && validation?.overview?.message && (
+                        {/* {validation?.overview?.status === false && validation?.overview?.message && (
                             <p className='error-para'>About Destination {validation.overview.message}</p>
-                        )}
+                        )} */}
 
                     </div>
                 </div>
@@ -749,9 +749,9 @@ const DestinationCreation = () => {
                             tabIndex={1}
                             onBlur={(newContent) => handleChange("travel_guidelines", newContent)}
                         />
-                        {validation?.travel_guidelines?.status === false && validation?.travel_guidelines?.message && (
+                        {/* {validation?.travel_guidelines?.status === false && validation?.travel_guidelines?.message && (
                             <p className='error-para'>Destination Guidance{validation.travel_guidelines.message}</p>
-                        )}
+                        )} */}
                     </div>
                 </div>
             
