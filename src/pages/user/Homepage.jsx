@@ -96,14 +96,14 @@ const Homepage = () => {
                                                         {trip?.pricing?.pricing_model === "customized" ? (
 
                                                             <>
-                                                                <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
-                                                                ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                                                                <span>₹{trip?.pricing?.customized?.base_price}</span>
+                                                                ₹{trip?.pricing?.customized?.final_price}
                                                             </>
 
                                                         ) : (
                                                             <>
-                                                                <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
-                                                                ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                                                                <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
+                                                                ₹{trip?.pricing?.fixed_departure[0]?.final_price}
                                                             </>
                                                         )}
                                                     </p>
@@ -255,7 +255,7 @@ const Homepage = () => {
                         <div className='mt-3'>
                             <div className="row">
                                 {lastFourTrips && lastFourTrips.length > 0 ? (
-                                    lastFourTrips.map((trip, index) => (
+                                    lastFourTrips.reverse().map((trip, index) => (
                                         <div className='col-lg-3 col-md-6'>
                                             <div className="featured-card-main">
                                                 <div className='position-relative'>
@@ -271,12 +271,28 @@ const Homepage = () => {
 
                                                 <div className="featured-content-main">
                                                     <p className="featured-city-para">
-                                                        {trip?.pickup_location} → {trip?.drop_location}
+                                                        <p className="featured-city-para">
+                                                            {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
+                                                                ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
+                                                                : `${trip?.pickup_location} → ${trip?.drop_location}`}
+                                                        </p>
+                                                        {/* {trip?.drop_location} */}
                                                     </p>
 
                                                     <p className="featured-content">
-                                                        <span>₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price} </span>
-                                                        ₹{trip?.pricing?.fixed_departure?.fixed_departure?.[0]?.base_price}
+                                                        {trip?.pricing?.pricing_model === "customized" ? (
+
+                                                            <>
+                                                                <span>₹{trip?.pricing?.customized?.base_price}</span>
+                                                                ₹{trip?.pricing?.customized?.final_price}
+                                                            </>
+
+                                                        ) : (
+                                                            <>
+                                                                <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
+                                                                ₹{trip?.pricing?.fixed_departure[0]?.final_price}
+                                                            </>
+                                                        )}
                                                     </p>
                                                     <div className="featured-bottom-content d-flex gap-2">
                                                         {/* <div className='trip-card-amount button'>
@@ -286,14 +302,13 @@ const Homepage = () => {
                                                 </div> */}
                                                         <div className='trip-card-amount'>
                                                             <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
+                                                                {/* From <span className="fw-bold"></span>/- */}
                                                                 Trip Detail
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-
                                         </div>
                                     ))
                                 ) : (

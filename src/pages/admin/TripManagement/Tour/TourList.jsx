@@ -93,7 +93,7 @@ const TourList = () => {
         },
     ];
 
-    const numberedRows = Array.isArray(tripList?.reverse())
+    const numberedRows = Array.isArray(tripList)
         ? tripList.map((row, index) => ({
             ...row,
             sno: index + 1,

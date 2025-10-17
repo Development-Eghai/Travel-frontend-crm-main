@@ -54,9 +54,7 @@ export default function TourCreation() {
 
     // Media - Updated to store file objects and preview URLs
     hero_image: null,
-    hero_image_preview: null,
     gallery_images: [],
-    gallery_previews: [],
 
     // Pricing
 
@@ -517,21 +515,6 @@ export default function TourCreation() {
 
   // Prepare data for API submission - UPDATED to include images
   const prepareSubmissionData = async () => {
-    // Convert images to base64 or prepare for upload
-    // let heroImageBase64 = null;
-    // let galleryImagesBase64 = [];
-
-    // if (formData.hero_image) {
-    //   heroImageBase64 = await fileToBase64(formData.hero_image);
-    // }
-
-    // if (formData.gallery_images.length > 0) {
-    //   for (const file of formData.gallery_images) {
-    //     const base64 = await fileToBase64(file);
-    //     galleryImagesBase64.push(base64);
-    //   }
-    // }
-
     const submissionData = {
       title: formData.title,
       overview: formData.overview,
@@ -555,8 +538,8 @@ export default function TourCreation() {
       privacy_policy: formData.privacy_policy,
       payment_terms: formData.payment_terms,
 
-      // gallery_images:formData.gallery_images,
-      // hero_image:formData.hero_image,
+      gallery_images:formData.gallery_images,
+      hero_image:formData.hero_image,
 
       itinerary: formData.itineraryDays.map((day) => ({
         day_number: day.day_number,
@@ -587,13 +570,13 @@ export default function TourCreation() {
       //   gallery_urls: formData?.gallery_images,
       // },
 
-      media: {
-        hero_image_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
-        thumbnail_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
-        gallery_urls: [
-          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII="
-        ]
-      },
+      // media: {
+      //   hero_image_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
+      //   thumbnail_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
+      //   gallery_urls: [
+      //     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII="
+      //   ]
+      // },
 
       pricing: {
         pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
@@ -1216,7 +1199,7 @@ export default function TourCreation() {
                     {formData?.gallery_images?.map((image, index) => (
                       <div className='upload-image-div destination-image-div'>
                         <div>
-                          <img src={`${image}`} alt="Category-Preview" key={index} />
+                          <img src={encodeURI(image)} alt="Category-Preview" key={index} />
                         </div>
                       </div>
                     ))}
@@ -1611,7 +1594,7 @@ export default function TourCreation() {
                         name="pricingType"
                         className="form-check-input"
                         checked={
-                          formData.pricing.customized[0]?.pricing_type ===
+                          formData.pricing.customized?.pricing_type ===
                           "Price Per Package"
                         }
                         onChange={() =>
@@ -1909,8 +1892,6 @@ export default function TourCreation() {
       case "policies":
         return (
           <div className="form-container">
-            <h5>Terms and Conditions</h5>
-
             <div className="form-group">
               <label>Terms and Conditions Content</label>
               <textarea
@@ -2044,8 +2025,8 @@ export default function TourCreation() {
           {currentIndex + 1}/{steps.length} sections complete
         </span>
         <div style={{ display: "flex", gap: "8px" }}>
-          <button className="button button-secondary">Save Draft</button>
-          <button className="button button-secondary">Preview</button>
+          {/* <button className="button button-secondary">Save Draft</button>
+          <button className="button button-secondary">Preview</button> */}
           <button className="button button-green" onClick={handleSubmit}>
             Publish Trip
           </button>

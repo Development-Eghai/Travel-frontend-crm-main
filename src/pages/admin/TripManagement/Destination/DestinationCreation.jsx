@@ -15,7 +15,7 @@ const DestinationCreation = () => {
 
     const navigate = useNavigate();
     const { id } = useParams();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [createDestination, setCreateDestination] = useState({});
     const [destinationList, setDestinationList] = useState([])
@@ -84,23 +84,23 @@ const DestinationCreation = () => {
             if (res?.data?.message === "Files uploaded") {
                 successMsg("Image uploaded successfully");
                 const path = res.data.files;
-                const existingImages = createDestination?.hero_image || [];
+                const existingImages = createDestination?.hero_banner_images || [];
 
                 const newPaths = Array.isArray(path)
                     ? path.flat()
                     : [path];
 
                 const updatedImages = [...existingImages, ...newPaths];
-                if (validation?.hero_image?.status === false) {
+                if (validation?.hero_banner_images?.status === false) {
                     setValidation((prev) => ({
                         ...prev,
-                        hero_image: { status: true, message: "" },
+                        hero_banner_images: { status: true, message: "" },
                     }));
                 }
 
                 setCreateDestination({
                     ...createDestination,
-                    hero_image: updatedImages,
+                    hero_banner_images: updatedImages,
                 });
             }
         } catch (error) {
@@ -115,7 +115,7 @@ const DestinationCreation = () => {
         validate.title = StringValidation(data?.title);
         validate.slug = SlugValidation(data?.slug);
         validate.subtitle = NonEmptyValidation(data?.subtitle);
-        validate.hero_image = NonEmptyArrayValidation(data?.hero_image);
+        validate.hero_banner_images = NonEmptyArrayValidation(data?.hero_banner_images);
 
 
         validate.primary_destination_id = (!createDestination?.primary_destination_id || createDestination.primary_destination_id.length === 0)
@@ -148,6 +148,7 @@ const DestinationCreation = () => {
     };
 
     const handleSubmit = async (e) => {
+        console.log("in handleSubmit")
         e.preventDefault()
 
         const cleanedData = normalizeEmptyFields(createDestination);
@@ -381,6 +382,8 @@ const DestinationCreation = () => {
     }, [])
 
     console.log(createDestination, "createDestination")
+    console.log(validation, "validation")
+
 
     return (
         <>
@@ -425,19 +428,19 @@ const DestinationCreation = () => {
                                 multiple
                                 accept="image/*"
                                 className="form-control"
-                                onChange={(e) => handleFileUpload(e, "hero_image")}
+                                onChange={(e) => handleFileUpload(e, "hero_banner_images")}
                             />
 
-                            {validation?.hero_image?.status === false && validation?.hero_image?.message && (
-                                <p className='error-para'>Banner Images {validation.hero_image.message}</p>
+                            {validation?.hero_banner_images?.status === false && validation?.hero_banner_images?.message && (
+                                <p className='error-para'>Banner Images {validation.hero_banner_images.message}</p>
                             )}
 
-                            {createDestination?.hero_image && createDestination?.hero_image?.length > 0 && (
+                            {createDestination?.hero_banner_images && createDestination?.hero_banner_images?.length > 0 && (
                                 <div className="d-flex flex-wrap">
-                                    {createDestination?.hero_image?.map((image, index) => (
+                                    {createDestination?.hero_banner_images?.map((image, index) => (
                                         <div className='upload-image-div destination-image-div'>
                                             <div>
-                                                <img src={`${image}`} alt="Category-Preview" key={index} />
+                                                <img src={encodeURI(image)} alt="Category-Preview" key={index} />
                                             </div>
                                         </div>
                                     ))}
@@ -751,10 +754,9 @@ const DestinationCreation = () => {
                         )}
                     </div>
                 </div>
-
+            
                 {id ? <button className="create-common-btn" onClick={(e) => handleUpdate(e)}>{isLoading ? <CircularProgress/>: "Update"}</button> :
-                    <button className="create-common-btn" onClick={(e) => handleSubmit(e)}>{isLoading ? <CircularProgress/>: "Create"}</button>}
-
+                    <button className="create-common-btn" onClick={(e) => handleSubmit(e)}>{isLoading ? <CircularProgress/>: "Create"}</button>} 
 
             </div>
 

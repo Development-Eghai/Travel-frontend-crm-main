@@ -109,7 +109,6 @@ const TourPreview = () => {
             {/* <section className="destination-detail-banner-main">
                 <Swiper
                     modules={[EffectFade, Autoplay, Navigation]}
-                    navigation={true}
                     effect="fade"
                     autoplay={{
                         delay: 4000,
@@ -118,19 +117,19 @@ const TourPreview = () => {
                     loop={true}
                     className="destination-swiper"
                 >
-                    {specificTourData?.hero_slider_images.map((imageUrl, index) => (
+                    {specificTourData?.gallery_images?.map((imageUrl, index) => (
                         <SwiperSlide key={index}>
                             <div
                                 className="destination-slide"
                                 style={{
-                                    backgroundImage: `url($${imageUrl})`,
+                                    backgroundImage: `url(${imageUrl})`,
                                 }}
                             >
                                 <div className="destination-overlay"></div>
                                 <div className='destination-slide-content'>
-                                    <h1 className="dest-package-name">Europe Tour Packages</h1>
+                                    <h1 className="dest-package-name">{specificTourData?.title}</h1>
                                     <p className="dest-package-para">
-                                        Explore the nature-kissed beauty of Thailand
+                                        {specificTourData?.overview}
                                     </p>
                                 </div>
                             </div>
@@ -138,6 +137,43 @@ const TourPreview = () => {
                     ))}
                 </Swiper>
             </section> */}
+
+
+
+            <section className="destination-detail-banner-main">
+                <Swiper
+                    modules={[EffectFade, Autoplay, Navigation]}
+                    // navigation={true}
+                    effect="fade"
+                    autoplay={{
+                        delay: 4000,
+                        disableOnInteraction: false,
+                    }}
+                    loop={true}
+                    className="destination-swiper"
+                >
+                    {specificTourData?.gallery_images?.map((imageUrl) => (
+                        <SwiperSlide>
+                            <div
+                                className="destination-slide swiper-slider-banners"
+                                style={{
+                                    backgroundImage: `url(${encodeURI(imageUrl)})`,
+                                }}
+                            >
+                                <div className="destination-overlay"></div>
+                                <div className="destination-slide-content">
+                                    <h3 className="dest-package-name text-center">
+                                        {specificTourData?.title}
+                                    </h3>
+                                    <p className="dest-package-para">
+                                        {specificTourData?.overview}
+                                    </p>
+                                </div>
+                            </div>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+            </section>
 
             <div className='trip-detail-content-main'>
                 <div className='container'>
@@ -240,7 +276,7 @@ const TourPreview = () => {
                                     <div className="container">
                                         <div className='trip-detail-faqs mt-4'>
                                             <div className="accordion" id="accordionExample">
-                                                {/* {specificTourData?.faqs?.map((item, index) => (
+                                                {specificTourData?.faqs?.map((item, index) => (
                                                     <div className="accordion-item" key={index}>
                                                         <h2 className="accordion-header" id={`day_wise_itenary${index}`}>
                                                             <button className="accordion-button" type="button" data-bs-toggle="collapse"
@@ -258,7 +294,7 @@ const TourPreview = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                ))} */}
+                                                ))}
 
                                                 <p className=''>{specificTourData?.faqs?.question}</p>
                                                 <p className=''>{specificTourData?.faqs?.answer}</p>

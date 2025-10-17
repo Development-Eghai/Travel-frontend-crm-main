@@ -133,40 +133,87 @@ const TourCategory = () => {
 
     }
 
+    // const handleFileUpload = async (e, key) => {
+    //     const file = e.target.files[0];
+    //     if (!file) return;
+
+    //     const imageName = file.name;
+    //     const type = imageName.split(".").pop().toLowerCase();
+
+    //     if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
+    //         errorMsg("Unsupported file type");
+    //         return;
+    //     }
+
+    //     const maxSize = 5 * 1024 * 1024; 
+    //     if (file.size > maxSize) {
+    //       errorMsg("File size should not exceed 5MB.");
+    //       return;
+    //     }
+
+    //     const formData = new FormData();
+    //     formData.append("image", file);
+    //     formData.append("storage", "local");
+
+    //     try {
+    //         const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
+    //         console.log(res.data, "res?.data");
+
+    //         if (res?.data?.message === "Upload successful") {
+    //             successMsg("Image uploaded successfully");
+    //             setcategoryData({ ...categoryData, [key]: res.data.url });
+    //         }
+    //     } catch (error) {
+    //         console.error("Upload error:", error);
+    //         errorMsg("File upload failed");
+    //     }
+    // };
+
     const handleFileUpload = async (e, key) => {
         const file = e.target.files[0];
+
         if (!file) return;
-
-        const imageName = file.name;
-        const type = imageName.split(".").pop().toLowerCase();
-
-        if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
-            errorMsg("Unsupported file type");
+        let image_name = e?.target?.files[0]?.name;
+        let image_type = image_name?.split(".");
+        let type = image_type?.pop();
+        if (type !== "jpeg" && type !== "png" && type !== "jpg" && type !== "pdf" && type !== "webp") {
+            errorMsg
+                ("Unsupported file type")
             return;
         }
 
-        const maxSize = 5 * 1024 * 1024; 
-        if (file.size > maxSize) {
-          errorMsg("File size should not exceed 5MB.");
-          return;
-        }
-
         const formData = new FormData();
-        formData.append("image", file);
+        formData.append("gallery_images", file);
         formData.append("storage", "local");
-
         try {
-            const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
-            console.log(res.data, "res?.data");
-
-            if (res?.data?.message === "Upload successful") {
+            const res = await APIBaseUrl.post("https://api.yaadigo.com/multiple", formData);
+            if (res?.data?.message === "Files uploaded") {
                 successMsg("Image uploaded successfully");
-                setcategoryData({ ...categoryData, [key]: res.data.url });
+                const path = res.data.files;
+                const existingImages = categoryData?.image || [];
+
+                const newPaths = Array.isArray(path)
+                    ? path.flat()
+                    : [path];
+
+                const updatedImages = [...existingImages, ...newPaths];
+                if (validation?.image?.status === false) {
+                    setValidation((prev) => ({
+                        ...prev,
+                        image: { status: true, message: "" },
+                    }));
+                }
+
+                setcategoryData({
+                    ...categoryData,
+                    image: updatedImages,
+                });
             }
         } catch (error) {
             console.error("Upload error:", error);
             errorMsg("File upload failed");
         }
+
     };
 
     const getAllTourCategory = async () => {
@@ -258,7 +305,9 @@ const TourCategory = () => {
         getAllTourCategory()
     }, [])
 
-    console.log(categoryList,"categoryList")
+
+    console.log(categoryData, "categoryData")
+    console.log(categoryList, "categoryList")
 
 
     return (
@@ -272,8 +321,8 @@ const TourCategory = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                // getRowId={(row) => row._id}
-                isLoading={isLoading}
+                    // getRowId={(row) => row._id}
+                    isLoading={isLoading}
                 />
             </div>
 
@@ -349,9 +398,15 @@ const TourCategory = () => {
                             {validation?.image?.status === false && validation?.image?.message && (
                                 <p className='error-para'>Image {validation.image.message}</p>
                             )}
-                            {categoryData?.image && (
-                                <div className='upload-image-div'>
-                                    <img src={`${categoryData?.image}`} alt="Category-Preview" />
+                            {Array.isArray(categoryData?.image) && categoryData.image.length > 0 && (
+                                <div className="d-flex flex-wrap">
+                                    {categoryData.image.map((image, index) => (
+                                        <div className="upload-image-div destination-image-div" key={index}>
+                                            <div>
+                                                <img src={encodeURI(image)} alt={`Category-Preview-${index}`} />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
 

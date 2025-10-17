@@ -3,6 +3,11 @@ import { useParams } from 'react-router-dom';
 import { Images } from '../../../../helpers/Images/images';
 import { APIBaseUrl } from '../../../../common/api/api';
 import { CircularProgress } from "@mui/material";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, EffectFade, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/navigation";
 
 const CategoryPreview = () => {
   const { id } = useParams();
@@ -57,9 +62,53 @@ const CategoryPreview = () => {
 
   console.log(trips, "trips")
   console.log(categoryData, "categoryData")
+  console.log(categoryData.image);
 
   return (
-    <div>
+    <div className='overflow-hidden'>
+      <section className="destination-detail-banner-main">
+        {categoryData?.image?.length > 0 && (
+          <Swiper
+            modules={[EffectFade, Autoplay, Navigation]}
+            navigation={true}
+            effect="fade"
+            autoplay={{
+              delay: 4000,
+              disableOnInteraction: false,
+            }}
+            loop={true}
+            className="destination-swiper"
+          >
+            {categoryData?.image?.map((imageUrl, index) => (
+              <SwiperSlide key={index}>
+                <div
+                  className="destination-slide swiper-slider-banners"
+                  style={{
+                    backgroundImage: `url(${encodeURI(imageUrl)})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div className="destination-overlay"></div>
+                  <div className="destination-slide-content">
+                    <h3 className="dest-package-name text-center">
+                      {categoryData?.name}
+                    </h3>
+                    <p className="dest-package-para">
+                      {categoryData?.description}
+                    </p>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
+
+        
+      </section>
+
+
+
       <div className='container'>
         <div className='section-padding'>
           <h1 className='category-heading-preview'>{categoryData?.name} Category</h1>
@@ -102,14 +151,14 @@ const CategoryPreview = () => {
                           {trip?.pricing?.pricing_model === "customized" ? (
 
                             <>
-                              <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
-                              ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                              <span>₹{trip?.pricing?.customized?.base_price}</span>
+                              ₹{trip?.pricing?.customized?.final_price}
                             </>
 
                           ) : (
                             <>
-                              <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
-                              ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                              <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
+                              ₹{trip?.pricing?.fixed_departure[0]?.final_price}
                             </>
                           )}
                         </p>

@@ -126,7 +126,7 @@ const DestinationPreview = () => {
 
   return (
     <div className="">
-      {/* <section className="destination-detail-banner-main">
+      <section className="destination-detail-banner-main">
         <Swiper
           modules={[EffectFade, Autoplay, Navigation]}
           navigation={true}
@@ -138,12 +138,12 @@ const DestinationPreview = () => {
           loop={true}
           className="destination-swiper"
         >
-          {destinationContent?.hero_images?.map((imageUrl) => (
+          {destinationContent?.hero_banner_images?.map((imageUrl) => (
             <SwiperSlide>
               <div
-                className="destination-slide"
+                className="destination-slide swiper-slider-banners"
                 style={{
-                  backgroundImage: `url(${imageUrl})`,
+                  backgroundImage: `url(${encodeURI(imageUrl)})`,
                 }}
               >
                 <div className="destination-overlay"></div>
@@ -159,7 +159,7 @@ const DestinationPreview = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </section> */}
+      </section>
 
       {/* <section className="destination-tabsection-parent">
         <div className="container">
@@ -257,33 +257,26 @@ const DestinationPreview = () => {
                                 ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
                                 : `${trip?.pickup_location} → ${trip?.drop_location}`}
                             </p>
-                            {/* {trip?.drop_location} */}
                           </p>
 
                           <p className="featured-content">
                             {trip?.pricing?.pricing_model === "customized" ? (
 
                               <>
-                                <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
-                                ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                                <span>₹{trip?.pricing?.customized?.base_price}</span>
+                                ₹{trip?.pricing?.customized?.final_price}
                               </>
 
                             ) : (
                               <>
-                                <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
-                                ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                                <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
+                                ₹{trip?.pricing?.fixed_departure[0]?.final_price}
                               </>
                             )}
                           </p>
                           <div className="featured-bottom-content d-flex gap-2">
-                            {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
                             <div className='trip-card-amount'>
                               <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                {/* From <span className="fw-bold"></span>/- */}
                                 Trip Detail
                               </p>
                             </div>
@@ -349,40 +342,32 @@ const DestinationPreview = () => {
                                       ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
                                       : `${trip?.pickup_location} → ${trip?.drop_location}`}
                                   </p>
-                                  {/* {trip?.drop_location} */}
                                 </p>
 
                                 <p className="featured-content">
                                   {trip?.pricing?.pricing_model === "customized" ? (
 
                                     <>
-                                      <span>₹{trip?.pricing?.fixed_departure?.customized?.base_price}</span>
-                                      ₹{trip?.pricing?.fixed_departure?.customized?.final_price}
+                                      <span>₹{trip?.pricing?.customized?.base_price}</span>
+                                      ₹{trip?.pricing?.customized?.final_price}
                                     </>
 
                                   ) : (
                                     <>
-                                      <span>₹{trip?.pricing?.fixed_departure?.customized_package?.base_price}</span>
-                                      ₹{trip?.pricing?.fixed_departure?.customized_package?.final_price}
+                                      <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
+                                      ₹{trip?.pricing?.fixed_departure[0]?.final_price}
                                     </>
                                   )}
                                 </p>
                                 <div className="featured-bottom-content d-flex gap-2">
-                                  {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
                                   <div className='trip-card-amount'>
                                     <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                      {/* From <span className="fw-bold"></span>/- */}
                                       Trip Detail
                                     </p>
                                   </div>
                                 </div>
                               </div>
                             </div>
-
                           </div>
                         ))}
 
