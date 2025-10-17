@@ -866,7 +866,6 @@ export default function TourCreation() {
 
                 <div className="mb-3">
                   <label className="form-label">Drop city *</label>
-                  <label className="form-label">Drop city *</label>
                     <input
                       type="text"
                       className="form-control"
