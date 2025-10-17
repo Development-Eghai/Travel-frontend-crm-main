@@ -853,39 +853,30 @@ export default function TourCreation() {
               <div className="col-md-6">
                 <div className="mb-3">
                   <label className="form-label">Pickup city *</label>
-                  <select
-                    className="form-select"
-                    value={formData.pickup_location}
-                    onChange={(e) =>
+                        <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter pickup city"
+                      value={formData.pickup_location}
+                      onChange={(e) =>
                       handleInputChange("pickup_location", e.target.value)
                     }
-                  >
-                    <option value="">Select city</option>
-                    {indianCities.map((city, index) => (
-                      <option key={index} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    />
                 </div>
 
                 <div className="mb-3">
                   <label className="form-label">Drop city *</label>
-                  <select
-                    className="form-select"
-                    value={formData.drop_location}
-                    onChange={(e) =>
-                      handleInputChange("drop_location", e.target.value)
-                    }
-                  >
-                    <option value="">Select city</option>
-                    {indianCities.map((city, index) => (
-                      <option key={index} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  <label className="form-label">Drop city *</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter drop city"
+                      value={formData.drop_location}
+                      onChange={(e) =>
+                        handleInputChange("drop_location", e.target.value)
+                      }
+                    />
+                 </div>
 
                 <div className="row">
                   <div className="col-6 mb-3">
