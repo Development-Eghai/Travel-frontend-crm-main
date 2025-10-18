@@ -17,6 +17,8 @@ import TopHeader from "../../../../container/TopHeader";
 import ContactForm from "../ContactForm/ContactForm";
 import { APIBaseUrl } from "../../../../common/api/api";
 import { de } from "date-fns/locale";
+import TripCard from '../../../../component/TripCard';
+
 
 const DestinationPreview = () => {
   const navigate = useNavigate();
@@ -226,179 +228,87 @@ const DestinationPreview = () => {
           </section>
 
           <section className="section-padding-bottom">
-            <div className="container">
-              <div>
-                <h4 className="common-section-heading">
-                  Popular Trip Packages
-                </h4>
-              </div>
+  <div className="container">
+    <div>
+      <h4 className="common-section-heading">
+        Popular Trip Packages
+      </h4>
+    </div>
 
-              <div className="mt-4">
+    <div className="mt-4">
+      <div className="row">
+        {trips.slice(0, visibleCount).map((trip, index) => (
+          <div className="col-lg-3 col-md-6 mb-4" key={index}>
+            <TripCard trip={trip} />
+          </div>
+        ))}
 
-                <div className="row">
-                  {trips.slice(0, visibleCount).map((trip, index) => (
-                    <div className="col-lg-3 col-md-6" key={index}>
-                      <div className="featured-card-main">
-                        <div className='position-relative'>
-                          <div>
-                          <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
-                          </div>
+        {trips.length > 4 && (
+          <div className="destination-viewall-main d-flex justify-content-center mt-4">
+            <button className="destination-viewall" onClick={handleToggle}>
+              {visibleCount >= trips.length ? "Show Less" : "Show More"}
+              <i
+                className={`fa-solid ms-2 ${visibleCount >= trips.length ? "fa-arrow-up" : "fa-arrow-right"
+                  }`}
+              ></i>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
 
-                          <div className='featured-card-day-card'>
-                            <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
-                          </div>
+<section className="section-padding-bottom">
+  <div className="container">
+    {destinationContent?.custom_packages?.map((pkg, pkgIndex) => {
+      const isExpanded = expandedSections[pkgIndex];
+      const tripsToShow = isExpanded
+        ? pkg.trips
+        : pkg.trips.slice(0, 4); // show first 4 initially
 
-                        </div>
+      return (
+        <div key={pkgIndex} className="mb-5">
+          <div>
+            <h4 className="common-section-heading">{pkg.title}</h4>
+          </div>
 
-                        <div className="featured-content-main">
-                          <p className="featured-city-para">
-                            <p className="featured-city-para">
-                              {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
-                                ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
-                                : `${trip?.pickup_location} → ${trip?.drop_location}`}
-                            </p>
-                          </p>
-
-                          <p className="featured-content">
-                            {trip?.pricing?.pricing_model === "customized" ? (
-
-                              <>
-                                <span>₹{trip?.pricing?.customized?.base_price}</span>
-                                ₹{trip?.pricing?.customized?.final_price}
-                              </>
-
-                            ) : (
-                              <>
-                                <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
-                                ₹{trip?.pricing?.fixed_departure[0]?.final_price}
-                              </>
-                            )}
-                          </p>
-                          <div className="featured-bottom-content d-flex gap-2">
-                            <div className='trip-card-amount'>
-                              <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                Trip Detail
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {trips.length > 4 && (
-                    <div className="destination-viewall-main d-flex justify-content-center mt-4">
-                      <button className="destination-viewall" onClick={handleToggle}>
-                        {visibleCount >= trips.length ? "Show Less" : "Show More"}
-                        <i
-                          className={`fa-solid ms-2 ${visibleCount >= trips.length ? "fa-arrow-up" : "fa-arrow-right"
-                            }`}
-                        ></i>
-                      </button>
-                    </div>
-                  )}
-
-
-
+          <div className="mt-4">
+            <div className="row">
+              {tripsToShow.map((trip, index) => (
+                <div className="col-lg-3 col-md-6 mb-4" key={index}>
+                  <TripCard trip={trip} />
                 </div>
+              ))}
+
+              {/* Show More / Show Less */}
+              <div className="d-flex justify-content-center w-100">
+                {pkg.trips.length > 4 && (
+                  <button
+                    className="destination-viewall btn btn-outline-dark mt-3"
+                    onClick={() => toggleViewMore(pkgIndex)}
+                  >
+                    {isExpanded ? (
+                      <>
+                        Show Less{" "}
+                        <i className="fa-solid fa-arrow-up ms-2"></i>
+                      </>
+                    ) : (
+                      <>
+                        Show More{" "}
+                        <i className="fa-solid fa-arrow-down ms-2"></i>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
-          </section>
-
-          <section className="section-padding-bottom">
-            <div className="container">
-              {destinationContent?.custom_packages?.map((pkg, pkgIndex) => {
-                const isExpanded = expandedSections[pkgIndex];
-                const tripsToShow = isExpanded
-                  ? pkg.trips
-                  : pkg.trips.slice(0, 4); // show first 4 initially
-
-                return (
-                  <div key={pkgIndex} className="mb-5">
-                    <div>
-                      <h4 className="common-section-heading">{pkg.title}</h4>
-                    </div>
-
-                    <div className="mt-4">
-                      <div className="row">
-                        {tripsToShow.map((trip, index) => (
-                          <div className="col-lg-3 col-md-6 mb-4" key={index}>
-                            <div className="featured-card-main">
-                              <div className='position-relative'>
-                                <div>
-                                <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
-                                </div>
-
-                                <div className='featured-card-day-card'>
-                                  <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
-                                </div>
-
-                              </div>
-
-                              <div className="featured-content-main">
-                                <p className="featured-city-para">
-                                  <p className="featured-city-para">
-                                    {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
-                                      ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
-                                      : `${trip?.pickup_location} → ${trip?.drop_location}`}
-                                  </p>
-                                </p>
-
-                                <p className="featured-content">
-                                  {trip?.pricing?.pricing_model === "customized" ? (
-
-                                    <>
-                                      <span>₹{trip?.pricing?.customized?.base_price}</span>
-                                      ₹{trip?.pricing?.customized?.final_price}
-                                    </>
-
-                                  ) : (
-                                    <>
-                                      <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
-                                      ₹{trip?.pricing?.fixed_departure[0]?.final_price}
-                                    </>
-                                  )}
-                                </p>
-                                <div className="featured-bottom-content d-flex gap-2">
-                                  <div className='trip-card-amount'>
-                                    <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                      Trip Detail
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* Show More / Show Less */}
-                        <div className="d-flex justify-content-center">
-                          {pkg.trips.length > 4 && (
-                            <button
-                              className="destination-viewall btn btn-outline-dark mt-3"
-                              onClick={() => toggleViewMore(pkgIndex)}
-                            >
-                              {isExpanded ? (
-                                <>
-                                  Show Less{" "}
-                                  <i className="fa-solid fa-arrow-up ms-2"></i>
-                                </>
-                              ) : (
-                                <>
-                                  Show More{" "}
-                                  <i className="fa-solid fa-arrow-down ms-2"></i>
-                                </>
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</section>
 
           {/* <section className="section-padding-bottom">
             <div className="container">

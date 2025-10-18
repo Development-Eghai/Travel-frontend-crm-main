@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Header from './component/Header'
 import Footer from './component/Footer'
 import { Swiper, SwiperSlide } from 'swiper/react';
+import TripCard from '../../component/TripCard'
 import { Navigation, EffectFade, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-fade';

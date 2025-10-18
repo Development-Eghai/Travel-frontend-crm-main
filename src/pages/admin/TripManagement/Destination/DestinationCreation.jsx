@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import JoditEditor from "jodit-react";
 import { UpdateDestination } from "../../../../common/api/ApiService";
@@ -117,33 +116,6 @@ const DestinationCreation = () => {
         validate.subtitle = NonEmptyValidation(data?.subtitle);
         validate.hero_banner_images = NonEmptyArrayValidation(data?.hero_banner_images);
 
-
-        validate.primary_destination_id = (!createDestination?.primary_destination_id || createDestination.primary_destination_id.length === 0)
-            ? { status: false, message: "Primary destination is required" }
-            : { status: true, message: "" };
-
-        validate.popular_trip_ids = (!createDestination?.popular_trip_ids || createDestination.popular_trip_ids.length === 0)
-            ? { status: false, message: "Popular trip packages are required" }
-            : { status: true, message: "" };
-
-        validate.featured_blog_ids = (!createDestination?.featured_blog_ids || createDestination.featured_blog_ids.length === 0)
-            ? { status: false, message: "Feature blogs packages are required" }
-            : { status: true, message: "" };
-
-        validate.activity_ids = (!createDestination?.activity_ids || createDestination.activity_ids.length === 0)
-            ? { status: false, message: "Activities are required" }
-            : { status: true, message: "" };
-
-
-        validate.blog_category_ids = (!createDestination?.blog_category_ids || createDestination.blog_category_ids.length === 0)
-            ? { status: false, message: "Blog Category are required" }
-            : { status: true, message: "" };
-
-
-        validate.destination_type = NonEmptyValidation(data?.destination_type);
-        validate.overview = NonEmptyValidation(data?.overview);
-        // validate.customPackage = NonEmptyFaqArrayValidation(data?.customPackage);
-        validate.travel_guidelines = NonEmptyValidation(data?.travel_guidelines);
         return validate;
     };
 
@@ -164,6 +136,18 @@ const DestinationCreation = () => {
             302,
             303
         ]
+
+        // Convert primary_destination_id to integer or null
+        if (cleanedData.primary_destination_id === "null" || cleanedData.primary_destination_id === "" || !cleanedData.primary_destination_id) {
+            cleanedData.primary_destination_id = null;
+        } else {
+            cleanedData.primary_destination_id = parseInt(cleanedData.primary_destination_id);
+        }
+
+        // Ensure featured_blog_ids is always present
+        if (!cleanedData.featured_blog_ids || cleanedData.featured_blog_ids.length === 0) {
+            cleanedData.featured_blog_ids = [];
+        }
 
         const isValide = validateDetails(cleanedData)
         setValidation(isValide);
@@ -199,7 +183,7 @@ const DestinationCreation = () => {
 
         const newData = {
             ...removedObject,
-            faqs: faqs.map(({ _id, ...rest }) => rest),
+            custom_packages: customPackage
         };
 
         const cleanedData = normalizeEmptyFields(newData);
@@ -212,7 +196,7 @@ const DestinationCreation = () => {
                 navigate(-1);
                 successMsg("Destination Updated successfully");
                 setCreateDestination({});
-                setCustomPackage([{ title: "", description: "" }]);
+                setCustomPackage([{ title: "", description: "", trip_ids: [] }]);
             }
         }
     };
@@ -534,13 +518,10 @@ const DestinationCreation = () => {
                                 }
                                 options={allBlogCategory}
                             />
-                            {/* {validation?.blog_category_ids?.status === false && validation?.blog_category_ids?.message && (
-                                <p className='error-para'>{validation.blog_category_ids.message}</p>
-                            )} */}
                         </div>
                     </div>
 
-                    {/* <div className='col-lg-6'>
+                    <div className='col-lg-6'>
                         <div className='admin-input-div'>
                             <label>Select Featured Blogs</label>
                             <Select
@@ -550,15 +531,15 @@ const DestinationCreation = () => {
                                     (createDestination?.featured_blog_ids || []).includes(opt.value)
                                 )}
                                 onChange={(selectedOptions) =>
-                                    handleDropdown("featured_blog_ids", selectedOptions?.map((opt) => opt?.value))
+                                    handleDropdown(
+                                        "featured_blog_ids",
+                                        selectedOptions ? selectedOptions.map((opt) => opt?.value) : []
+                                    )
                                 }
                                 options={allBlogPost}
                             />
-                            {validation?.featured_blog_ids?.status === false && validation?.featured_blog_ids?.message && (
-                                <p className='error-para'>{validation.featured_blog_ids.message}</p>
-                            )}
                         </div>
-                    </div> */}
+                    </div>
 
                     <div className='col-lg-6'>
                         <div className='admin-input-div'>

@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router";
 import { TourPreviewDetails } from '../../../../common/api/ApiService';
 import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
 import { APIBaseUrl } from '../../../../common/api/api';
+import TripCard from '../../../../component/TripCard';
 
 
 const TourPreview = () => {
@@ -77,6 +78,17 @@ const TourPreview = () => {
         }
     };
 
+    // Helper function to parse and split inclusions/exclusions
+    const parseListItems = (htmlString) => {
+        if (!htmlString) return [];
+        
+        // Remove HTML tags
+        const text = htmlString.replace(/<[^>]*>/g, '');
+        
+        // Split by semicolon and filter out empty items
+        return text.split(';').map(item => item.trim()).filter(item => item.length > 0);
+    };
+
 
     const getSpecificTour = async () => {
         try {
@@ -127,7 +139,7 @@ const TourPreview = () => {
     const [visibleCount, setVisibleCount] = useState(4); // 👈 show 4 trips initially
 
     const handleToggle = () => {
-        if (visibleCount >= trip.length) {
+        if (visibleCount >= tripList.length) {
             // 👇 If all shown → collapse back to 4
             setVisibleCount(4);
         } else {
@@ -149,43 +161,6 @@ const TourPreview = () => {
 
     return (
         <div className='overflow-hidden-page'>
-
-            {/* <section className="destination-detail-banner-main">
-                <Swiper
-                    modules={[EffectFade, Autoplay, Navigation]}
-                    // navigation={true}
-                    effect="fade"
-                    autoplay={{
-                        delay: 4000,
-                        disableOnInteraction: false,
-                    }}
-                    loop={true}
-                    className="destination-swiper"
-                >
-                    {specificTourData?.gallery_images?.map((imageUrl) => (
-                        <SwiperSlide>
-                            <div
-                                className="destination-slide swiper-slider-banners"
-                                style={{
-                                    backgroundImage: `url(${encodeURI(imageUrl)})`,
-                                }}
-                            >
-                                <div className="destination-overlay"></div>
-                                <div className="destination-slide-content">
-                                    <h3 className="dest-package-name text-center">
-                                        {specificTourData?.title}
-                                    </h3>
-                                    <p className="dest-package-para">
-                                        {specificTourData?.overview}
-                                    </p>
-                                </div>
-                            </div>
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
-            </section> */}
-
-
 
             <section className="destination-detail-banner-main">
                 {specificTourData?.gallery_images?.length > 0 && (
@@ -224,8 +199,6 @@ const TourPreview = () => {
                         ))}
                     </Swiper>
                 )}
-
-
             </section>
 
             <div className='trip-detail-content-main'>
@@ -323,14 +296,6 @@ const TourPreview = () => {
                                                                     </>
                                                                 )}
 
-                                                                {/* <div className='d-flex flex-wrap'>
-                                                                    {item?.day_images?.map((img, index) => (
-                                                                        <div key={index} className='trip-day-image'>
-                                                                            <img src={`${BACKEND_DOMAIN}${img}`} alt={`Day Image ${index + 1}`} />
-                                                                        </div>
-                                                                    ))}
-                                                                </div> */}
-
                                                             </div>
                                                         </div>
                                                     </div>
@@ -376,7 +341,17 @@ const TourPreview = () => {
                                     <h3>Inclusions</h3>
 
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.inclusions || "<p>No description available</p>" }}></p>
+                                        <ul className='inclusion-exclusion-list' style={{ listStyle: 'none', paddingLeft: 0 }}>
+                                            {parseListItems(specificTourData?.inclusions).map((item, index) => (
+                                                <li key={index} className='inclusion-item' style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                                    <i className="fa-solid fa-circle-check text-success me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {parseListItems(specificTourData?.inclusions).length === 0 && (
+                                            <p>No inclusions available</p>
+                                        )}
                                     </div>
 
                                 </div>
@@ -384,14 +359,34 @@ const TourPreview = () => {
                                 <div className='trip-detail-section' ref={exclusionRef}>
                                     <h3>Exclusions</h3>
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.exclusions || "<p>No description available</p>" }}></p>
+                                        <ul className='inclusion-exclusion-list' style={{ listStyle: 'none', paddingLeft: 0 }}>
+                                            {parseListItems(specificTourData?.exclusions).map((item, index) => (
+                                                <li key={index} className='exclusion-item' style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                                    <i className="fa-solid fa-circle-xmark text-danger me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {parseListItems(specificTourData?.exclusions).length === 0 && (
+                                            <p>No exclusions available</p>
+                                        )}
                                     </div>
                                 </div>
 
                                 <div className='trip-detail-section' ref={highlightsRef}>
                                     <h3>Key Highlights</h3>
                                     <div className='mt-4'>
-                                        <p dangerouslySetInnerHTML={{ __html: specificTourData?.highlights || "<p>No description available</p>" }}></p>
+                                        <ul className='inclusion-exclusion-list' style={{ listStyle: 'none', paddingLeft: 0 }}>
+                                            {parseListItems(specificTourData?.highlights).map((item, index) => (
+                                                <li key={index} className='highlight-item' style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                                    <i className="fa-solid fa-star text-warning me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {parseListItems(specificTourData?.highlights).length === 0 && (
+                                            <p>No highlights available</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -522,55 +517,10 @@ const TourPreview = () => {
                                 </div>
 
                                 <div className="mt-4">
-
                                     <div className="row">
                                         {tripList?.slice(0, visibleCount).map((trip, index) => (
                                             <div className="col-lg-3 col-md-6" key={index}>
-                                                <div className="featured-card-main">
-                                                    <div className='position-relative'>
-                                                        <div>
-                                                            <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
-                                                        </div>
-
-                                                        <div className='featured-card-day-card'>
-                                                            <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div className="featured-content-main">
-                                                        <p className="featured-city-para">
-                                                            <p className="featured-city-para">
-                                                                {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
-                                                                    ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
-                                                                    : `${trip?.pickup_location} → ${trip?.drop_location}`}
-                                                            </p>
-                                                        </p>
-
-                                                        <p className="featured-content">
-                                                            {trip?.pricing?.pricing_model === "customized" ? (
-
-                                                                <>
-                                                                    <span>₹{trip?.pricing?.customized?.base_price}</span>
-                                                                    ₹{trip?.pricing?.customized?.final_price}
-                                                                </>
-
-                                                            ) : (
-                                                                <>
-                                                                    <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
-                                                                    ₹{trip?.pricing?.fixed_departure[0]?.final_price}
-                                                                </>
-                                                            )}
-                                                        </p>
-                                                        <div className="featured-bottom-content d-flex gap-2">
-                                                            <div className='trip-card-amount'>
-                                                                <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                                                    Trip Detail
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <TripCard trip={trip} />
                                             </div>
                                         ))}
 
@@ -585,14 +535,10 @@ const TourPreview = () => {
                                                 </button>
                                             </div>
                                         )}
-
-
-
                                     </div>
                                 </div>
                             </div>
                         </section>
-
 
                     </div>
                 </div>

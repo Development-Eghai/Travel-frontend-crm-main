@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import Header from "./component/Header"
 import Footer from "./component/Footer"
 import HomeBanner from './component/HomeBanner'
+import TripCard from '../../component/TripCard'
 import { Images } from "../../helpers/Images/images";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -70,59 +71,7 @@ const Homepage = () => {
                                 {allTrips && allTrips.length > 0 ? (
                                     allTrips.map((trip, index) => (
                                         <SwiperSlide key={trip.id || index}>
-                                            <div className="featured-card-main">
-                                                <div className='position-relative'>
-                                                    <div className='trip-card-image-parent'> 
-                                                        {/* <img className="featured-card-img" src={Images?.featured_card} alt="featured" /> */}
-                                                        <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
-                                                    </div>
-
-                                                    <div className='featured-card-day-card'>
-                                                        <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
-                                                    </div>
-
-                                                </div>
-
-                                                <div className="featured-content-main">
-                                                    <p className="featured-city-para">
-                                                        <p className="featured-city-para">
-                                                            {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
-                                                                ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
-                                                                : `${trip?.pickup_location} → ${trip?.drop_location}`}
-                                                        </p>
-                                                        {/* {trip?.drop_location} */}
-                                                    </p>
-
-                                                    <p className="featured-content">
-                                                        {trip?.pricing?.pricing_model === "customized" ? (
-
-                                                            <>
-                                                                <span>₹{trip?.pricing?.customized?.base_price}</span>
-                                                                ₹{trip?.pricing?.customized?.final_price}
-                                                            </>
-
-                                                        ) : (
-                                                            <>
-                                                                <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
-                                                                ₹{trip?.pricing?.fixed_departure[0]?.final_price}
-                                                            </>
-                                                        )}
-                                                    </p>
-                                                    <div className="featured-bottom-content d-flex gap-2">
-                                                        {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
-                                                        <div className='trip-card-amount'>
-                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                                                {/* From <span className="fw-bold"></span>/- */}
-                                                                Trip Detail
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <TripCard trip={trip} />
                                         </SwiperSlide>
                                     ))
                                 ) : (
@@ -257,59 +206,8 @@ const Homepage = () => {
                             <div className="row">
                                 {lastFourTrips && lastFourTrips.length > 0 ? (
                                     lastFourTrips.reverse().map((trip, index) => (
-                                        <div className='col-lg-3 col-md-6'>
-                                            <div className="featured-card-main">
-                                                <div className='position-relative'>
-                                                    <div>
-                                                    <img className="featured-card-img" src={trip?.hero_image} alt="featured" />
-                                                    </div>
-
-                                                    <div className='featured-card-day-card'>
-                                                        <p>{`${trip?.days} Days`} {`${trip?.nights} Nights`} </p>
-                                                    </div>
-
-                                                </div>
-
-                                                <div className="featured-content-main">
-                                                    <p className="featured-city-para">
-                                                        <p className="featured-city-para">
-                                                            {`${trip?.pickup_location} → ${trip?.drop_location}`.length > 30
-                                                                ? `${trip?.pickup_location} → ${trip?.drop_location}`.slice(0, 30) + "..."
-                                                                : `${trip?.pickup_location} → ${trip?.drop_location}`}
-                                                        </p>
-                                                        {/* {trip?.drop_location} */}
-                                                    </p>
-
-                                                    <p className="featured-content">
-                                                        {trip?.pricing?.pricing_model === "customized" ? (
-
-                                                            <>
-                                                                <span>₹{trip?.pricing?.customized?.base_price}</span>
-                                                                ₹{trip?.pricing?.customized?.final_price}
-                                                            </>
-
-                                                        ) : (
-                                                            <>
-                                                                <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
-                                                                ₹{trip?.pricing?.fixed_departure[0]?.final_price}
-                                                            </>
-                                                        )}
-                                                    </p>
-                                                    <div className="featured-bottom-content d-flex gap-2">
-                                                        {/* <div className='trip-card-amount button'>
-                                                    <p className="">
-                                                        Trip Detail
-                                                    </p>
-                                                </div> */}
-                                                        <div className='trip-card-amount'>
-                                                            <p className="" onClick={() => window.open(`/trip-preview/${trip?.slug}/${trip?.id}`, "_blank", "noopener,noreferrer")}                                                            >
-                                                                {/* From <span className="fw-bold"></span>/- */}
-                                                                Trip Detail
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div className='col-lg-3 col-md-6' key={trip.id || index}>
+                                            <TripCard trip={trip} />
                                         </div>
                                     ))
                                 ) : (
@@ -415,18 +313,6 @@ const Homepage = () => {
                     </div>
                 </section>
 
-                {/* <section className='section-padding'>
-                    <div className="row">
-                        <div className='col-lg-7'>
-
-                        </div>
-                        <div className='col-lg-5'>
-
-                        </div>
-                    </div>
-
-                </section> */}
-
                 <section className='section-padding-bottom'>
                     <div className="container">
                         <div className='booking-offer-main'>
@@ -459,75 +345,6 @@ const Homepage = () => {
                 <section>
                     <ContactForm />
                 </section>
-
-                {/* <section className='section-padding'>
-                    <div className='container'>
-                        <div className='d-flex justify-content-between'>
-                            <div>
-                                <h4 className='common-section-heading'>Travel Articles</h4>
-                            </div>
-                            <div>
-                                <a href='/' className='anchor-tag'>See all</a>
-                            </div>
-                        </div>
-                        <div className='row'>
-                            <div className='col-lg-4 col-md-4'>
-                                <div className="blogs-card-main mt-lg-4 mt-5 position-relative">
-                                    <div>
-                                        <img className="blogs-card-img" src={Images.featured_card} alt="featured" />
-                                        <div className='blogs-tag-main'>
-                                            <p>Trips</p>
-                                        </div>
-                                    </div>
-                                    <div className="blogs-content-main">
-                                        <div className='d-flex mt-4'>
-                                            <p className="blogs-author">April 06 2023</p>
-                                            <p className="blogs-posted">By Ali Tufan</p>
-                                        </div>
-                                        <p className='blogs-content mt-2'>Kenya vs Tanzania Safari: The Better African
-                                            Safari Experience</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='col-lg-4 col-md-4'>
-                                <div className="blogs-card-main mt-lg-4 mt-5 position-relative">
-                                    <div>
-                                        <img className="blogs-card-img" src={Images.featured_card} alt="featured" />
-                                        <div className='blogs-tag-main'>
-                                            <p>Trips</p>
-                                        </div>
-                                    </div>
-                                    <div className="blogs-content-main">
-                                        <div className='d-flex mt-4'>
-                                            <p className="blogs-author">April 06 2023</p>
-                                            <p className="blogs-posted">By Ali Tufan</p>
-                                        </div>
-                                        <p className='blogs-content mt-2'>Kenya vs Tanzania Safari: The Better African
-                                            Safari Experience</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='col-lg-4 col-md-4'>
-                                <div className="blogs-card-main mt-lg-4 mt-5 position-relative">
-                                    <div>
-                                        <img className="blogs-card-img" src={Images.featured_card} alt="featured" />
-                                        <div className='blogs-tag-main'>
-                                            <p>Trips</p>
-                                        </div>
-                                    </div>
-                                    <div className="blogs-content-main">
-                                        <div className='d-flex mt-4'>
-                                            <p className="blogs-author">April 06 2023</p>
-                                            <p className="blogs-posted">By Ali Tufan</p>
-                                        </div>
-                                        <p className='blogs-content mt-2'>Kenya vs Tanzania Safari: The Better African
-                                            Safari Experience</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section> */}
 
             </div>
         </div>
