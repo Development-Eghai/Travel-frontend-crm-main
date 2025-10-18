@@ -129,38 +129,41 @@ const DestinationPreview = () => {
   return (
     <div className="">
       <section className="destination-detail-banner-main">
-        <Swiper
-          modules={[EffectFade, Autoplay, Navigation]}
-          navigation={true}
-          effect="fade"
-          autoplay={{
-            delay: 4000,
-            disableOnInteraction: false,
-          }}
-          loop={true}
-          className="destination-swiper"
-        >
-          {destinationContent?.hero_banner_images?.map((imageUrl) => (
-            <SwiperSlide>
-              <div
-                className="destination-slide swiper-slider-banners"
-                style={{
-                  backgroundImage: `url(${encodeURI(imageUrl)})`,
-                }}
-              >
-                <div className="destination-overlay"></div>
-                <div className="destination-slide-content">
-                  <h3 className="dest-package-name text-center">
-                    {destinationContent?.title}
-                  </h3>
-                  <p className="dest-package-para">
-                    {destinationContent?.subtitle}
-                  </p>
+        {/* FIX: Conditionally render Swiper only when images are loaded */}
+        {destinationContent?.hero_banner_images?.length > 0 && (
+          <Swiper
+            modules={[EffectFade, Autoplay, Navigation]}
+            navigation={true}
+            effect="fade"
+            autoplay={{
+              delay: 4000,
+              disableOnInteraction: false,
+            }}
+            loop={true}
+            className="destination-swiper"
+          >
+            {destinationContent.hero_banner_images.map((imageUrl, index) => (
+              <SwiperSlide key={index}> {/* Added key prop */}
+                <div
+                  className="destination-slide swiper-slider-banners"
+                  style={{
+                    backgroundImage: `url(${encodeURI(imageUrl)})`,
+                  }}
+                >
+                  <div className="destination-overlay"></div>
+                  <div className="destination-slide-content">
+                    <h3 className="dest-package-name text-center">
+                      {destinationContent?.title}
+                    </h3>
+                    <p className="dest-package-para">
+                      {destinationContent?.subtitle}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </section>
 
       {/* <section className="destination-tabsection-parent">

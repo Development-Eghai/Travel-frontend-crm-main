@@ -12,21 +12,22 @@ import {
 import "./TourCreation.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getSpecificDestination } from "../../../../store/slices/destinationSlices";
-import { createTrip } from "../../../../store/slices/tripSlices";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { APIBaseUrl } from "../../../../common/api/api";
 import { errorMsg, successMsg } from "../../../../common/Toastify";
+import { CircularProgress } from "@mui/material";
 
 export default function TourCreation() {
   const [activeStep, setActiveStep] = useState("basic");
   const [openDay, setOpenDay] = useState(null);
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
-    // Basic Info
     title: "",
     overview: "",
     destination_id: "",
@@ -38,8 +39,6 @@ export default function TourCreation() {
     drop_location: "",
     days: "",
     nights: "",
-
-    // Itinerary
     itineraryDays: [
       {
         id: 1,
@@ -51,13 +50,8 @@ export default function TourCreation() {
         meal_plan: [],
       },
     ],
-
-    // Media - Updated to store file objects and preview URLs
     hero_image: null,
     gallery_images: [],
-
-    // Pricing
-
     pricing: {
       pricing_model: "",
       fixed_departure: [
@@ -79,16 +73,13 @@ export default function TourCreation() {
         base_price: "",
         discount: "",
         final_price: "",
+        gst_percentage: "",
       },
     },
-
-    // Details
     highlights: [],
     inclusions: [],
     exclusions: [],
     faqs: [],
-
-    // Policies
     terms: "",
     privacy_policy: "",
     payment_terms: "",
@@ -99,7 +90,6 @@ export default function TourCreation() {
   const [highlightsInput, setHighlightsInput] = useState("");
   const [inclusionsInput, setInclusionsInput] = useState("");
   const [exclusionsInput, setExclusionsInput] = useState("");
-  const [customPolicyInput, setCustomPolicyInput] = useState("");
 
   const steps = [
     { id: "basic", label: "Basic Info", icon: Info },
@@ -108,59 +98,6 @@ export default function TourCreation() {
     { id: "pricing", label: "Pricing", icon: DollarSign },
     { id: "details", label: "Details", icon: FileText },
     { id: "policies", label: "Policies", icon: Shield },
-  ];
-
-  const indianCities = [
-    "Mumbai",
-    "Delhi",
-    "Bangalore",
-    "Hyderabad",
-    "Ahmedabad",
-    "Chennai",
-    "Kolkata",
-    "Surat",
-    "Pune",
-    "Jaipur",
-    "Lucknow",
-    "Kanpur",
-    "Nagpur",
-    "Indore",
-    "Thane",
-    "Bhopal",
-    "Visakhapatnam",
-    "Pimpri-Chinchwad",
-    "Patna",
-    "Vadodara",
-    "Ghaziabad",
-    "Ludhiana",
-    "Agra",
-    "Nashik",
-    "Faridabad",
-    "Meerut",
-    "Rajkot",
-    "Kalyan-Dombivli",
-    "Vasai-Virar",
-    "Varanasi",
-    "Srinagar",
-    "Aurangabad",
-    "Dhanbad",
-    "Amritsar",
-    "Navi Mumbai",
-    "Allahabad",
-    "Howrah",
-    "Gwalior",
-    "Jabalpur",
-    "Coimbatore",
-    "Vijayawada",
-    "Jodhpur",
-    "Madurai",
-    "Raipur",
-    "Kota",
-    "Chandigarh",
-    "Guwahati",
-    "Solapur",
-    "Hubli-Dharwad",
-    "Mysore",
   ];
 
   const dispatch = useDispatch();
@@ -181,39 +118,31 @@ export default function TourCreation() {
     }));
   };
 
-  const handleNestedChange = (parent, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent],
-        [field]: value,
-      },
-    }));
-  };
-
-  const handlePricingChange = (field, value, index = 0) => {
-    setFormData((prev) => ({
-      ...prev,
-      pricing: {
-        ...prev.pricing,
-        fixed_departure: prev.pricing.fixed_departure.map((item, i) =>
-          i === index ? { ...item, [field]: value } : item
-        ),
-      },
-    }));
-  };
-
   const handleCustomPricingChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      pricing: {
-        ...prev.pricing,
-        customized: {
-          ...prev.pricing.customized,
-          [field]: value,
+    setFormData((prev) => {
+      const updatedCustomized = {
+        ...prev.pricing.customized,
+        [field]: value,
+      };
+
+      // Auto-calculate final price
+      const basePrice = parseFloat(updatedCustomized.base_price) || 0;
+      const discount = parseFloat(updatedCustomized.discount) || 0;
+      const gst = parseFloat(updatedCustomized.gst_percentage) || 0;
+
+      const discountedPrice = basePrice - discount;
+      const finalPrice = discountedPrice + (discountedPrice * gst / 100);
+
+      updatedCustomized.final_price = finalPrice.toFixed(2);
+
+      return {
+        ...prev,
+        pricing: {
+          ...prev.pricing,
+          customized: updatedCustomized,
         },
-      },
-    }));
+      };
+    });
   };
 
   const handleArrayChange = (field, value, isChecked) => {
@@ -289,7 +218,6 @@ export default function TourCreation() {
     }));
   };
 
-  // Add items to arrays
   const addHighlight = () => {
     if (highlightsInput.trim()) {
       setFormData((prev) => ({
@@ -323,60 +251,26 @@ export default function TourCreation() {
   const [faqs, setFaqs] = useState([]);
   const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
 
-  // Add FAQ
   const addFaqs = () => {
     if (faqInput?.question?.trim() && faqInput?.answer?.trim()) {
       setFaqs([...faqs, faqInput]);
       setFaqInput({ question: "", answer: "" });
-
     } else {
       alert("Please fill both question and answer!");
     }
   };
 
-  // Delete FAQ
   const deleteFaqs = (indexToRemove) => {
     const updatedFaqs = faqs.filter((_, index) => index !== indexToRemove);
     setFaqs(updatedFaqs);
   };
 
-  const addCustomPolicy = () => {
-    if (customPolicyInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        custom_policies: [
-          ...prev.custom_policies,
-          { title: "Custom Policy", content: customPolicyInput.trim() },
-        ],
-      }));
-      setCustomPolicyInput("");
-    }
+  const removeItem = (field, index) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
   };
-
-  // Remove items from arrays
-  // const removeItem = (field, index) => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [field]: prev[field].filter((_, i) => i !== index),
-  //   }));
-  // };
-
-  // File handlers - UPDATED to handle file previews and base64 conversion
-  const handleHeroImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData((prev) => ({
-          ...prev,
-          hero_image: file,
-          hero_image_preview: e.target.result, // Base64 string for preview
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
 
   const handleFileUpload = async (e, key) => {
     const file = e.target.files[0];
@@ -402,7 +296,6 @@ export default function TourCreation() {
 
     try {
       const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
-      console.log(res.data, "res?.data");
 
       if (res?.data?.message === "Upload successful") {
         successMsg("Image uploaded successfully");
@@ -425,8 +318,7 @@ export default function TourCreation() {
     let image_type = image_name?.split(".");
     let type = image_type?.pop();
     if (type !== "jpeg" && type !== "png" && type !== "jpg" && type !== "pdf" && type !== "webp") {
-      errorMsg
-        ("Unsupported file type")
+      errorMsg("Unsupported file type")
       return;
     }
 
@@ -460,38 +352,6 @@ export default function TourCreation() {
       console.error("Upload error:", error);
       errorMsg("File upload failed");
     }
-
-  };
-
-  const handleGalleryImagesChange = (event) => {
-    const files = Array.from(event.target.files);
-    const newPreviews = [];
-
-    files.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        newPreviews.push(e.target.result);
-
-        // When all files are processed, update state
-        if (newPreviews.length === files.length) {
-          setFormData((prev) => ({
-            ...prev,
-            gallery_images: [...prev.gallery_images, ...files],
-            gallery_previews: [...prev.gallery_previews, ...newPreviews],
-          }));
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  // Remove gallery image
-  const removeGalleryImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      gallery_images: prev.gallery_images.filter((_, i) => i !== index),
-      gallery_previews: prev.gallery_previews.filter((_, i) => i !== index),
-    }));
   };
 
   // Remove hero image
@@ -499,21 +359,17 @@ export default function TourCreation() {
     setFormData((prev) => ({
       ...prev,
       hero_image: null,
-      hero_image_preview: null,
     }));
   };
 
-  // Convert file to base64 for submission
-  const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
+  // Remove gallery image
+  const removeGalleryImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      gallery_images: prev.gallery_images.filter((_, i) => i !== index),
+    }));
   };
 
-  // Prepare data for API submission - UPDATED to include images
   const prepareSubmissionData = async () => {
     const submissionData = {
       title: formData.title,
@@ -537,47 +393,17 @@ export default function TourCreation() {
       terms: formData.terms,
       privacy_policy: formData.privacy_policy,
       payment_terms: formData.payment_terms,
-
       gallery_images: formData.gallery_images,
       hero_image: formData.hero_image,
-
       itinerary: formData.itineraryDays.map((day) => ({
         day_number: day.day_number,
         title: day.title,
         description: day.description,
-        image_urls: [], // Would be actual URLs after upload
+        image_urls: [],
         activities: day.activities,
         hotel_name: day.hotel_name,
         meal_plan: day.meal_plan,
       })),
-
-      // UPDATED: Include actual image data in the media section
-      // media: {
-      //   hero_image: formData.hero_image, // Base64 string of hero image
-      //   hero_image_name: "dummy name",
-      //   hero_image_type: "dummy type",
-      //   gallery_images: formData.gallery_images, // Array of base64 strings
-      //   gallery_image_names: "dummy gallery_image_names",
-      //   gallery_image_types: "gallery_image_types",
-
-      //   // Also include URL fields for backward compatibility
-      //   hero_image_url: formData.hero_image
-      //     ? `${formData?.hero_image}`
-      //     : "https://example.com/images/hero.jpg",
-      //   thumbnail_url: formData.hero_image
-      //     ? `${formData?.hero_image}`
-      //     : "https://example.com/images/thumb.jpg",
-      //   gallery_urls: formData?.gallery_images,
-      // },
-
-      // media: {
-      //   hero_image_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
-      //   thumbnail_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII=",
-      //   gallery_urls: [
-      //     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO2nZ9kAAAAASUVORK5CYII="
-      //   ]
-      // },
-
       pricing: {
         pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
         ...(formData.pricing_model === "fixed" && {
@@ -602,10 +428,10 @@ export default function TourCreation() {
             base_price: parseInt(formData.pricing.customized.base_price),
             discount: parseInt(formData.pricing.customized.discount) || 0,
             final_price: parseInt(formData.pricing.customized.final_price),
+            gst_percentage: parseInt(formData.pricing.customized.gst_percentage) || 0,
           },
         }),
       },
-
       policies: [
         ...(formData.terms
           ? [{ title: "Terms and Conditions", content: formData.terms }]
@@ -625,50 +451,46 @@ export default function TourCreation() {
 
   const handleSubmit = async () => {
     try {
+      setIsLoading(true);
       const submissionData = await prepareSubmissionData();
-      console.log("submissionData normal:", submissionData);
-      // console.log("submissionData json:", submissionData.json());
 
-      // dispatch(createTrip(submissionData))
-      //   .unwrap()
-      //   .then((result) => {
-      //     toast.success("Trip created successfully!");
-      //     // setFormData({});
-      //     // navigate("/admin/tour-list")
-      //   })
-      //   .catch((err) => {
-      //     console.error("Error creating trip:", err);
-      //     toast.error("Error creating trip. Please try again.");
-      //   });
-
-
-      try {
-        const res = await APIBaseUrl.post("trips/", submissionData, {
-          headers: {
-            "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-          },
-        });
-        if (res?.data?.success === true) {
-          console.log(res?.data, "response dataa")
-          toast.success("Trip created successfully!");
-          setFormData({});
-          // setFaqs([]);
-          // setFixedPackage([{
-          //   from_date: "", to_date: "", description: "",
-          //   available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-          // }])
-          // setFaqInput({ question: "", answer: "" })
-          navigate("/admin/tour-list")
-        }
-
-      } catch (error) {
-        console.error("Error fetching trips:", error?.response?.data || error.message);
-        throw error;
+      const res = await APIBaseUrl.post("trips/", submissionData, {
+        headers: {
+          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+        },
+      });
+      if (res?.data?.success === true) {
+        toast.success("Trip created successfully!");
+        setFormData({});
+        setIsLoading(false);
+        navigate("/admin/tour-list")
       }
-
     } catch (error) {
-      console.error("Error preparing data:", error);
-      toast.error("Error preparing trip data. Please try again.");
+      console.error("Error creating trip:", error);
+      toast.error("Error creating trip. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      setIsLoading(true);
+      const submissionData = await prepareSubmissionData();
+
+      const res = await APIBaseUrl.put(`trips/${id}`, submissionData, {
+        headers: {
+          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+        },
+      });
+      if (res?.data?.success === true) {
+        toast.success("Trip updated successfully!");
+        setIsLoading(false);
+        navigate("/admin/tour-list")
+      }
+    } catch (error) {
+      console.error("Error updating trip:", error);
+      toast.error("Error updating trip. Please try again.");
+      setIsLoading(false);
     }
   };
 
@@ -682,18 +504,12 @@ export default function TourCreation() {
         },
       });
       if (res?.data?.success === true) {
-
         setcategoryList(res?.data?.data)
       }
-
     } catch (error) {
-      console.error("Error fetching trips:", error?.response?.data || error.message);
-      throw error;
+      console.error("Error fetching categories:", error?.response?.data || error.message);
     }
   }
-  useEffect(() => {
-    getAllTourCategory()
-  }, [])
 
   const [fixedPackage, setFixedPackage] = useState([{
     from_date: "", to_date: "", description: "",
@@ -714,31 +530,112 @@ export default function TourCreation() {
     }
   };
 
-  // const updateFixedPackage = (index, key, value) => {
-  //   const updatedFaqs = [...fixedPackage];
-  //   updatedFaqs[index][key] = value;
-  //   setFixedPackage(updatedFaqs);
-  // };
-
   const updateFixedPackage = (index, key, value) => {
     const updatedPackages = [...fixedPackage];
     updatedPackages[index][key] = value;
 
-    // Parse numeric values safely
     const basePrice = parseFloat(updatedPackages[index].base_price) || 0;
     const discount = parseFloat(updatedPackages[index].discount) || 0;
     const gst = parseFloat(updatedPackages[index].gst_percentage) || 0;
 
-    // Calculate final price only if base and gst exist
     const discountedPrice = basePrice - discount;
     const finalPrice = discountedPrice + (discountedPrice * gst / 100);
 
-    // Set the calculated final price
-    updatedPackages[index].final_price = finalPrice.toFixed(2); // 2 decimals
+    updatedPackages[index].final_price = finalPrice.toFixed(2);
 
     setFixedPackage(updatedPackages);
   };
 
+  // Fetch specific trip for editing
+  const getSpecificTrip = async (tripId) => {
+    try {
+      const res = await APIBaseUrl.get(`trips/${tripId}`, {
+        headers: {
+          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+        },
+      });
+      if (res?.data?.success === true) {
+        const tripData = res?.data?.data;
+
+        const highlightsArray = tripData.highlights ? tripData.highlights.split("; ") : [];
+        const inclusionsArray = tripData.inclusions ? tripData.inclusions.split("; ") : [];
+        const exclusionsArray = tripData.exclusions ? tripData.exclusions.split("; ") : [];
+
+        const itineraryDays = tripData.itinerary?.map((day, index) => ({
+          id: index + 1,
+          day_number: day.day_number,
+          title: day.title,
+          description: day.description,
+          activities: day.activities || [],
+          hotel_name: day.hotel_name,
+          meal_plan: day.meal_plan || [],
+        })) || [];
+
+        setFormData({
+          ...formData,
+          title: tripData.title || "",
+          overview: tripData.overview || "",
+          destination_id: tripData.destination_id || "",
+          destination_type: tripData.destination_type || "",
+          category_id: tripData.category_id || null,
+          themes: tripData.themes || [],
+          hotel_category: tripData.hotel_category?.toString() || "",
+          pickup_location: tripData.pickup_location || "",
+          drop_location: tripData.drop_location || "",
+          days: tripData.days || "",
+          nights: tripData.nights || "",
+          hero_image: tripData.hero_image || null,
+          gallery_images: tripData.gallery_images || [],
+          highlights: highlightsArray,
+          inclusions: inclusionsArray,
+          exclusions: exclusionsArray,
+          terms: tripData.terms || "",
+          privacy_policy: tripData.privacy_policy || "",
+          payment_terms: tripData.payment_terms || "",
+          pricing_model: tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom",
+          itineraryDays: itineraryDays,
+          pricing: {
+            ...formData.pricing,
+            customized: {
+              pricing_type: tripData.pricing?.customized?.pricing_type || "",
+              base_price: tripData.pricing?.customized?.base_price || "",
+              discount: tripData.pricing?.customized?.discount || "",
+              final_price: tripData.pricing?.customized?.final_price || "",
+              gst_percentage: tripData.pricing?.customized?.gst_percentage || "",
+            }
+          }
+        });
+
+        setFaqs(tripData.faqs || []);
+        setSelectedPricing(tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom");
+
+        if (tripData.pricing?.fixed_departure) {
+          setFixedPackage(tripData.pricing.fixed_departure.map(pkg => ({
+            from_date: pkg.from_date?.split('T')[0] || "",
+            to_date: pkg.to_date?.split('T')[0] || "",
+            available_slots: pkg.available_slots || "",
+            title: pkg.title || "",
+            description: pkg.description || "",
+            base_price: pkg.base_price || "",
+            discount: pkg.discount || "",
+            final_price: pkg.final_price || "",
+            booking_amount: pkg.booking_amount || "",
+            gst_percentage: pkg.gst_percentage || "",
+          })));
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching trip:", error?.response?.data || error.message);
+      errorMsg("Failed to load trip data");
+    }
+  };
+
+  useEffect(() => {
+    getAllTourCategory();
+    if (id) {
+      getSpecificTrip(id);
+    }
+  }, [id]);
 
   const renderStepContent = () => {
     switch (activeStep) {
@@ -846,7 +743,6 @@ export default function TourCreation() {
                         <label className="form-check-label">{cat.name}</label>
                       </div>
                     ))}
-
                 </div>
 
                 <div className="mb-3">
@@ -879,29 +775,29 @@ export default function TourCreation() {
               <div className="col-md-6">
                 <div className="mb-3">
                   <label className="form-label">Pickup city *</label>
-                        <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter pickup city"
-                      value={formData.pickup_location}
-                      onChange={(e) =>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter pickup city"
+                    value={formData.pickup_location}
+                    onChange={(e) =>
                       handleInputChange("pickup_location", e.target.value)
                     }
-                    />
+                  />
                 </div>
 
                 <div className="mb-3">
                   <label className="form-label">Drop city *</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter drop city"
-                      value={formData.drop_location}
-                      onChange={(e) =>
-                        handleInputChange("drop_location", e.target.value)
-                      }
-                    />
-                 </div>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter drop city"
+                    value={formData.drop_location}
+                    onChange={(e) =>
+                      handleInputChange("drop_location", e.target.value)
+                    }
+                  />
+                </div>
 
                 <div className="row">
                   <div className="col-6 mb-3">
@@ -1171,8 +1067,29 @@ export default function TourCreation() {
                 </div>
 
                 {formData?.hero_image && (
-                  <div className='upload-image-div'>
-                    <img src={`${formData?.hero_image}`} alt="Category-Preview" />
+                  <div className='upload-image-div' style={{position: 'relative'}}>
+                    <img src={`${formData?.hero_image}`} alt="Hero-Preview" />
+                    <span 
+                      className="delete-image-icon" 
+                      onClick={removeHeroImage}
+                      style={{
+                        position: 'absolute', 
+                        top: '5px', 
+                        right: '5px', 
+                        background: 'red', 
+                        color: 'white', 
+                        borderRadius: '50%', 
+                        width: '25px', 
+                        height: '25px', 
+                        textAlign: 'center', 
+                        cursor: 'pointer', 
+                        lineHeight: '25px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      &times;
+                    </span>
                   </div>
                 )}
               </div>
@@ -1213,10 +1130,31 @@ export default function TourCreation() {
                 {formData?.gallery_images && formData?.gallery_images?.length > 0 && (
                   <div className="d-flex flex-wrap">
                     {formData?.gallery_images?.map((image, index) => (
-                      <div className='upload-image-div destination-image-div'>
+                      <div className='upload-image-div destination-image-div' key={index} style={{position: 'relative'}}>
                         <div>
-                          <img src={encodeURI(image)} alt="Category-Preview" key={index} />
+                          <img src={encodeURI(image)} alt="Gallery-Preview" />
                         </div>
+                        <span 
+                          className="delete-image-icon" 
+                          onClick={() => removeGalleryImage(index)}
+                          style={{
+                            position: 'absolute', 
+                            top: '5px', 
+                            right: '5px', 
+                            background: 'red', 
+                            color: 'white', 
+                            borderRadius: '50%', 
+                            width: '20px', 
+                            height: '20px', 
+                            textAlign: 'center', 
+                            cursor: 'pointer', 
+                            lineHeight: '20px',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          &times;
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -1297,8 +1235,8 @@ export default function TourCreation() {
                 <div className="mt-3 destination-faq">
                   <div className="accordion" id="accordionExample">
                     {fixedPackage.map((trip, index) => (
-                      <div className='mt-4'>
-                        <div className="accordion-item" key={index} >
+                      <div className='mt-4' key={index}>
+                        <div className="accordion-item">
                           <h2 className="accordion-header d-flex align-items-center justify-content-between">
                             <button
                               className="accordion-button flex-grow-1 fw-bold"
@@ -1410,7 +1348,6 @@ export default function TourCreation() {
                               </div>
 
                               <div className="row mb-3">
-
                                 <div className="col-md-4">
                                   <label className="form-label">Booking Amount (₹)</label>
                                   <input
@@ -1442,10 +1379,7 @@ export default function TourCreation() {
                                     className="form-control"
                                     readOnly
                                     value={trip?.final_price}
-                                    placeholder="final price"
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "final_price", e.target.value)
-                                    }
+                                    placeholder="Auto-calculated"
                                   />
                                 </div>
                               </div>
@@ -1510,7 +1444,7 @@ export default function TourCreation() {
                 </div>
 
                 <div className="row mb-3">
-                  <div className="col-md-6">
+                  <div className="col-md-4">
                     <label className="form-label">Base Price (₹) *</label>
                     <input
                       type="number"
@@ -1522,7 +1456,7 @@ export default function TourCreation() {
                       }
                     />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-4">
                     <label className="form-label">Discount (₹)</label>
                     <input
                       type="number"
@@ -1534,28 +1468,26 @@ export default function TourCreation() {
                       }
                     />
                   </div>
-                  {/* <div className="col-md-6">
-                    <label className="form-label mt-3">GST Percentage (%)</label>
+                  <div className="col-md-4">
+                    <label className="form-label">GST Percentage (%)</label>
                     <input
                       type="number"
                       className="form-control"
-                      value={formData.pricing.customized?.final_price}
                       placeholder="Enter GST percentage"
+                      value={formData.pricing.customized?.gst_percentage || ""}
                       onChange={(e) =>
-                        updateFixedPackage(index, "gst_percentage", e.target.value)
+                        handleCustomPricingChange("gst_percentage", e.target.value)
                       }
                     />
-                  </div> */}
-                  <div className="col-md-6">
+                  </div>
+                  <div className="col-md-4">
                     <label className="form-label mt-3">Final Price (₹)</label>
                     <input
                       type="number"
                       className="form-control"
-                      placeholder="Enter final price"
+                      placeholder="Auto-calculated"
+                      readOnly
                       value={formData.pricing.customized?.final_price}
-                      onChange={(e) =>
-                        handleCustomPricingChange("final_price", e.target.value)
-                      }
                     />
                   </div>
                 </div>
@@ -1739,7 +1671,7 @@ export default function TourCreation() {
                 >
                   <input
                     type="text"
-                    placeholder="Add FAQ question and answer"
+                    placeholder="Add FAQ question"
                     value={faqInput?.question}
                     onChange={(e) =>
                       setFaqInput({ ...faqInput, question: e.target.value })
@@ -1748,7 +1680,7 @@ export default function TourCreation() {
                   />
                   <input
                     type="text"
-                    placeholder="Add FAQ question and answer"
+                    placeholder="Add FAQ answer"
                     value={faqInput?.answer}
                     onChange={(e) =>
                       setFaqInput({ ...faqInput, answer: e.target.value })
@@ -1796,8 +1728,6 @@ export default function TourCreation() {
                     )}
                 </div>
               </div>
-
-
             </div>
           </div>
         );
@@ -1838,39 +1768,6 @@ export default function TourCreation() {
                 }
               ></textarea>
             </div>
-
-            {/* <div className="form-group">
-              <label>Custom Policy</label>
-              <textarea
-                rows="3"
-                placeholder="Enter custom policy"
-                value={customPolicyInput}
-                onChange={(e) => setCustomPolicyInput(e.target.value)}
-              ></textarea>
-              <button type="button" onClick={addCustomPolicy}>
-                Add new Policy
-              </button>
-              <div>
-                {formData.custom_policies.map((policy, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      marginTop: "10px",
-                      padding: "10px",
-                      border: "1px solid #ddd",
-                    }}
-                  >
-                    <strong>{policy.title}</strong>
-                    <p>{policy.content}</p>
-                    <button
-                      onClick={() => removeItem("custom_policies", index)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div> */}
           </div>
         );
 
@@ -1879,19 +1776,19 @@ export default function TourCreation() {
     }
   };
 
-  console.log(formData, "formData-formData")
-
   return (
     <div className="tour-container">
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="d-flex justify-content-between">
         <div className="tour-header">
-          <h2>Add New Trip</h2>
+          <h2>{id ? "Edit Trip" : "Add New Trip"}</h2>
           <p>Create a comprehensive travel package</p>
         </div>
         <div>
-          <button className='admin-add-button mt-0' onClick={() => navigate(-1)}><i class="fa-solid fa-plus me-2"></i> Back</button>
+          <button className='admin-add-button mt-0' onClick={() => navigate(-1)}>
+            <i className="fa-solid fa-arrow-left me-2"></i> Back
+          </button>
         </div>
       </div>
 
@@ -1938,11 +1835,23 @@ export default function TourCreation() {
           {currentIndex + 1}/{steps.length} sections complete
         </span>
         <div style={{ display: "flex", gap: "8px" }}>
-          {/* <button className="button button-secondary">Save Draft</button>
-          <button className="button button-secondary">Preview</button> */}
-          <button className="button button-green" onClick={handleSubmit}>
-            Publish Trip
-          </button>
+          {id ? (
+            <button 
+              className="button button-green" 
+              onClick={handleUpdate}
+              disabled={isLoading}
+            >
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Update Trip"}
+            </button>
+          ) : (
+            <button 
+              className="button button-green" 
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Publish Trip"}
+            </button>
+          )}
         </div>
       </div>
     </div>
