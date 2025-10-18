@@ -10,6 +10,7 @@ import { TourPreviewDetails } from '../../../../common/api/ApiService';
 import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
 import { APIBaseUrl } from '../../../../common/api/api';
 import TripCard from '../../../../component/TripCard';
+import { errorMsg, successMsg } from '../../../../common/Toastify';
 
 
 const TourPreview = () => {
@@ -20,6 +21,22 @@ const TourPreview = () => {
     const [showReadMore, setShowReadMore] = useState(false);
     const [activeTab, setActiveTab] = useState(1);
     const [tripList, setTripList] = useState([])
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // --- NEW: Enquiry Form State ---
+    const [enquiryFormData, setEnquiryFormData] = useState({
+        departure_city: '',
+        travel_date: '',
+        adults: 1, // Default minimum 1 adult
+        children: 0,
+        infants: 0,
+        hotel_category: '',
+        full_name: '',
+        contact_number: '',
+        email: '',
+        additional_comments: ''
+    })
+    // -------------------------------
 
 
     const TripTab = [
@@ -81,12 +98,55 @@ const TourPreview = () => {
     // Helper function to parse and split inclusions/exclusions
     const parseListItems = (htmlString) => {
         if (!htmlString) return [];
-        
+
         // Remove HTML tags
         const text = htmlString.replace(/<[^>]*>/g, '');
-        
+
         // Split by semicolon and filter out empty items
         return text.split(';').map(item => item.trim()).filter(item => item.length > 0);
+    };
+
+    // Helper function to parse policy content by full stops
+    const parsePolicyItems = (content) => {
+        if (!content) return [];
+
+        // Remove HTML tags if any
+        const text = content.replace(/<[^>]*>/g, '');
+
+        // Split by full stop (period) and filter out empty items
+        return text.split('.').map(item => item.trim()).filter(item => item.length > 0);
+    };
+
+    // Helper function to get icon for policy type
+    const getPolicyIcon = (title) => {
+        const lowerTitle = title.toLowerCase();
+
+        if (lowerTitle.includes('terms') || lowerTitle.includes('condition')) {
+            return <i className="fa-solid fa-file-contract text-primary me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+        } else if (lowerTitle.includes('cancel') || lowerTitle.includes('privacy')) {
+            return <i className="fa-solid fa-ban text-danger me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+        } else if (lowerTitle.includes('payment')) {
+            return <i className="fa-solid fa-credit-card text-success me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+        } else {
+            return <i className="fa-solid fa-circle-info text-info me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+        }
+    };
+
+    // Helper function to format policy title
+    const formatPolicyTitle = (title) => {
+        if (!title) return title;
+
+        // Replace "Privacy Policy" with "Cancellation Policy"
+        if (title.toLowerCase().includes('privacy')) {
+            return 'Cancellation Policy';
+        }
+
+        // Replace "Payment Terms" remains as is but can be customized
+        if (title.toLowerCase().includes('payment')) {
+            return 'Payment Terms';
+        }
+
+        return title;
     };
 
 
@@ -136,14 +196,12 @@ const TourPreview = () => {
     }, [])
 
 
-    const [visibleCount, setVisibleCount] = useState(4); // 👈 show 4 trips initially
+    const [visibleCount, setVisibleCount] = useState(4);
 
     const handleToggle = () => {
         if (visibleCount >= tripList.length) {
-            // 👇 If all shown → collapse back to 4
             setVisibleCount(4);
         } else {
-            // 👇 Show 4 more each click
             setVisibleCount((prev) => prev + 4);
         }
     };
@@ -157,7 +215,82 @@ const TourPreview = () => {
         }));
     };
 
-    console.log(specificTourData, 'specificTourData')
+    // --- NEW: Enquiry Form Handlers ---
+    const handleEnquiryChange = (e) => {
+        const { name, value, type } = e.target;
+        setEnquiryFormData(prev => ({
+            ...prev,
+            [name]: type === 'number' ? parseInt(value) || 0 : value,
+        }));
+    };
+
+    const handleEnquirySubmit = async (e) => {
+        e.preventDefault();
+
+        // Basic validation
+        if (!enquiryFormData.full_name || !enquiryFormData.email || !enquiryFormData.contact_number || !enquiryFormData.travel_date) {
+            errorMsg("Please fill in Full Name, Email, Contact Number, and Travel Date.");
+            return;
+        }
+
+        if (!specificTourData?.title) {
+            errorMsg("Tour details are not loaded. Cannot submit enquiry.");
+            return;
+        }
+
+        const payload = {
+            destination: specificTourData.title, // Auto-filled from trip data (This is "Travel To")
+            departure_city: enquiryFormData.departure_city || "N/A", // This is "Travel From"
+            travel_date: enquiryFormData.travel_date,
+            adults: enquiryFormData.adults || 1, 
+            children: enquiryFormData.children || 0,
+            infants: enquiryFormData.infants || 0,
+            hotel_category: enquiryFormData.hotel_category || "N/A",
+            full_name: enquiryFormData.full_name,
+            contact_number: enquiryFormData.contact_number,
+            email: enquiryFormData.email,
+            additional_comments: enquiryFormData.additional_comments || ""
+        };
+
+        setIsSubmitting(true);
+        try {
+            // CORRECTED FIX: Only using the endpoint path, assuming APIBaseUrl is configured with the base prefix, and maintaining the trailing slash.
+            // This fixes the "Not Found" error caused by double-prefixing.
+            const res = await APIBaseUrl.post(`https://api.yaadigo.com/public/api/enquires/`, payload, {
+                headers: {
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                },
+            });
+
+            if (res?.data?.success === true) {
+                successMsg("Your enquiry has been submitted successfully! We will contact you soon.");
+                // Reset form
+                setEnquiryFormData({
+                    departure_city: '',
+                    travel_date: '',
+                    adults: 1,
+                    children: 0,
+                    infants: 0,
+                    hotel_category: '',
+                    full_name: '',
+                    contact_number: '',
+                    email: '',
+                    additional_comments: ''
+                });
+            } else {
+                errorMsg(res?.data?.message || "Failed to submit enquiry. Please try again.");
+            }
+
+        } catch (error) {
+            console.error("Enquiry submission error:", error?.response?.data || error.message);
+            // Display a more specific error message based on the API response structure if available
+            const apiError = error?.response?.data?.detail || error?.response?.data?.message;
+            errorMsg(apiError || "An error occurred during submission. Please check your network and API configuration.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    // ------------------------------------
 
     return (
         <div className='overflow-hidden-page'>
@@ -211,7 +344,7 @@ const TourPreview = () => {
                                 <div className='d-flex trip-pickup-parent'>
                                     <div className='trip-pickup-drop me-lg-4 me-0'>
                                         <div>
-                                            <i class="fa-solid fa-location-dot"></i>
+                                            <i className="fa-solid fa-location-dot"></i>
                                         </div>
                                         <div className='d-flex flex-column'>
                                             <p>Pickup & Drop</p>
@@ -220,7 +353,7 @@ const TourPreview = () => {
                                     </div>
                                     <div className='trip-pickup-drop mt-lg-0 mt-3'>
                                         <div>
-                                            <i class="fa-solid fa-clock"></i>
+                                            <i className="fa-solid fa-clock"></i>
                                         </div>
                                         <div className='d-flex flex-column'>
                                             <p>Duration </p>
@@ -273,8 +406,8 @@ const TourPreview = () => {
                                                                     <>
                                                                         <p className='mt-3 fw-bold'>Activity : </p>
                                                                         <ul>
-                                                                            {item?.activities?.map((item, index) => (
-                                                                                <li key={index}>{item}</li>))}
+                                                                            {item?.activities?.map((activity, idx) => (
+                                                                                <li key={idx}>{activity}</li>))}
                                                                         </ul>
                                                                     </>
                                                                 )}
@@ -282,7 +415,6 @@ const TourPreview = () => {
                                                                 {item?.hotel_name && item?.hotel_name !== "" && (
                                                                     <>
                                                                         <p className='mt-3'><span className='fw-bold'>Hotel Name :</span> {item?.hotel_name}</p>
-
                                                                     </>
                                                                 )}
 
@@ -290,8 +422,8 @@ const TourPreview = () => {
                                                                     <>
                                                                         <p className='mt-3 fw-bold'>Meal Plan : </p>
                                                                         <ul>
-                                                                            {item?.meal_plan?.map((item, index) => (
-                                                                                <li key={index}>{item}</li>))}
+                                                                            {item?.meal_plan?.map((meal, idx) => (
+                                                                                <li key={idx}>{meal}</li>))}
                                                                         </ul>
                                                                     </>
                                                                 )}
@@ -305,37 +437,36 @@ const TourPreview = () => {
                                     </div>
                                 </div>
 
-                                <div className='trip-detail-section' ref={itineraryRef}>
-                                    <h3>Frequently Asked Questions</h3>
-                                    <div className="container">
-                                        <div className='trip-detail-faqs mt-4'>
-                                            <div className="accordion" id="accordionExample">
-                                                {specificTourData?.faqs?.map((item, index) => (
-                                                    <div className="accordion-item" key={index}>
-                                                        <h2 className="accordion-header" id={`day_wise_itenary${index}`}>
-                                                            <button className="accordion-button" type="button" data-bs-toggle="collapse"
-                                                                data-bs-target={`#itenarys${index}`} aria-expanded={index === 0 ? 'true' : 'false'}
-                                                                aria-controls={`itenarys${index}`}>
-                                                                <p className=''>{item?.question}</p>
-                                                            </button>
-                                                        </h2>
-                                                        <div id={`itenarys${index}`}
-                                                            className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
-                                                            aria-labelledby={`day_wise_itenary${index}`}
-                                                            data-bs-parent="#accordionExample">
-                                                            <div className="accordion-body">
-                                                                <p className=''>{item?.answer}</p>
+                                {specificTourData?.faqs && specificTourData?.faqs.length > 0 && (
+                                    <div className='trip-detail-section'>
+                                        <h3>Frequently Asked Questions</h3>
+                                        <div className="container">
+                                            <div className='trip-detail-faqs mt-4'>
+                                                <div className="accordion" id="accordionFAQ">
+                                                    {specificTourData?.faqs?.map((item, index) => (
+                                                        <div className="accordion-item" key={index}>
+                                                            <h2 className="accordion-header" id={`faq_header${index}`}>
+                                                                <button className="accordion-button" type="button" data-bs-toggle="collapse"
+                                                                    data-bs-target={`#faq${index}`} aria-expanded={index === 0 ? 'true' : 'false'}
+                                                                    aria-controls={`faq${index}`}>
+                                                                    <p>{item?.question}</p>
+                                                                </button>
+                                                            </h2>
+                                                            <div id={`faq${index}`}
+                                                                className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
+                                                                aria-labelledby={`faq_header${index}`}
+                                                                data-bs-parent="#accordionFAQ">
+                                                                <div className="accordion-body">
+                                                                    <p>{item?.answer}</p>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                ))}
-
-                                                <p className=''>{specificTourData?.faqs?.question}</p>
-                                                <p className=''>{specificTourData?.faqs?.answer}</p>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
 
                                 <div className='trip-detail-section inclusion' ref={inclusionRef}>
                                     <h3>Inclusions</h3>
@@ -393,12 +524,45 @@ const TourPreview = () => {
                                 <div className='trip-detail-section'>
                                     <h3>Policies</h3>
                                     <div className='mt-4'>
-                                        {specificTourData?.policies?.map((item, index) => (
-                                            <>
-                                                <p className='mt-5 fw-bold'>{item?.title} :</p>
-                                                <p className='mt-3'>{item?.content} </p>
-                                            </>
-                                        ))}
+                                        {specificTourData?.policies?.map((policy, policyIndex) => {
+                                            const policyItems = parsePolicyItems(policy?.content);
+                                            const formattedTitle = formatPolicyTitle(policy?.title);
+
+                                            return (
+                                                <div key={policyIndex} className='mb-5'>
+                                                    <h5 className='fw-bold mb-3' style={{ color: '#2c3e50', fontSize: '18px' }}>
+                                                        {formattedTitle}
+                                                    </h5>
+
+                                                    {policyItems.length > 0 ? (
+                                                        <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+                                                            {policyItems.map((item, itemIndex) => (
+                                                                <li
+                                                                    key={itemIndex}
+                                                                    style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'flex-start',
+                                                                        marginBottom: '12px',
+                                                                        lineHeight: '1.6'
+                                                                    }}
+                                                                >
+                                                                    {getPolicyIcon(policy?.title)}
+                                                                    <span>{item}.</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    ) : (
+                                                        <p style={{ color: '#6c757d', fontStyle: 'italic' }}>
+                                                            No {formattedTitle.toLowerCase()} available
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+
+                                        {(!specificTourData?.policies || specificTourData?.policies.length === 0) && (
+                                            <p style={{ color: '#6c757d', fontStyle: 'italic' }}>No policies available</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -421,88 +585,176 @@ const TourPreview = () => {
                                         <p className='trip-price-per'>Per Person</p>
                                     </div>
 
-                                    {/* <button onClick={() => handlePreview(id)} >Dates & Pricing</button> */}
                                     <button >Dates & Pricing</button>
-
 
                                 </div>
                             </div>
 
                             <div className='trip-detail-right'>
                                 {!isFixedPackage && (
-                                    <div className='trip-detail-contact-form'>
+                                    <form className='trip-detail-contact-form' onSubmit={handleEnquirySubmit}>
                                         <div className='trip-detail-contact-form-head'>
                                             <p className='head-1'>Enquiry Now !</p>
                                             <p className='head-2'>Allow Us to Call You Back!</p>
                                         </div>
 
                                         <div className='trip-detail-contact-input-container'>
+                                            
+                                            {/* --- 1. Travel To (Destination) --- */}
                                             <div className='trip-detail-contact-input'>
-                                                <label>Your Name</label>
-                                                <input type='text' placeholder='eg. John Doe' />
+                                                <label>Travel To (Destination)</label>
+                                                <input
+                                                    type='text'
+                                                    name='destination_display'
+                                                    value={specificTourData?.title || 'Loading...'}
+                                                    readOnly // The destination is the tour title, so it should not be editable
+                                                    className="form-control-plaintext"
+                                                    style={{ fontWeight: 'bold' }}
+                                                />
+                                            </div>
+                                            {/* ---------------------------------- */}
+                                            
+                                            {/* --- 2. Travel From (Departure City) --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>Travel From (Departure City)</label>
+                                                <input
+                                                    type='text'
+                                                    name='departure_city'
+                                                    value={enquiryFormData.departure_city}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. Delhi, Mumbai'
+                                                />
+                                            </div>
+                                            
+                                            {/* --- 3. Full Name --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>Full Name *</label>
+                                                <input
+                                                    type='text'
+                                                    name='full_name'
+                                                    value={enquiryFormData.full_name}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. John Doe'
+                                                    required
+                                                />
                                             </div>
 
+                                            {/* --- 4. Email --- */}
                                             <div className='trip-detail-contact-input'>
-                                                <label>Your Phone Number</label>
-                                                <input type='number' placeholder='eg. 123456789' />
+                                                <label>Email *</label>
+                                                <input
+                                                    type='email'
+                                                    name='email'
+                                                    value={enquiryFormData.email}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. JohnDoe@gmail.com'
+                                                    required
+                                                />
                                             </div>
 
+                                            {/* --- 5. Contact Number --- */}
                                             <div className='trip-detail-contact-input'>
-                                                <label>Your Email Id</label>
-                                                <input type='email' placeholder='eg. JohnDoe@gmail.com' />
+                                                <label>Contact Number *</label>
+                                                <input
+                                                    type='tel'
+                                                    name='contact_number'
+                                                    value={enquiryFormData.contact_number}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. 1234567890'
+                                                    required
+                                                />
                                             </div>
 
+                                            {/* --- 6. Travel Date --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>Travel Date *</label>
+                                                <input
+                                                    type='date'
+                                                    name='travel_date'
+                                                    value={enquiryFormData.travel_date}
+                                                    onChange={handleEnquiryChange}
+                                                    required
+                                                />
+                                            </div>
+
+
+                                            {/* --- 7. No. of Adults --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>No. of Adults *</label>
+                                                <input
+                                                    type='number'
+                                                    name='adults'
+                                                    value={enquiryFormData.adults}
+                                                    onChange={handleEnquiryChange}
+                                                    min='1'
+                                                    placeholder='eg. 2'
+                                                    required
+                                                />
+                                            </div>
+
+                                            {/* --- 8. No. of Children --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>No. of Children</label>
+                                                <input
+                                                    type='number'
+                                                    name='children'
+                                                    value={enquiryFormData.children}
+                                                    onChange={handleEnquiryChange}
+                                                    min='0'
+                                                    placeholder='eg. 0'
+                                                />
+                                            </div>
+
+                                            {/* --- 9. No. of Infants --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>No. of Infants</label>
+                                                <input
+                                                    type='number'
+                                                    name='infants'
+                                                    value={enquiryFormData.infants}
+                                                    onChange={handleEnquiryChange}
+                                                    min='0'
+                                                    placeholder='eg. 0'
+                                                />
+                                            </div>
+
+                                            {/* --- 10. Hotel Category --- */}
                                             <div className='trip-detail-contact-input'>
                                                 <div className='admin-input-div mt-0'>
-                                                    <label>Select Slots </label>
+                                                    <label>Hotel Category</label>
                                                     <select
-                                                        name="featured_trip_page">
-                                                        <option value="">Select Slots</option>
-                                                        <option value="Five Star">⭐ ⭐ ⭐ ⭐ ⭐</option>
-                                                        <option value="Four Star">⭐ ⭐ ⭐ ⭐</option>
-                                                        <option value="Three Star">⭐ ⭐ ⭐</option>
-                                                        <option value="Two Star">⭐ ⭐</option>
+                                                        name="hotel_category"
+                                                        value={enquiryFormData.hotel_category}
+                                                        onChange={handleEnquiryChange}
+                                                    >
+                                                        <option value="">Select Hotel Category</option>
+                                                        <option value="Five Star">⭐⭐⭐⭐⭐ (Five Star)</option>
+                                                        <option value="Four Star">⭐⭐⭐⭐ (Four Star)</option>
+                                                        <option value="Three Star">⭐⭐⭐ (Three Star)</option>
+                                                        <option value="Two Star">⭐⭐ (Two Star)</option>
+                                                        <option value="Budget">Budget</option>
                                                     </select>
                                                 </div>
                                             </div>
 
+                                            {/* --- 11. Additional Comments --- */}
                                             <div className='trip-detail-contact-input'>
                                                 <div className='admin-input-div mt-0'>
-                                                    <label>Select Package</label>
-                                                    <select
-                                                        name="featured_trip_page">
-                                                        <option value="">Select Package</option>
-                                                        <option value="Double">Double</option>
-                                                        <option value="Triple">Triple</option>
-                                                        <option value="Quad">Quad</option>
-                                                    </select>
+                                                    <label>Additional Comments</label>
+                                                    <textarea
+                                                        name='additional_comments'
+                                                        value={enquiryFormData.additional_comments}
+                                                        onChange={handleEnquiryChange}
+                                                        placeholder='Write any message or special requests here...'
+                                                        style={{ height: "100px" }}
+                                                    ></textarea>
                                                 </div>
                                             </div>
-
-                                            <div className='trip-detail-contact-input'>
-                                                <label>No. of Adults</label>
-                                                <input type='number' placeholder='eg. 4' />
-                                            </div>
-
-                                            <div className='trip-detail-contact-input'>
-                                                <label>no. of Infants</label>
-                                                <input type='number' placeholder='eg. 3' />
-                                            </div>
-
-                                            <div className='trip-detail-contact-input'>
-                                                <label>no. of Children</label>
-                                                <input type='number' placeholder='eg. 2' />
-                                            </div>
-
-                                            <div className='trip-detail-contact-input'>
-                                                <div className='admin-input-div mt-0'>
-                                                    <label>Wite Some Message</label>
-                                                    <textarea style={{ height: "100px" }}></textarea>
-                                                </div>
-                                            </div>
-                                            <button>Submit</button>
+                                            <button type='submit' disabled={isSubmitting}>
+                                                {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
+                                            </button>
                                         </div>
-                                    </div>
+                                    </form>
                                 )}
                             </div>
 
