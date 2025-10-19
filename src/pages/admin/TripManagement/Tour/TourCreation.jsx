@@ -29,6 +29,7 @@ export default function TourCreation() {
   // Form state
   const [formData, setFormData] = useState({
     title: "",
+    slug: "", // Added slug field
     overview: "",
     destination_id: "",
     destination_type: "",
@@ -110,12 +111,32 @@ export default function TourCreation() {
   const currentIndex = steps.findIndex((s) => s.id === activeStep);
   const progress = ((currentIndex + 1) / steps.length) * 100 + "%";
 
+  // Helper function to generate slug
+  const generateSlug = (title) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
   // Handler functions
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [field]: value,
+      };
+      
+      // Auto-generate slug when title changes (only if not editing)
+      if (field === "title" && !id) {
+        updated.slug = generateSlug(value);
+      }
+      
+      return updated;
+    });
   };
 
   const handleCustomPricingChange = (field, value) => {
@@ -125,7 +146,6 @@ export default function TourCreation() {
         [field]: value,
       };
 
-      // Auto-calculate final price
       const basePrice = parseFloat(updatedCustomized.base_price) || 0;
       const discount = parseFloat(updatedCustomized.discount) || 0;
       const gst = parseFloat(updatedCustomized.gst_percentage) || 0;
@@ -354,7 +374,6 @@ export default function TourCreation() {
     }
   };
 
-  // Remove hero image
   const removeHeroImage = () => {
     setFormData((prev) => ({
       ...prev,
@@ -362,7 +381,6 @@ export default function TourCreation() {
     }));
   };
 
-  // Remove gallery image
   const removeGalleryImage = (index) => {
     setFormData((prev) => ({
       ...prev,
@@ -384,7 +402,7 @@ export default function TourCreation() {
       days: parseInt(formData.days),
       nights: parseInt(formData.nights),
       meta_tags: `${formData.title}, ${formData.themes.join(", ")}`,
-      slug: formData.title.toLowerCase().replace(/\s+/g, "-"),
+      slug: id ? formData.slug : generateSlug(formData.title), // Use existing slug if editing
       pricing_model: formData.pricing_model,
       highlights: formData.highlights.join("; "),
       inclusions: formData.inclusions.join("; "),
@@ -546,7 +564,6 @@ export default function TourCreation() {
     setFixedPackage(updatedPackages);
   };
 
-  // Fetch specific trip for editing
   const getSpecificTrip = async (tripId) => {
     try {
       const res = await APIBaseUrl.get(`trips/${tripId}`, {
@@ -574,6 +591,7 @@ export default function TourCreation() {
         setFormData({
           ...formData,
           title: tripData.title || "",
+          slug: tripData.slug || "", // IMPORTANT: Preserve the slug
           overview: tripData.overview || "",
           destination_id: tripData.destination_id || "",
           destination_type: tripData.destination_type || "",
