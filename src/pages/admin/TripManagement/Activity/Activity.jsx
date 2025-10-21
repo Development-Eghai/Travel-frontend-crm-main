@@ -227,19 +227,45 @@ const TourType = () => {
     const getAllActivity = async () => {
         try {
             setIsLoading(true);
-            const res = await APIBaseUrl.get("activities/", {
-                headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-                },
-            });
-            if (res?.data?.success === true) {
-                setIsLoading(false);
-                setActivityList(res?.data?.data)
+            let allActivities = [];
+            let skip = 0;
+            const limit = 100;
+            let hasMore = true;
+
+            // Fetch all activities with pagination
+            while (hasMore) {
+                const res = await APIBaseUrl.get("activities/", {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                    params: { skip, limit }
+                });
+
+                console.log(`API Response for activities (skip: ${skip}):`, res?.data);
+                
+                if (res?.data?.success === true) {
+                    const activities = res?.data?.data || [];
+                    allActivities = [...allActivities, ...activities];
+                    
+                    // If we got less than the limit, we've reached the end
+                    hasMore = activities.length === limit;
+                    skip += limit;
+                } else {
+                    console.error("API returned unsuccessful response:", res?.data);
+                    hasMore = false;
+                }
             }
 
+            console.log("Total activities fetched:", allActivities.length);
+            setActivityList(allActivities);
+            setIsLoading(false);
+
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
-            throw error;
+            console.error("Error fetching activities - Full error:", error);
+            console.error("Error response data:", error?.response?.data);
+            console.error("Error status:", error?.response?.status);
+            setActivityList([]);
+            setIsLoading(false);
         }
     };
 
@@ -258,8 +284,8 @@ const TourType = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                // getRowId={(row) => row._id}
-                isLoading={isLoading}
+                    getRowId={(row) => row.id || row._id}
+                    isLoading={isLoading}
                 />
             </div>
 

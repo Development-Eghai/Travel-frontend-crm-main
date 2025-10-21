@@ -127,7 +127,6 @@ const ContactForm = ({ isOpen, onClose }) => {
     const formErrors = validateForm();
 
     if (Object.keys(formErrors).length === 0) {
-      console.log('Form submitted:', formData);
       setIsSubmitted(true);
     } else {
       setErrors(formErrors);

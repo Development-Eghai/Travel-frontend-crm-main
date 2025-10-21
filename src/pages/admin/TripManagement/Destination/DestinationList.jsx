@@ -102,7 +102,6 @@ const DestinationList = () => {
         : [];
 
     const getAllDestination = async () => {
-
         try {
             setIsLoading(true);
             const res = await APIBaseUrl.get("destinations/", {
@@ -110,16 +109,24 @@ const DestinationList = () => {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
                 },
             });
+            console.log("API Response for destinations:", res?.data);
+            // Destinations API returns all records without pagination and uses status code instead of error_code
             if (res?.data?.success === true) {
+                console.log("Total destinations fetched:", res?.data?.data?.length);
+                setDestinationList(res?.data?.data || [])
                 setIsLoading(false);
-                setDestinationList(res?.data?.data)
+            } else {
+                console.error("API returned unsuccessful response:", res?.data);
+                setDestinationList([]);
+                setIsLoading(false);
             }
 
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
-            throw error;
+            console.error("Error fetching destinations - Full error:", error);
+            console.error("Error response data:", error?.response?.data);
+            setDestinationList([]);
+            setIsLoading(false);
         }
-
     }
 
 
@@ -176,8 +183,8 @@ console.log(destinationList,"destinationList")
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                // getRowId={(row) => row._id}
-                isLoading={isLoading}
+                    getRowId={(row) => row.id || row._id}
+                    isLoading={isLoading}
                 />
             </div>
 
