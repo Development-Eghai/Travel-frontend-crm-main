@@ -219,20 +219,45 @@ const TourCategory = () => {
     const getAllTourCategory = async () => {
         try {
             setIsLoading(true);
-            const res = await APIBaseUrl.get("categories/", {
-                headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-                },
-            });
-            if (res?.data?.success === true) {
+            let allCategories = [];
+            let skip = 0;
+            const limit = 100;
+            let hasMore = true;
 
-                setcategoryList(res?.data?.data)
-                setIsLoading(false);
+            // Fetch all categories with pagination
+            while (hasMore) {
+                const res = await APIBaseUrl.get("categories/", {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                    params: { skip, limit }
+                });
+
+                console.log(`API Response for categories (skip: ${skip}):`, res?.data);
+                
+                if (res?.data?.success === true) {
+                    const categories = res?.data?.data || [];
+                    allCategories = [...allCategories, ...categories];
+                    
+                    // If we got less than the limit, we've reached the end
+                    hasMore = categories.length === limit;
+                    skip += limit;
+                } else {
+                    console.error("API returned unsuccessful response:", res?.data);
+                    hasMore = false;
+                }
             }
 
+            console.log("Total categories fetched:", allCategories.length);
+            setcategoryList(allCategories);
+            setIsLoading(false);
+
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
-            throw error;
+            console.error("Error fetching categories - Full error:", error);
+            console.error("Error response data:", error?.response?.data);
+            console.error("Error status:", error?.response?.status);
+            setcategoryList([]);
+            setIsLoading(false);
         }
     }
 
@@ -321,7 +346,7 @@ const TourCategory = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
-                    // getRowId={(row) => row._id}
+                    getRowId={(row) => row.id || row._id}
                     isLoading={isLoading}
                 />
             </div>

@@ -28,7 +28,7 @@ export const routes = [
         component: AdminDashboard,
     },
     {
-        path: "/destination-create",
+        path: "/destination-create/:id?",
         component: DestinationCreation,
     },
     {
@@ -44,7 +44,7 @@ export const routes = [
         component: TourList,
     },
     {
-        path: "/tour-create",
+        path: "/tour-create/:id?",
         component: TourCreation,
     },
     {

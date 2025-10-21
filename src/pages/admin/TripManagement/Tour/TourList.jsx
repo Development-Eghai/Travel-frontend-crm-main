@@ -118,18 +118,44 @@ const TourList = () => {
     const getAllTrips = async () => {
         try {
             setIsLoading(true);
-            const res = await APIBaseUrl.get("trips", {
-                headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-                },
-            });
-            if (res?.data?.success === true && res?.data?.error_code === 0) {
-                setTripList(res?.data?.data)
-                setIsLoading(false);
+            let allTrips = [];
+            let skip = 0;
+            const limit = 100;
+            let hasMore = true;
+
+            // Fetch all trips with pagination
+            while (hasMore) {
+                const res = await APIBaseUrl.get("trips/", {
+                    headers: {
+                        "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    },
+                    params: { skip, limit }
+                });
+
+                console.log(`API Response for trips (skip: ${skip}):`, res?.data);
+                
+                if (res?.data?.success === true && res?.data?.error_code === 0) {
+                    const trips = res?.data?.data || [];
+                    allTrips = [...allTrips, ...trips];
+                    
+                    // If we got less than the limit, we've reached the end
+                    hasMore = trips.length === limit;
+                    skip += limit;
+                } else {
+                    console.error("API returned unsuccessful response:", res?.data);
+                    hasMore = false;
+                }
             }
 
+            console.log("Total trips fetched:", allTrips.length);
+            setTripList(allTrips);
+            setIsLoading(false);
+
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
+            console.error("Error fetching trips - Full error:", error);
+            console.error("Error response data:", error?.response?.data);
+            console.error("Error status:", error?.response?.status);
+            setTripList([]);
             setIsLoading(false);
         }
     };
@@ -173,6 +199,7 @@ const TourList = () => {
                 <MyDataTable
                     rows={numberedRows}
                     columns={columns}
+                    getRowId={(row) => row.id || row._id}
                     isLoading={isLoading}
                 />
             </div>

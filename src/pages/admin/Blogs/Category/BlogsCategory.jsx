@@ -202,7 +202,7 @@ const BlogsCategory = () => {
           rows={numberedRows}
           columns={columns}
           getRowId={(row) => row._id}
-        // isLoading={isLoading}
+          isLoading={isLoading}
         />
       </div>
 

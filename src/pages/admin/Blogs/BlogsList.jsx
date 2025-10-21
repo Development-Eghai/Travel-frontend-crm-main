@@ -15,6 +15,7 @@ const BlogsList = () => {
     const [bloglistDetails, setBlogList] = useState([])
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [deleteId, setDeleteId] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
 
@@ -122,15 +123,16 @@ const BlogsList = () => {
     }));
 
     const getAllBlogDetails = async () => {
-
+        setIsLoading(true);
         axios.get(BACKEND_BASE_API + '/blog/get_all')
             .then(response => {
                 console.log(response.data.data);
                 setBlogList(response.data.data);
-
+                setIsLoading(false);
             })
             .catch(error => {
                 console.error("Error fetching categories:", error);
+                setIsLoading(false);
             });
     }
 
@@ -192,7 +194,7 @@ const BlogsList = () => {
                     rows={numberedRows}
                     columns={columns}
                     getRowId={(row) => row._id}
-                // isLoading={isLoading}
+                    isLoading={isLoading}
                 />
             </div>
             <CustomModal

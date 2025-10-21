@@ -11,6 +11,7 @@ import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
 import { APIBaseUrl } from '../../../../common/api/api';
 import TripCard from '../../../../component/TripCard';
 import { errorMsg, successMsg } from '../../../../common/Toastify';
+import axios from 'axios';
 
 
 const TourPreview = () => {
@@ -241,24 +242,27 @@ const TourPreview = () => {
         const payload = {
             destination: specificTourData.title, // Auto-filled from trip data (This is "Travel To")
             departure_city: enquiryFormData.departure_city || "N/A", // This is "Travel From"
-            travel_date: enquiryFormData.travel_date,
+            departure_date: enquiryFormData.travel_date,
+            flexible_date: false,
             adults: enquiryFormData.adults || 1, 
             children: enquiryFormData.children || 0,
             infants: enquiryFormData.infants || 0,
-            hotel_category: enquiryFormData.hotel_category || "N/A",
+            child_ages: [],
+            infant_ages: [],
+            hotel_category: enquiryFormData.hotel_category || "Budget",
             full_name: enquiryFormData.full_name,
             contact_number: enquiryFormData.contact_number,
             email: enquiryFormData.email,
-            additional_comments: enquiryFormData.additional_comments || ""
+            comments: enquiryFormData.additional_comments || "",
+            source: 'trip_preview_page'
         };
 
         setIsSubmitting(true);
         try {
-            // CORRECTED FIX: Only using the endpoint path, assuming APIBaseUrl is configured with the base prefix, and maintaining the trailing slash.
-            // This fixes the "Not Found" error caused by double-prefixing.
-            const res = await APIBaseUrl.post(`https://api.yaadigo.com/public/api/enquires/`, payload, {
+            // Using axios directly with the full API endpoint for enquiry submission
+            const res = await axios.post('https://api.yaadigo.com/api/enquires/', payload, {
                 headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    'Content-Type': 'application/json',
                 },
             });
 

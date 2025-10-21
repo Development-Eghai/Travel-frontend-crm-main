@@ -59,8 +59,6 @@ const AppRoutes = () => {
 
                 {/* Admin Routes */}
                 <Route path="/admin/*" element={<Layout />} />
-                <Route path="/admin/destination-create/:id?" element={<DestinationCreation />} />
-                <Route path="/admin/tour-create/:id?" element={<TourCreation />} />
                 <Route path="/admin-login" element={<LoginPage />} />
             </Routes>
         </Router>
