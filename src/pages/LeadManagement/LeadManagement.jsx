@@ -15,12 +15,30 @@ const LeadManagement = () => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [openAddLead, setOpenAddLead] = useState(false);
 
-  // Fetch leads from API
+  // ✅ Fetch leads from YaadiGo public API
   const fetchLeads = async () => {
     try {
-      const response = await fetch('/api/leads');
+      const response = await fetch('https://api.yaadigo.com/public/api/enquires/');
       const data = await response.json();
-      setLeads(data);
+      const formatted = Array.isArray(data) ? data : data?.data || [];
+
+      // Normalize fields
+      const normalized = formatted.map((item, index) => ({
+        id: index + 1,
+        name: item.full_name,
+        email: item.email,
+        mobile: item.contact_number,
+        destination_type: item.destination,
+        trip_type: item.hotel_category || '-',
+        status: 'new',
+        priority: 'medium',
+        assigned_to: 'Unassigned',
+        follow_up_date: null,
+        created_at: item.travel_date || new Date(),
+        source: 'Website',
+      }));
+
+      setLeads(normalized);
     } catch (error) {
       console.error('Error fetching leads:', error);
     }
@@ -30,18 +48,16 @@ const LeadManagement = () => {
     fetchLeads();
   }, []);
 
-  const handleAddNewLead = () => {
-    setOpenAddLead(true);
-  };
-
+  const handleAddNewLead = () => setOpenAddLead(true);
   const handleCloseAddLead = () => {
     setOpenAddLead(false);
-    fetchLeads(); // Refresh leads after adding new one
+    fetchLeads();
   };
 
   const filteredLeads = leads.filter(lead => {
-    const matchesSearch = lead.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      lead.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.email?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
     return matchesSearch && matchesStatus;
   });

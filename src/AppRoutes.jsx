@@ -24,6 +24,7 @@ import TourCreation from "./pages/admin/TripManagement/Tour/TourCreation";
 import CategoryPreview from "./pages/admin/TripManagement/Category/CategoryPreview";
 import NotFound from "./common/NotFound";
 
+
 const DestinationDetail = lazy(() => import("./pages/user/DestinationDetail"));
 const Homepage = lazy(() => import("./pages/user/Homepage"));
 const LeadManagement = lazy(() => import("./pages/LeadManagement/LeadManagement"));

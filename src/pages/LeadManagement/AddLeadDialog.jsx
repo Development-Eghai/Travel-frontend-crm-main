@@ -31,7 +31,7 @@ const AddLeadDialog = ({ open, onClose }) => {
     children: 0
   });
 
-  // Fetch trip themes from API
+  // Fetch trip themes (if needed)
   useEffect(() => {
     const fetchTripThemes = async () => {
       try {
@@ -62,18 +62,33 @@ const AddLeadDialog = ({ open, onClose }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('/api/leads', {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        mobile: formData.mobile,
+        destination_type: parseInt(formData.destinationType) || 0,
+        pickup: formData.pickup,
+        drop: formData.drop,
+        travel_from: formData.travelFrom ? new Date(formData.travelFrom).toISOString() : null,
+        travel_to: formData.travelTo ? new Date(formData.travelTo).toISOString() : null,
+        adults: formData.adults.toString(),
+        children: formData.children.toString(),
+      };
+
+      const response = await fetch('https://api.yaadigo.com/secure/api/leads/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': 'bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
-      
+
       if (response.ok) {
-        onClose();
+        console.log('✅ Lead created successfully');
+        onClose(true); // ✅ tell parent to refresh list
       } else {
-        console.error('Error creating lead');
+        console.error('❌ Error creating lead:', await response.text());
       }
     } catch (error) {
       console.error('Error:', error);
@@ -81,7 +96,7 @@ const AddLeadDialog = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={() => onClose(false)} maxWidth="md" fullWidth>
       <DialogTitle>Add New Lead</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -193,7 +208,7 @@ const AddLeadDialog = ({ open, onClose }) => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={() => onClose(false)}>Cancel</Button>
         <Button onClick={handleSubmit} variant="contained" color="primary">
           Add Lead
         </Button>

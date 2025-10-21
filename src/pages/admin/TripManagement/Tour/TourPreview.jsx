@@ -11,8 +11,7 @@ import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
 import { APIBaseUrl } from '../../../../common/api/api';
 import TripCard from '../../../../component/TripCard';
 import { errorMsg, successMsg } from '../../../../common/Toastify';
-import axios from 'axios';
-
+import './TourPreview.css';
 
 const TourPreview = () => {
     const navigate = useNavigate();
@@ -242,27 +241,24 @@ const TourPreview = () => {
         const payload = {
             destination: specificTourData.title, // Auto-filled from trip data (This is "Travel To")
             departure_city: enquiryFormData.departure_city || "N/A", // This is "Travel From"
-            departure_date: enquiryFormData.travel_date,
-            flexible_date: false,
+            travel_date: enquiryFormData.travel_date,
             adults: enquiryFormData.adults || 1, 
             children: enquiryFormData.children || 0,
             infants: enquiryFormData.infants || 0,
-            child_ages: [],
-            infant_ages: [],
-            hotel_category: enquiryFormData.hotel_category || "Budget",
+            hotel_category: enquiryFormData.hotel_category || "N/A",
             full_name: enquiryFormData.full_name,
             contact_number: enquiryFormData.contact_number,
             email: enquiryFormData.email,
-            comments: enquiryFormData.additional_comments || "",
-            source: 'trip_preview_page'
+            additional_comments: enquiryFormData.additional_comments || ""
         };
 
         setIsSubmitting(true);
         try {
-            // Using axios directly with the full API endpoint for enquiry submission
-            const res = await axios.post('https://api.yaadigo.com/api/enquires/', payload, {
+            // CORRECTED FIX: Only using the endpoint path, assuming APIBaseUrl is configured with the base prefix, and maintaining the trailing slash.
+            // This fixes the "Not Found" error caused by double-prefixing.
+            const res = await APIBaseUrl.post(`https://api.yaadigo.com/public/api/enquires/`, payload, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
                 },
             });
 
@@ -337,7 +333,7 @@ const TourPreview = () => {
                     </Swiper>
                 )}
             </section>
-
+          
             <div className='trip-detail-content-main'>
                 <div className='container'>
                     <div className='row'>
@@ -441,36 +437,7 @@ const TourPreview = () => {
                                     </div>
                                 </div>
 
-                                {specificTourData?.faqs && specificTourData?.faqs.length > 0 && (
-                                    <div className='trip-detail-section'>
-                                        <h3>Frequently Asked Questions</h3>
-                                        <div className="container">
-                                            <div className='trip-detail-faqs mt-4'>
-                                                <div className="accordion" id="accordionFAQ">
-                                                    {specificTourData?.faqs?.map((item, index) => (
-                                                        <div className="accordion-item" key={index}>
-                                                            <h2 className="accordion-header" id={`faq_header${index}`}>
-                                                                <button className="accordion-button" type="button" data-bs-toggle="collapse"
-                                                                    data-bs-target={`#faq${index}`} aria-expanded={index === 0 ? 'true' : 'false'}
-                                                                    aria-controls={`faq${index}`}>
-                                                                    <p>{item?.question}</p>
-                                                                </button>
-                                                            </h2>
-                                                            <div id={`faq${index}`}
-                                                                className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
-                                                                aria-labelledby={`faq_header${index}`}
-                                                                data-bs-parent="#accordionFAQ">
-                                                                <div className="accordion-body">
-                                                                    <p>{item?.answer}</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                                
 
                                 <div className='trip-detail-section inclusion' ref={inclusionRef}>
                                     <h3>Inclusions</h3>
@@ -569,7 +536,38 @@ const TourPreview = () => {
                                         )}
                                     </div>
                                 </div>
+                                    {/* FAQ Section */}
 
+                                    {specificTourData?.faqs && specificTourData?.faqs.length > 0 && (
+                                    <div className='trip-detail-section'>
+                                        <h3>Frequently Asked Questions</h3>
+                                        <div className="container">
+                                            <div className='trip-detail-faqs mt-4'>
+                                                <div className="accordion" id="accordionFAQ">
+                                                    {specificTourData?.faqs?.map((item, index) => (
+                                                        <div className="accordion-item" key={index}>
+                                                            <h2 className="accordion-header" id={`faq_header${index}`}>
+                                                                <button className="accordion-button" type="button" data-bs-toggle="collapse"
+                                                                    data-bs-target={`#faq${index}`} aria-expanded={index === 0 ? 'true' : 'false'}
+                                                                    aria-controls={`faq${index}`}>
+                                                                    <p>{item?.question}</p>
+                                                                </button>
+                                                            </h2>
+                                                            <div id={`faq${index}`}
+                                                                className={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
+                                                                aria-labelledby={`faq_header${index}`}
+                                                                data-bs-parent="#accordionFAQ">
+                                                                <div className="accordion-body">
+                                                                    <p>{item?.answer}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -589,7 +587,7 @@ const TourPreview = () => {
                                         <p className='trip-price-per'>Per Person</p>
                                     </div>
 
-                                    <button >Dates & Pricing</button>
+                                    {/* <button >Dates & Pricing</button> */}
 
                                 </div>
                             </div>
@@ -630,44 +628,7 @@ const TourPreview = () => {
                                                 />
                                             </div>
                                             
-                                            {/* --- 3. Full Name --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Full Name *</label>
-                                                <input
-                                                    type='text'
-                                                    name='full_name'
-                                                    value={enquiryFormData.full_name}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. John Doe'
-                                                    required
-                                                />
-                                            </div>
-
-                                            {/* --- 4. Email --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Email *</label>
-                                                <input
-                                                    type='email'
-                                                    name='email'
-                                                    value={enquiryFormData.email}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. JohnDoe@gmail.com'
-                                                    required
-                                                />
-                                            </div>
-
-                                            {/* --- 5. Contact Number --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Contact Number *</label>
-                                                <input
-                                                    type='tel'
-                                                    name='contact_number'
-                                                    value={enquiryFormData.contact_number}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. 1234567890'
-                                                    required
-                                                />
-                                            </div>
+                                           
 
                                             {/* --- 6. Travel Date --- */}
                                             <div className='trip-detail-contact-input'>
@@ -709,7 +670,7 @@ const TourPreview = () => {
                                                 />
                                             </div>
 
-                                            {/* --- 9. No. of Infants --- */}
+                                            {/* --- 9. No. of Infants ---
                                             <div className='trip-detail-contact-input'>
                                                 <label>No. of Infants</label>
                                                 <input
@@ -720,7 +681,7 @@ const TourPreview = () => {
                                                     min='0'
                                                     placeholder='eg. 0'
                                                 />
-                                            </div>
+                                            </div> */}
 
                                             {/* --- 10. Hotel Category --- */}
                                             <div className='trip-detail-contact-input'>
@@ -740,7 +701,44 @@ const TourPreview = () => {
                                                     </select>
                                                 </div>
                                             </div>
+                                                 {/* --- 3. Full Name --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>Full Name *</label>
+                                                <input
+                                                    type='text'
+                                                    name='full_name'
+                                                    value={enquiryFormData.full_name}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. John Doe'
+                                                    required
+                                                />
+                                            </div>
 
+                                            {/* --- 4. Email --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>Email *</label>
+                                                <input
+                                                    type='email'
+                                                    name='email'
+                                                    value={enquiryFormData.email}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. JohnDoe@gmail.com'
+                                                    required
+                                                />
+                                            </div>
+
+                                            {/* --- 5. Contact Number --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>Contact Number *</label>
+                                                <input
+                                                    type='tel'
+                                                    name='contact_number'
+                                                    value={enquiryFormData.contact_number}
+                                                    onChange={handleEnquiryChange}
+                                                    placeholder='eg. 1234567890'
+                                                    required
+                                                />
+                                            </div>
                                             {/* --- 11. Additional Comments --- */}
                                             <div className='trip-detail-contact-input'>
                                                 <div className='admin-input-div mt-0'>
