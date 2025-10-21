@@ -58,17 +58,20 @@ const Header = () => {
     setIsModalOpen(true);
   };
 
+  // Function to force a page refresh
+  const handleLinkClick = (url) => {
+    window.location.href = url; // Force page refresh
+  };
+
   return (
     <div className="overflow-hidden">
       <div
         className={`header-main ${!no_fixed_header_for?.includes(window.location.pathname)
           ? ""
-          : "not-fixed-header"
-          }`}
+          : "not-fixed-header"}`}
       >
         <nav className="navbar navbar-expand-lg" ref={wrapperRef}>
           <div className="container d-flex justify-content-between align-items-center">
-
             {/* Logo (only on mobile) */}
             <Link to="/" className="d-lg-none">
               <img
@@ -86,8 +89,7 @@ const Header = () => {
               <ul className="navbar-nav align-items-center gap-3">
                 {/* Domestic Dropdown */}
                 <li
-                  className={`nav-item dropdown ${openDropdown === "domestic" ? "show" : ""
-                    }`}
+                  className={`nav-item dropdown ${openDropdown === "domestic" ? "show" : ""}`}
                   onMouseEnter={() => handleMouseEnter("domestic")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -104,34 +106,102 @@ const Header = () => {
                   </button>
 
                   <ul
-                    className={`dropdown-menu ${openDropdown === "domestic" ? "show" : ""
-                      }`}
+                    className={`dropdown-menu ${openDropdown === "domestic" ? "show" : ""}`}
                   >
                     <li>
-                      <Link
-                        to="/domestic/uttarakhand"
+                      <button
                         className="dropdown-item"
+                        onClick={() => handleLinkClick("/destination/kerala/27")}
                       >
-                        Uttarakhand
-                      </Link>
+                        Kerala
+                      </button>
                     </li>
                     <li>
-                      <Link to="/domestic/himachal" className="dropdown-item">
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/destination/himachal/18")}
+                      >
                         Himachal
-                      </Link>
+                      </button>
                     </li>
                     <li>
-                      <Link to="/domestic/goa" className="dropdown-item">
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/destination/kashmir/26")}
+                      >
+                        Kashmir
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/destination/spiti/30")}
+                      >
+                        Spiti Valley
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/destination/goa/28")}
+                      >
                         Goa
-                      </Link>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("#")}
+                      >
+                        Rajasthan
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("#")}
+                      >
+                        Gujarat
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("#")}
+                      >
+                        Orissa
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("#")}
+                      >
+                        Tamil Nadu
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("#")}
+                      >
+                        Karnataka
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("#")}
+                      >
+                        Andaman and Nicobar Islands
+                      </button>
                     </li>
                   </ul>
                 </li>
 
                 {/* International Dropdown */}
                 <li
-                  className={`nav-item dropdown ${openDropdown === "international" ? "show" : ""
-                    }`}
+                  className={`nav-item dropdown ${openDropdown === "international" ? "show" : ""}`}
                   onMouseEnter={() => handleMouseEnter("international")}
                   onMouseLeave={handleMouseLeave}
                 >
@@ -148,130 +218,80 @@ const Header = () => {
                   </button>
 
                   <ul
-                    className={`dropdown-menu ${openDropdown === "international" ? "show" : ""
-                      }`}
+                    className={`dropdown-menu ${openDropdown === "international" ? "show" : ""}`}
                   >
                     <li>
-                      <Link to="/international/europe" className="dropdown-item">
-                        Europe
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/international/bali" className="dropdown-item">
-                        Bali
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/international/dubai" className="dropdown-item">
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/international/dubai")}
+                      >
                         Dubai
-                      </Link>
+                      </button>
                     </li>
-                  </ul>
-                </li>
-
-                {/* Honeymoon Dropdown */}
-                <li
-                  className={`nav-item dropdown ${openDropdown === "honeymoon" ? "show" : ""
-                    }`}
-                  onMouseEnter={() => handleMouseEnter("honeymoon")}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <button
-                    type="button"
-                    className="nav-link dropdown-toggle custom-dropdown"
-                    onClick={() => toggleDropdown("honeymoon")}
-                    aria-expanded={openDropdown === "honeymoon"}
-                  >
-                    Honeymoon Trips{" "}
-                    <span className="arrow" aria-hidden>
-                      {openDropdown === "honeymoon" ? "▲" : "▼"}
-                    </span>
-                  </button>
-
-                  <ul
-                    className={`dropdown-menu ${openDropdown === "honeymoon" ? "show" : ""
-                      }`}
-                  >
                     <li>
-                      <Link to="/international/europe" className="dropdown-item">
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/international/thailand")}
+                      >
+                        Thailand
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/international/bali")}
+                      >
                         Bali
-                      </Link>
+                      </button>
                     </li>
                     <li>
-                      <Link to="/international/bali" className="dropdown-item">
-                        Kashmir
-                      </Link>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/international/malaysia")}
+                      >
+                        Malaysia
+                      </button>
                     </li>
                     <li>
-                      <Link to="/international/dubai" className="dropdown-item">
-                        Himachal
-                      </Link>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/international/nepal")}
+                      >
+                        Nepal
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => handleLinkClick("/international/vietnam")}
+                      >
+                        Vietnam
+                      </button>
                     </li>
                   </ul>
                 </li>
 
-                {/* Upcoming Group Trips Dropdown */}
-                <li
-                  className={`nav-item dropdown ${openDropdown === "upcoming" ? "show" : ""
-                    }`}
-                  onMouseEnter={() => handleMouseEnter("upcoming")}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <button
-                    type="button"
-                    className="nav-link dropdown-toggle custom-dropdown"
-                    onClick={() => toggleDropdown("upcoming")}
-                    aria-expanded={openDropdown === "upcoming"}
+                {/* Upcoming Group Trips (Added as normal links) */}
+                <li className="nav-item">
+                  <Link
+                    to="/upcoming-group-trips"
+                    className="nav-link text-decoration-none"
+                    onClick={() => handleLinkClick("/upcoming-group-trips")}
                   >
-                    Upcoming Group Trips{" "}
-                    <span className="arrow" aria-hidden>
-                      {openDropdown === "upcoming" ? "▲" : "▼"}
-                    </span>
-                  </button>
-
-                  <ul
-                    className={`dropdown-menu ${openDropdown === "upcoming" ? "show" : ""
-                      }`}
-                  >
-                    <li>
-                      <Link to="/international/europe" className="dropdown-item">
-                        Spiti Valley
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/international/bali" className="dropdown-item">
-                        Ladakh
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="/international/dubai" className="dropdown-item">
-                        Manali
-                      </Link>
-                    </li>
-                  </ul>
+                    Upcoming Group Trips
+                  </Link>
                 </li>
 
-                {/* Other Links */}
-                {/* <li className="nav-item">
-                  <Link to="/blogs" className="nav-link custom-link">
-                    Blogs
+                {/* Honeymoon Trips (Added as normal links) */}
+                <li className="nav-item">
+                  <Link
+                    to="/honeymoon-trips"
+                    className="nav-link text-decoration-none"
+                    onClick={() => handleLinkClick("/honeymoon-trips")}
+                  >
+                    Honeymoon Trips
                   </Link>
-                </li> */}
-                {/* <li className="nav-item">
-                  <Link to="/careers" className="nav-link custom-link">
-                    Careers
-                  </Link>
-                </li> */}
-                {/* <li className="nav-item">
-                  <Link to="/contact-us" className="nav-link custom-link">
-                    Contact Us
-                  </Link>
-                </li> */}
-                {/* <li className="nav-item">
-                  <Link to="/about-us" className="nav-link custom-link">
-                    About Us
-                  </Link>
-                </li> */}
+                </li>
               </ul>
             </div>
 
@@ -288,8 +308,9 @@ const Header = () => {
 
         {/* Slide-out Mobile Menu */}
         <div
-          className={`mobile-menu d-lg-none position-fixed top-0 end-0 h-100 p-4 ${mobileMenuOpen ? "open" : ""
-            }`}
+          className={`mobile-menu d-lg-none position-fixed top-0 end-0 h-100 p-4 ${
+            mobileMenuOpen ? "open" : ""
+          }`}
           style={{
             width: "70%",
             backgroundColor: "#3b2a1a",
@@ -298,23 +319,17 @@ const Header = () => {
             zIndex: 1050,
           }}
         >
-
           <button
             className="btn-close mb-4 text-white btn-close-mobile"
             onClick={() => setMobileMenuOpen(false)}
           ></button>
 
-
-
           <ul className="list-unstyled d-flex flex-column gap-3 m-0">
-
             <li>
               <button className="plan-trip-btn" onClick={handleOpenModal}>
                 Plan Your Trip
               </button>
             </li>
-
-
             <li>
               <Link
                 to="/blogs"
@@ -324,7 +339,6 @@ const Header = () => {
                 Blogs
               </Link>
             </li>
-
             <li>
               <Link
                 to="/contact-us"
@@ -344,17 +358,30 @@ const Header = () => {
               </Link>
             </li>
 
+            {/* Added Items for Mobile Menu */}
+            <li>
+              <Link
+                to="/upcoming-group-trips"
+                className="text-decoration-none text-white"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Upcoming Group Trips
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/honeymoon-trips"
+                className="text-decoration-none text-white"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Honeymoon Trips
+              </Link>
+            </li>
           </ul>
-
-
         </div>
       </div>
 
-      <ContactForm
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
-
+      <ContactForm isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

@@ -5766,3 +5766,36 @@ textarea:focus {
   left: 25%;
 
 }
+
+/* General link styling (same as other navbar links) */
+.navbar-nav .nav-item .nav-link {
+  color: #fff; /* Assuming white text color */
+  font-size: 16px; /* Adjust according to your needs */
+  text-transform: capitalize; /* Matching the nav links' text styling */
+  font-weight: 500; /* Adjust according to your design */
+  transition: color 0.3s ease;
+}
+
+/* Hover effect styling (same as other navbar links) */
+.navbar-nav .nav-item .nav-link:hover,
+.navbar-nav .nav-item .nav-link:focus {
+  color: #ff9c00; /* Hover color, adjust to match your theme */
+  text-decoration: none; /* Optional: remove underline on hover */
+}
+
+/* For Mobile Menu (same styling as desktop navbar) */
+.mobile-menu .list-unstyled .nav-link {
+  color: #fff; /* White text color */
+  font-size: 18px; /* Slightly larger text on mobile */
+  text-transform: capitalize;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* Hover effect for mobile menu links */
+.mobile-menu .list-unstyled .nav-link:hover,
+.mobile-menu .list-unstyled .nav-link:focus {
+  color: #ff9c00; /* Adjust to match your hover color */
+  text-decoration: none; /* Optional: remove underline on hover */
+}
+
