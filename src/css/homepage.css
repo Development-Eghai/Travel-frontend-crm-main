@@ -15,36 +15,44 @@
     position: relative;
 }
 
+/* --- REPLACEMENT START (Text Position) --- */
 .home-banner-content {
-    position: absolute;
-    top: 50%;
+   position: absolute;
+    top: 30%; /* ADJUSTED: Moves text block slightly down to sit above the raised search bar */
     left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    transform: translate(-50%, -50%); 
+    text-align: center; 
     color: white;
     width: 100%;
     padding: 0 2rem;
     z-index: 3;
 }
+/* --- REPLACEMENT END --- */
 
+/* --- REPLACEMENT START (Text Spacing) --- */
 .banner-heading {
     font-size: 3.5rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem; /* Reduced space below main heading */
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
+/* --- REPLACEMENT END --- */
 
+/* --- REPLACEMENT START (Text Spacing) --- */
 .banner-para {
+    display: none;
     font-size: 1.1rem;
     font-weight: 400;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem; /* Reduced space below paragraph */
 }
+/* --- REPLACEMENT END --- */
 
 /* Search Bar Overlay - More Compact */
+/* --- REPLACEMENT START (Search Bar Position) --- */
 .search-bar-overlay {
     position: absolute;
-    bottom: 50px;
+    bottom: 180px; /* ADJUSTED: Moves search bar significantly higher */
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -52,6 +60,7 @@
     z-index: 10;
     padding: 0 2rem;
 }
+/* --- REPLACEMENT END --- */
 
 .search-bar-main {
     width: 100%;
@@ -178,6 +187,183 @@
     opacity: 0.5;
 }
 
+/* ========================================
+// CATEGORY SECTION STYLES
+// ======================================== */
+.categories-section {
+    background-color: #f9fafb; /* Light background for contrast */
+}
+
+/* FIX: Changed to flexbox to center the grid content itself if items don't fill the row */
+.categories-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.categories-grid {
+    display: grid;
+    /* Responsive grid: 8 columns desktop, fewer on mobile */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+    gap: 2rem;
+    /* Remove justify-items: center as it's not needed if we center the container */
+    max-width: 1200px; /* Optional: Limit the width if needed */
+    width: 100%;
+}
+
+.category-circle-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Center the card content within its grid cell */
+    justify-self: center; 
+}
+
+.category-circle-card:hover {
+    transform: translateY(-8px);
+}
+
+.category-circle-image {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: 4px solid #fff; /* White border for lift effect */
+}
+
+.category-circle-card:hover .category-circle-image {
+    box-shadow: 0 12px 30px rgba(37, 211, 102, 0.3);
+    border-color: #25d366; /* Green border on hover */
+}
+
+.category-circle-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.category-circle-card:hover .category-circle-image img {
+    transform: scale(1.1);
+}
+
+.category-circle-name {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.category-circle-card:hover .category-circle-name {
+    color: #25d366;
+}
+/* ========================================
+// END CATEGORY SECTION STYLES
+// ======================================== */
+
+
+/* ========================================
+// DESTINATION SLIDER SECTION STYLES
+// ======================================== */
+.destination-slider-section {
+    background-color: #fff;
+}
+
+.destination-slider-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    height: 350px;
+}
+
+.destination-slider-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.destination-slider-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.destination-slider-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.destination-slider-card:hover .destination-slider-image img {
+    transform: scale(1.1);
+}
+
+.destination-overlay-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 1;
+}
+
+.destination-slider-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    color: white;
+    z-index: 2;
+}
+
+.destination-slider-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.destination-slider-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.destination-slider-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.destination-slider-price .price-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.destination-slider-price .price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #25d366;
+}
+/* ========================================
+// END DESTINATION SLIDER SECTION STYLES
+// ======================================== */
+
+
 /* Dropdown Styles */
 .dropdown-main {
     position: absolute;
@@ -271,6 +457,17 @@
     border-radius: 5px;
 }
 
+/* Common Section Styles */
+.section-padding {
+    padding: 80px 0px;
+}
+
+.common-section-heading {
+    font-size: 30px;
+    color: black;
+    font-weight: 600;
+}
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
     .banner-heading {
@@ -287,6 +484,21 @@
     
     .search-bar-overlay {
         max-width: 800px;
+    }
+    
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .category-circle-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .destination-slider-card {
+        height: 300px;
     }
 }
 
@@ -311,7 +523,7 @@
     }
     
     .search-bar-overlay {
-        bottom: 40px;
+        bottom: 90px; /* Adjusted slightly higher for this breakpoint too */
         max-width: 700px;
     }
     
@@ -326,6 +538,29 @@
     .hero-swiper-nav .nav-btn {
         width: 40px;
         height: 40px;
+    }
+    
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .category-circle-image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .destination-slider-card {
+        height: 300px;
+    }
+
+    .destination-slider-title {
+        font-size: 1.25rem;
+    }
+
+    .destination-slider-price .price-amount {
+        font-size: 1.25rem;
     }
 }
 
@@ -352,7 +587,7 @@
     }
     
     .search-bar-overlay {
-        bottom: 30px;
+        bottom: 60px; /* Adjusted for tablet */
         padding: 0 1rem;
         max-width: 100%;
     }
@@ -418,6 +653,39 @@
         height: 200px;
         object-fit: cover;
     }
+
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 1rem;
+    }
+
+    .category-circle-image {
+        width: 80px;
+        height: 80px;
+        border: 3px solid #fff;
+    }
+
+    .category-circle-name {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+    .destination-slider-card {
+        height: 280px;
+    }
+    
+    .destination-slider-content {
+        padding: 1rem;
+    }
+    
+    .destination-slider-title {
+        font-size: 1.25rem;
+    }
+
+    .destination-slider-price .price-amount {
+        font-size: 1.25rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -443,7 +711,7 @@
     }
     
     .search-bar-overlay {
-        bottom: 20px;
+        bottom: 50px; /* Adjusted for mobile */
         padding: 0 0.75rem;
     }
     
@@ -545,6 +813,39 @@
     .trending-destination-section .col-lg-4 {
         margin-bottom: 1rem;
     }
+
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .category-circle-image {
+        width: 70px;
+        height: 70px;
+        border: 2px solid #fff;
+    }
+
+    .category-circle-name {
+        font-size: 0.75rem;
+        margin-top: 0.4rem;
+    }
+
+    .destination-slider-card {
+        height: 250px;
+    }
+    
+    .destination-slider-content {
+        padding: 1rem;
+    }
+    
+    .destination-slider-title {
+        font-size: 1.1rem;
+    }
+
+    .destination-slider-price .price-amount {
+        font-size: 1.1rem;
+    }
 }
 
 
@@ -615,5 +916,3 @@
     height: 34px;
   }
 }
-
-

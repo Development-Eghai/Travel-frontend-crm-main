@@ -47,7 +47,6 @@ const TourCategory = () => {
                             <div className='admin-actions'>
                                 <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsUpdate(true) }}></i>
                                 <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
-                                {/* <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificTourCategory(params?.row?.id); setIsViewOnly(true) }} ></i> */}
                                 <i
                                     className="fa-solid fa-eye ms-3"
                                     style={{ cursor: "pointer" }}
@@ -103,6 +102,27 @@ const TourCategory = () => {
         }));
     };
 
+    // --- FUNCTION: REMOVE IMAGE ---
+    const handleRemoveImage = (indexToRemove) => {
+        const updatedImages = categoryData.image.filter(
+            (_, index) => index !== indexToRemove
+        );
+
+        // Clear validation error if images still exist
+        if (updatedImages.length > 0 && validation?.image?.status === false) {
+            setValidation((prev) => ({
+                ...prev,
+                image: { status: true, message: "" },
+            }));
+        }
+
+        setcategoryData({
+            ...categoryData,
+            image: updatedImages,
+        });
+    };
+    // ----------------------------------
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         const cleanedData = normalizeEmptyFields(categoryData);
@@ -132,42 +152,6 @@ const TourCategory = () => {
         }
 
     }
-
-    // const handleFileUpload = async (e, key) => {
-    //     const file = e.target.files[0];
-    //     if (!file) return;
-
-    //     const imageName = file.name;
-    //     const type = imageName.split(".").pop().toLowerCase();
-
-    //     if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
-    //         errorMsg("Unsupported file type");
-    //         return;
-    //     }
-
-    //     const maxSize = 5 * 1024 * 1024; 
-    //     if (file.size > maxSize) {
-    //       errorMsg("File size should not exceed 5MB.");
-    //       return;
-    //     }
-
-    //     const formData = new FormData();
-    //     formData.append("image", file);
-    //     formData.append("storage", "local");
-
-    //     try {
-    //         const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
-    //         console.log(res.data, "res?.data");
-
-    //         if (res?.data?.message === "Upload successful") {
-    //             successMsg("Image uploaded successfully");
-    //             setcategoryData({ ...categoryData, [key]: res.data.url });
-    //         }
-    //     } catch (error) {
-    //         console.error("Upload error:", error);
-    //         errorMsg("File upload failed");
-    //     }
-    // };
 
     const handleFileUpload = async (e, key) => {
         const file = e.target.files[0];
@@ -366,8 +350,6 @@ const TourCategory = () => {
 
                         <h4 className='mt-2 '>{isViewOnly ? "View Category" : isUpdate ? "Update Category" : "Add Category"}</h4>
 
-                        {/* <form onSubmit={(e) => handleSubmit(e)}> */}
-
                         <div className='model-input-div'>
                             <label>Name  <span className='required-icon'>*</span></label>
                             <input type="text" placeholder="Enter Name" name='name'
@@ -412,12 +394,10 @@ const TourCategory = () => {
                             {!isViewOnly && (
                                 <input
                                     type="file"
-                                    // multiple
                                     name='image'
                                     accept='.png,.jpeg,.jpg,.pdf,.webp'
                                     className="form-control"
                                     onChange={(e) => { handleFileUpload(e, "image"); handleChange(e) }}
-                                // onBlur={(e) => handleBlur(e.target.name, e.target.value)}
                                 />
                             )}
                             {validation?.image?.status === false && validation?.image?.message && (
@@ -426,10 +406,35 @@ const TourCategory = () => {
                             {Array.isArray(categoryData?.image) && categoryData.image.length > 0 && (
                                 <div className="d-flex flex-wrap">
                                     {categoryData.image.map((image, index) => (
-                                        <div className="upload-image-div destination-image-div" key={index}>
+                                        <div className="upload-image-div destination-image-div" key={index} style={{position: 'relative'}}>
                                             <div>
                                                 <img src={encodeURI(image)} alt={`Category-Preview-${index}`} />
                                             </div>
+                                            {/* DELETE BUTTON - Only show if not in view-only mode */}
+                                            {!isViewOnly && (
+                                                <span 
+                                                    className="delete-image-icon" 
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    style={{
+                                                        position: 'absolute', 
+                                                        top: '5px', 
+                                                        right: '5px', 
+                                                        background: 'red', 
+                                                        color: 'white', 
+                                                        borderRadius: '50%', 
+                                                        width: '20px', 
+                                                        height: '20px', 
+                                                        textAlign: 'center', 
+                                                        cursor: 'pointer', 
+                                                        lineHeight: '20px',
+                                                        fontSize: '14px',
+                                                        fontWeight: 'bold',
+                                                    }}
+                                                >
+                                                    &times;
+                                                </span>
+                                            )}
+                                            {/* END DELETE BUTTON */}
                                         </div>
                                     ))}
                                 </div>
@@ -445,7 +450,6 @@ const TourCategory = () => {
                             <button className='model-submit-button' onClick={(e) => handleUpdate(e)}>Update Category</button>
                         )}
 
-                        {/* </form> */}
                     </div>
                 </>
 

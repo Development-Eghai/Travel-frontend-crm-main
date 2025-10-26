@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import TripCard from '../../component/TripCard'
 import { Images } from "../../helpers/Images/images";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules"; 
+import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import 'swiper/css/pagination';
@@ -14,48 +14,93 @@ import SearchBar from '../../component/SearchBar';
 import CategorySection from '../../component/CategorySection';
 import DestinationSection from '../../component/DestinationSection';
 import '../../css/homepage.css';
-
+import { useNavigate } from 'react-router-dom';
 
 const Homepage = () => {
     const featuredSwiperRef = useRef(null);
     const heroSwiperRef = useRef(null);
+    const destinationSwiperRef = useRef(null); // <-- NEW REF for Destinations
 
     const [featuredNavState, setFeaturedNavState] = useState({ prev: false, next: true });
     const [heroNavState, setHeroNavState] = useState({ prev: true, next: true });
+    const [destNavState, setDestNavState] = useState({ prev: false, next: true }); // <-- NEW STATE for Dest Slider Nav
+
+    // New states for Categories and Destinations
+    const [homeCategories, setHomeCategories] = useState([]); 
+    const [isLoadingCategories, setIsLoadingCategories] = useState(true); 
+    const [destinations, setDestinations] = useState([]); // Destinations with popular trips
+    const [isLoadingDestinations, setIsLoadingDestinations] = useState(true); 
 
     const allTrips = useSelector((state) => state.home_page_slice.featured_trips);
-    const allDestination = useSelector((state) => state.home_page_slice.all_destination);
+    const allDestination = useSelector((state) => state.home_page_slice.all_destination); // Kept for legacy compatibility but not used in new sections
     const lastFourTrips = allTrips.slice(-4);
-    const firstSixDestination = allDestination.slice(0, 6);
+    // Removed firstSixDestination as it is replaced by the 'destinations' state
 
     const [upcomingGroupTrips, setUpcomingGroupTrips] = useState([]);
     const [honeymoonTrips, setHoneymoonTrips] = useState([]);
     const [indiaTrips, setIndiaTrips] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); // For CategorySection loading
 
-    // Hero Banner Slides Configuration
-    const heroBannerSlides = [
-        {
-            image: Images.banner_slider_1 || "/assets/images/banner-slider-1.png",
-            title: "Explore The World",
-            subtitle: "Globally",
-            description: "Search, compare and book 15,000+ multiday tours all over the world."
-        },
-        {
-            image: Images.banner_slider_2 || "/assets/images/banner-slider-2.png",
-            title: "Discover Paradise",
-            subtitle: "Globally",
-            description: "Search, compare and book 15,000+ multiday tours all over the world."
-        },
-        {
-            image: Images.banner_slider_1 || "/assets/images/banner-slider-1.png",
-            title: "Adventure Awaits",
-            subtitle: "Globally",
-            description: "Search, compare and book 15,000+ multiday tours all over the world."
+    const navigate = useNavigate();
+
+    // ----------------------------------------------------------------
+    // HANDLER & UTILITY FUNCTIONS
+    // ----------------------------------------------------------------
+
+    // Destination Slider Handlers
+    const handleDestSlideChange = (swiper) => {
+        setDestNavState({
+            prev: !swiper.isBeginning,
+            next: !swiper.isEnd,
+        });
+    };
+
+    const handleDestNavClick = (direction) => {
+        if (direction === 'prev') {
+            destinationSwiperRef.current?.slidePrev();
+        } else {
+            destinationSwiperRef.current?.slideNext();
         }
-    ];
+    };
 
-    const getTripsByCategory = async (categoryId) => {
+    // Navigation Handlers
+    const handleCategoryClick = (slug, id) => {
+        navigate(`/category-preview/${slug}/${id}`);
+    };
+
+    const handleDestinationClick = (slug, id) => {
+        navigate(`/destination/${slug}/${id}`);
+    };
+
+    // Utility function to get minimum price from popular trips
+    const getDestinationStartingPrice = (destination) => {
+        // This function requires 'popular_trips' to be present and populated
+        if (!destination?.popular_trips || destination.popular_trips.length === 0) {
+            return null;
+        }
+
+        let minPrice = Infinity;
+        destination.popular_trips.forEach(trip => {
+            if (trip?.pricing?.pricing_model === "customized" && trip?.pricing?.customized?.final_price) {
+                minPrice = Math.min(minPrice, trip.pricing.customized.final_price);
+            } else if (trip?.pricing?.fixed_departure?.length > 0) {
+                trip.pricing.fixed_departure.forEach(departure => {
+                    if (departure?.final_price) {
+                        minPrice = Math.min(minPrice, departure.final_price);
+                    }
+                });
+            }
+        });
+
+        return minPrice !== Infinity ? minPrice : null;
+    };
+
+
+    // ----------------------------------------------------------------
+    // API FETCH FUNCTIONS
+    // ----------------------------------------------------------------
+
+    const getTripsByCategory = async (categoryId) => { 
         try {
             const res = await APIBaseUrl.get(`categories/trip_details/${categoryId}`, {
                 headers: {
@@ -72,7 +117,7 @@ const Homepage = () => {
         }
     };
 
-    const getTripsByDestination = async (destinationId) => {
+    const getTripsByDestination = async (destinationId) => { 
         try {
             const res = await APIBaseUrl.get(`destinations/${destinationId}`, {
                 headers: {
@@ -88,6 +133,78 @@ const Homepage = () => {
             return [];
         }
     };
+
+    const fetchHomeCategories = async () => {
+        setIsLoadingCategories(true);
+        try {
+            const res = await APIBaseUrl.get('categories', {
+                headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
+            });
+            if (res?.data?.success === true) {
+                setHomeCategories(res.data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching home categories:", error);
+        } finally {
+            setIsLoadingCategories(false);
+        }
+    };
+
+   
+const fetchAllDestinationsWithTrips = async () => {
+    setIsLoadingDestinations(true);
+    try {
+        // Step 1: Fetch all destinations
+        const res = await APIBaseUrl.get('destinations/', {
+            headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
+        });
+        
+        console.log("Destinations API Response:", res?.data);
+        
+        if (res?.data?.success === true) {
+            const allDestinations = res?.data?.data || [];
+            console.log("All destinations:", allDestinations);
+            
+            // Step 2: For each destination, fetch its full details (which includes popular_trips)
+            const destinationsWithTripsPromises = allDestinations.map(async (dest) => {
+                try {
+                    // Fetch individual destination details
+                    const detailRes = await APIBaseUrl.get(`destinations/${dest.id}`, {
+                        headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
+                    });
+                    
+                    if (detailRes?.data?.success === true && detailRes?.data?.data?.popular_trips?.length > 0) {
+                        return detailRes.data.data;
+                    }
+                    return null;
+                } catch (error) {
+                    console.error(`Error fetching details for destination ${dest.id}:`, error);
+                    return null;
+                }
+            });
+            
+            // Step 3: Wait for all requests to complete
+            const resolvedDestinations = await Promise.all(destinationsWithTripsPromises);
+            
+            // Step 4: Filter out nulls (destinations without trips or with errors)
+            const destinationsWithTrips = resolvedDestinations.filter(dest => dest !== null);
+            
+            console.log("Destinations with trips:", destinationsWithTrips);
+            
+            setDestinations(destinationsWithTrips);
+        }
+    } catch (error) {
+        console.error("Error fetching destinations:", error);
+        console.error("Error details:", error?.response?.data);
+    } finally {
+        setIsLoadingDestinations(false);
+    }
+};
+
+
+    // ----------------------------------------------------------------
+    // USE EFFECT AND OTHER HANDLERS
+    // ----------------------------------------------------------------
 
     useEffect(() => {
         const fetchAllTrips = async () => {
@@ -109,7 +226,10 @@ const Homepage = () => {
             }
         };
 
+        // Call all necessary fetches
         fetchAllTrips();
+        fetchHomeCategories(); 
+        fetchAllDestinationsWithTrips(); // This function uses the correct endpoint
     }, []);
 
     const handleFeaturedSlideChange = (swiper) => {
@@ -220,6 +340,48 @@ const Homepage = () => {
             </div>
 
             <div className=''>
+                
+                {/* ========================================
+                // SECTION 1: Explore by Categories - Circular Cards 
+                // ======================================== */}
+                <section className="section-padding categories-section">
+                    <div className="container">
+                        <div className="d-flex justify-content-between mb-4 align-items-center">
+                            <h4 className="common-section-heading">Explore by Categories</h4>
+                        </div>
+
+                        {isLoadingCategories ? (
+                            <div className="text-center py-4">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        ) : homeCategories.length > 0 ? (
+                            <div className="categories-grid">
+                                {homeCategories.slice(0, 8).map((category) => (
+                                    <div
+                                        key={category.id}
+                                        className="category-circle-card"
+                                        onClick={() => handleCategoryClick(category.slug, category.id)}
+                                    >
+                                        <div className="category-circle-image">
+                                            <img
+                                                src={category.image?.[0] || Images.featured_card}
+                                                alt={category.name}
+                                            />
+                                        </div>
+                                        <h6 className="category-circle-name">{category.name}</h6>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center py-4">No categories available</p>
+                        )}
+                    </div>
+                </section>
+                {/* ========================================
+                // END SECTION 1
+                // ======================================== */}
 
                 {/* Featured Trips */}
                 <section className='featured-trips-section section-padding'>
@@ -284,91 +446,97 @@ const Homepage = () => {
                     </div>
                 </section>
 
-                {/* Trending Destinations */}
-                <section className='trending-destination-section section-padding'>
-                    <div className='container'>
-                        <div className='d-flex flex-lg-row flex-md-row flex-column justify-content-lg-between justify-content-md-between'>
-                            <div className='d-flex justify-content-center'>
-                                <h4 className='common-section-heading'>Trending Destinations</h4>
+                {/* ========================================
+                // SECTION 2: Popular Destinations - Slider with Prices 
+                // This replaces the old Trending Destinations grid.
+                // ======================================== */}
+                <section className="section-padding destination-slider-section">
+                    <div className="container">
+                        <div className="d-flex justify-content-between mb-4 align-items-center">
+                            <h4 className="common-section-heading">Popular Destinations</h4>
+                            <div className="slider-navigation">
+                                <button
+                                    onClick={() => handleDestNavClick('prev')}
+                                    className={`nav-btn ${destNavState.prev ? 'active-nav-btn' : 'disabled-nav-btn'}`}
+                                    disabled={!destNavState.prev}
+                                >
+                                    ←
+                                </button>
+                                <button
+                                    onClick={() => handleDestNavClick('next')}
+                                    className={`nav-btn ${destNavState.next ? 'active-nav-btn' : 'disabled-nav-btn'}`}
+                                    disabled={!destNavState.next}
+                                >
+                                    →
+                                </button>
                             </div>
                         </div>
 
-                        <div className='mt-4'>
-                            <div className="row">
-                                <div className="col-lg-3">
-                                    <div className='trending-grid-one'>
-                                        <div className='position-relative trending-card'>
-                                            <a href={`/destination/${firstSixDestination[0]?.slug}/${firstSixDestination[0]?.id}`} target='_blank' rel="noopener noreferrer">
-                                                <figure>
-                                                    <img src={Images.trending_one} alt="trending-one" className='trending-image' />
-                                                </figure>
-                                                <div className='trending-grid-content-three'>
-                                                    <p className='trending-grid-para'>{firstSixDestination[0]?.title}</p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div className='mt-4 trending-card position-relative'>
-                                            <a href={`/destination/${firstSixDestination[1]?.slug}/${firstSixDestination[1]?.id}`} target='_blank' rel="noopener noreferrer">
-                                                <figure>
-                                                    <img src={Images.trending_two} alt="trending-one" className='trending-image' />
-                                                </figure>
-                                                <div className='trending-grid-content-three'>
-                                                    <p className='trending-grid-para'>{firstSixDestination[1]?.title}</p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-lg-5">
-                                    <div className='position-relative trending-card'>
-                                        <a href={`/destination/${firstSixDestination[2]?.slug}/${firstSixDestination[2]?.id}`} target='_blank' rel="noopener noreferrer">
-                                            <figure>
-                                                <img src={Images.trending_three} alt="trending-one" className='trending-image' />
-                                            </figure>
-                                            <div className='trending-grid-content-three'>
-                                                <p className='trending-grid-para'>{firstSixDestination[2]?.title}</p>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div className='d-flex mt-4 justify-content-start justify-content-md-around'>
-                                        <div className='position-relative trending-card'>
-                                            <a href={`/destination/${firstSixDestination[3]?.slug}/${firstSixDestination[3]?.id}`} target='_blank' rel="noopener noreferrer">
-                                                <figure>
-                                                    <img src={Images.trending_four} alt="trending-one" className='trending-image' />
-                                                </figure>
-                                                <div className='trending-grid-content-center-image'>
-                                                    <p className='trending-grid-para'>{firstSixDestination[3]?.title}</p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div className='ms-4 position-relative trending-card'>
-                                            <a href={`/destination/${firstSixDestination[4]?.slug}/${firstSixDestination[4]?.id}`} target='_blank' rel="noopener noreferrer">
-                                                <figure>
-                                                    <img src={Images.trending_five} alt="trending-one" className='trending-image' />
-                                                </figure>
-                                                <div className='trending-grid-content-center-image'>
-                                                    <p className='trending-grid-para'>{firstSixDestination[4]?.title}</p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-lg-4">
-                                    <div className='position-relative trending-card'>
-                                        <a href={`/destination/${firstSixDestination[5]?.slug}/${firstSixDestination[5]?.id}`} target='_blank' rel="noopener noreferrer">
-                                            <figure>
-                                                <img src={Images.trending_six} alt="trending-one" className='trending-image' />
-                                            </figure>
-                                            <div className='trending-grid-content-three'>
-                                                <p className='trending-grid-para'>{firstSixDestination[5]?.title}</p>
-                                            </div>
-                                        </a>
-                                    </div>
+                        {isLoadingDestinations ? (
+                            <div className="text-center py-4">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
                                 </div>
                             </div>
-                        </div>
+                        ) : destinations.length > 0 ? (
+                            <Swiper
+                                modules={[Navigation]}
+                                slidesPerView={4}
+                                slidesPerGroup={1}
+                                spaceBetween={20}
+                                onSwiper={(swiper) => {
+                                    destinationSwiperRef.current = swiper;
+                                    handleDestSlideChange(swiper);
+                                }}
+                                onSlideChange={handleDestSlideChange}
+                                navigation={false}
+                                breakpoints={{
+                                    320: { slidesPerView: 1, slidesPerGroup: 1 },
+                                    576: { slidesPerView: 2, slidesPerGroup: 1 },
+                                    768: { slidesPerView: 3, slidesPerGroup: 1 },
+                                    992: { slidesPerView: 4, slidesPerGroup: 1 },
+                                }}
+                                loop={false}
+                            >
+                                {destinations.map((destination) => {
+                                    const startingPrice = getDestinationStartingPrice(destination);
+                                    const heroImage = destination?.hero_banner_images?.[0];
+
+                                    return (
+                                        <SwiperSlide key={destination.id}>
+                                            <div
+                                                className="destination-slider-card"
+                                                onClick={() => handleDestinationClick(destination.slug, destination.id)}
+                                            >
+                                                <div className="destination-slider-image">
+                                                    <img
+                                                        src={heroImage || Images.featured_card}
+                                                        alt={destination.title}
+                                                    />
+                                                    <div className="destination-overlay-gradient"></div>
+                                                </div>
+                                                <div className="destination-slider-content">
+                                                    <h5 className="destination-slider-title">{destination.title}</h5>
+                                                    {startingPrice !== null && (
+                                                        <div className="destination-slider-price">
+                                                            <span className="price-label">Starting from</span>
+                                                            <span className="price-amount">₹{startingPrice.toLocaleString()}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </SwiperSlide>
+                                    );
+                                })}
+                            </Swiper>
+                        ) : (
+                            <p className="text-center py-4">No destinations available</p>
+                        )}
                     </div>
                 </section>
+                {/* ========================================
+                // END SECTION 2
+                // ======================================== */}
 
                 <CategorySection
                     title="Upcoming Group Trips"
