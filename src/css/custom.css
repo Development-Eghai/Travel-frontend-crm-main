@@ -1283,3 +1283,8 @@ input::placeholder {
     font-size: 25px;
     font-weight: 500;
 }
+
+.trip-create-detail-add{
+    padding:5px 30px;
+    border-radius: 1px;
+}

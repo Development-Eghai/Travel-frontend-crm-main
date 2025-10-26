@@ -132,10 +132,9 @@ const TourList = () => {
                     params: { skip, limit }
                 });
 
-                console.log(`API Response for trips (skip: ${skip}):`, res?.data);
-                
                 if (res?.data?.success === true && res?.data?.error_code === 0) {
                     const trips = res?.data?.data || [];
+                    console.log(trips,"trips");
                     allTrips = [...allTrips, ...trips];
                     
                     // If we got less than the limit, we've reached the end

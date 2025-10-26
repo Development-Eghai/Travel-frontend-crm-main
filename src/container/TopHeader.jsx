@@ -10,16 +10,39 @@ const TopHeader = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+
   const getAllTrips = async () => {
     try {
-      const res = await APIBaseUrl.get("trips/", {
-        headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
-      });
-      if (res?.data?.success === true && res?.data?.error_code === 0) {
-        dispatch(setFeaturedTripSice(res?.data?.data));
+      let allTrips = [];
+      let skip = 0;
+      const limit = 100;
+      let hasMore = true;
+
+      while (hasMore) {
+        const res = await APIBaseUrl.get("trips/", {
+          headers: {
+            "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+          },
+          params: { skip, limit }
+        });
+
+        if (res?.data?.success === true && res?.data?.error_code === 0) {
+          const trips = res?.data?.data || [];
+          dispatch(setFeaturedTripSice(res?.data?.data));
+          allTrips = [...allTrips, ...trips];
+          hasMore = trips.length === limit;
+          skip += limit;
+        } else {
+          console.error("API returned unsuccessful response:", res?.data);
+          hasMore = false;
+        }
       }
+
     } catch (error) {
-      console.error("Error fetching trips:", error);
+      console.error("Error fetching trips - Full error:", error);
+      console.error("Error response data:", error?.response?.data);
+      console.error("Error status:", error?.response?.status);
+      
     }
   };
 
@@ -57,7 +80,7 @@ const TopHeader = () => {
           <div className="d-flex align-items-center">
             <Link to="/" className="d-flex align-items-center text-decoration-none">
               <img
-                src="/logo-indian-mountain-rovers.png" 
+                src="/logo-indian-mountain-rovers.png"
                 alt="IndianMountainRovers-Logo"
                 style={{ height: "60px" }}
               />

@@ -69,6 +69,26 @@ export default function TourCreation() {
           gst_percentage: "",
         },
       ],
+
+      // fixed_departure: [
+      //   {
+      //     from_date: "",
+      //     to_date: "",
+      //     available_slots: "",
+      //     description: "",
+      //     costingPackages: [
+      //       {
+      //         title: "",
+      //         base_price: "",
+      //         discount: "",
+      //         final_price: "",
+      //         booking_amount: "",
+      //         gst_percentage: "",
+      //       },
+      //     ],
+      //   },
+      // ],
+
       customized: {
         pricing_type: "",
         base_price: "",
@@ -129,12 +149,12 @@ export default function TourCreation() {
         ...prev,
         [field]: value,
       };
-      
+
       // Auto-generate slug when title changes (only if not editing)
       if (field === "title" && !id) {
         updated.slug = generateSlug(value);
       }
-      
+
       return updated;
     });
   };
@@ -450,6 +470,44 @@ export default function TourCreation() {
           },
         }),
       },
+
+
+      // pricing: {
+      //   pricing_model:
+      //     formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
+
+      //   ...(formData.pricing_model === "fixed" && {
+      //     fixed_departure: fixedPackage?.map((slot) => ({
+      //       from_date: slot?.from_date ? `${slot.from_date}T00:00:00` : null,
+      //       to_date: slot?.to_date ? `${slot.to_date}T00:00:00` : null,
+      //       available_slots: Number(slot?.available_slots) || 0,
+      //       description: slot?.description || "",
+
+      //       costing_packages: (slot?.costingPackages || []).map((pkg) => ({
+      //         title: pkg?.title || "",
+      //         base_price: Number(pkg?.base_price) || 0,
+      //         discount: Number(pkg?.discount) || 0,
+      //         final_price:
+      //           Number(pkg?.final_price) || 0,
+      //         booking_amount: Number(pkg?.booking_amount) || 0,
+      //         gst_percentage: Number(pkg?.gst_percentage) || 0,
+      //       })),
+      //     })),
+      //   }),
+
+      //   ...(formData.pricing_model === "custom" && {
+      //     customized: {
+      //       pricing_type: formData.pricing.customized.pricing_type,
+      //       base_price: Number(formData.pricing.customized.base_price) || 0,
+      //       discount: Number(formData.pricing.customized.discount) || 0,
+      //       final_price: Number(formData.pricing.customized.final_price) || 0,
+      //       gst_percentage:
+      //         Number(formData.pricing.customized.gst_percentage) || 0,
+      //     },
+      //   }),
+      // },
+
+
       policies: [
         ...(formData.terms
           ? [{ title: "Terms and Conditions", content: formData.terms }]
@@ -529,40 +587,181 @@ export default function TourCreation() {
     }
   }
 
-  const [fixedPackage, setFixedPackage] = useState([{
-    from_date: "", to_date: "", description: "",
-    available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-  }]);
+  // const [fixedPackage, setFixedPackage] = useState([{
+  //   from_date: "", to_date: "", description: "",
+  //   available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
+  // }]);
 
+  // const addFixedPackage = () => {
+  //   setFixedPackage([...fixedPackage, {
+  //     from_date: "", to_date: "", description: "",
+  //     available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
+  //   }]);
+  // };
+
+  // const deleteFixedPackage = (indexToRemove) => {
+  //   if (indexToRemove !== 0) {
+  //     const updatedFaqs = fixedPackage.filter((_, index) => index !== indexToRemove);
+  //     setFixedPackage(updatedFaqs);
+  //   }
+  // };
+
+  // const updateFixedPackage = (index, key, value) => {
+  //   const updatedPackages = [...fixedPackage];
+  //   updatedPackages[index][key] = value;
+
+  //   const basePrice = parseFloat(updatedPackages[index].base_price) || 0;
+  //   const discount = parseFloat(updatedPackages[index].discount) || 0;
+  //   const gst = parseFloat(updatedPackages[index].gst_percentage) || 0;
+
+  //   const discountedPrice = basePrice - discount;
+  //   const finalPrice = discountedPrice + (discountedPrice * gst / 100);
+
+  //   updatedPackages[index].final_price = finalPrice.toFixed(2);
+
+  //   setFixedPackage(updatedPackages);
+  // };
+
+
+  const [fixedPackage, setFixedPackage] = useState([
+    {
+      from_date: "",
+      to_date: "",
+      description: "",
+      available_slots: "",
+      // Each slot has its own array of costing packages
+      costingPackages: [
+        {
+          title: "",
+          base_price: "",
+          discount: "",
+          booking_amount: "",
+          gst_percentage: "",
+          final_price: "",
+        },
+      ],
+    },
+  ]);
+
+  // Add a new Available Slot
   const addFixedPackage = () => {
-    setFixedPackage([...fixedPackage, {
-      from_date: "", to_date: "", description: "",
-      available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-    }]);
+    setFixedPackage((prev) => [
+      ...prev,
+      {
+        from_date: "",
+        to_date: "",
+        description: "",
+        available_slots: "",
+        costingPackages: [
+          {
+            title: "",
+            base_price: "",
+            discount: "",
+            booking_amount: "",
+            gst_percentage: "",
+            final_price: "",
+          },
+        ],
+      },
+    ]);
   };
 
+  // Delete a slot (keeps index 0 non-deletable as original)
   const deleteFixedPackage = (indexToRemove) => {
     if (indexToRemove !== 0) {
-      const updatedFaqs = fixedPackage.filter((_, index) => index !== indexToRemove);
-      setFixedPackage(updatedFaqs);
+      setFixedPackage((prev) => prev.filter((_, i) => i !== indexToRemove));
     }
   };
 
-  const updateFixedPackage = (index, key, value) => {
-    const updatedPackages = [...fixedPackage];
-    updatedPackages[index][key] = value;
-
-    const basePrice = parseFloat(updatedPackages[index].base_price) || 0;
-    const discount = parseFloat(updatedPackages[index].discount) || 0;
-    const gst = parseFloat(updatedPackages[index].gst_percentage) || 0;
-
-    const discountedPrice = basePrice - discount;
-    const finalPrice = discountedPrice + (discountedPrice * gst / 100);
-
-    updatedPackages[index].final_price = finalPrice.toFixed(2);
-
-    setFixedPackage(updatedPackages);
+  // Update top-level slot fields (from_date, to_date, available_slots, description)
+  const updateFixedPackage = (slotIndex, field, value) => {
+    setFixedPackage((prev) =>
+      prev.map((slot, i) =>
+        i === slotIndex ? { ...slot, [field]: value } : slot
+      )
+    );
   };
+
+  // Add a costing package inside a specific slot
+  const addCostingPackage = (slotIndex) => {
+    setFixedPackage((prev) =>
+      prev.map((slot, i) =>
+        i === slotIndex
+          ? {
+            ...slot,
+            costingPackages: [
+              ...slot.costingPackages,
+              {
+                title: "",
+                base_price: "",
+                discount: "",
+                booking_amount: "",
+                gst_percentage: "",
+                final_price: "",
+              },
+            ],
+          }
+          : slot
+      )
+    );
+  };
+
+  // Delete a costing package inside a slot
+  const deleteCostingPackage = (slotIndex, pkgIndex) => {
+    setFixedPackage((prev) =>
+      prev.map((slot, i) =>
+        i === slotIndex
+          ? {
+            ...slot,
+            costingPackages: slot.costingPackages.filter(
+              (_, j) => j !== pkgIndex
+            ),
+          }
+          : slot
+      )
+    );
+  };
+
+  // Update a field inside a costing package and recalc final_price
+  const updateCostingPackage = (slotIndex, pkgIndex, field, value) => {
+    setFixedPackage((prev) =>
+      prev.map((slot, i) => {
+        if (i !== slotIndex) return slot;
+
+        const updatedPackages = slot.costingPackages.map((pkg, j) => {
+          if (j !== pkgIndex) return pkg;
+
+          // create temp package with updated field
+          const temp = { ...pkg, [field]: value };
+
+          // parse numeric values safely
+          const base = parseFloat(temp.base_price) || 0;
+          const discount = parseFloat(temp.discount) || 0;
+          const gst = parseFloat(temp.gst_percentage) || 0;
+
+          // compute taxable amount (base - discount)
+          const taxable = Math.max(base - discount, 0);
+
+          // final price = taxable + gst% of taxable
+          const final = taxable + (taxable * gst) / 100;
+
+          temp.final_price =
+            // show empty string if all fields are empty to keep UI clean
+            base === 0 && discount === 0 && gst === 0
+              ? ""
+              : final.toFixed(2);
+
+          return temp;
+        });
+
+        return { ...slot, costingPackages: updatedPackages };
+      })
+    );
+  };
+
+
+
+
 
   const getSpecificTrip = async (tripId) => {
     try {
@@ -1085,22 +1284,22 @@ export default function TourCreation() {
                 </div>
 
                 {formData?.hero_image && (
-                  <div className='upload-image-div' style={{position: 'relative'}}>
+                  <div className='upload-image-div' style={{ position: 'relative' }}>
                     <img src={`${formData?.hero_image}`} alt="Hero-Preview" />
-                    <span 
-                      className="delete-image-icon" 
+                    <span
+                      className="delete-image-icon"
                       onClick={removeHeroImage}
                       style={{
-                        position: 'absolute', 
-                        top: '5px', 
-                        right: '5px', 
-                        background: 'red', 
-                        color: 'white', 
-                        borderRadius: '50%', 
-                        width: '25px', 
-                        height: '25px', 
-                        textAlign: 'center', 
-                        cursor: 'pointer', 
+                        position: 'absolute',
+                        top: '5px',
+                        right: '5px',
+                        background: 'red',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '25px',
+                        height: '25px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
                         lineHeight: '25px',
                         fontSize: '16px',
                         fontWeight: 'bold',
@@ -1148,24 +1347,24 @@ export default function TourCreation() {
                 {formData?.gallery_images && formData?.gallery_images?.length > 0 && (
                   <div className="d-flex flex-wrap">
                     {formData?.gallery_images?.map((image, index) => (
-                      <div className='upload-image-div destination-image-div' key={index} style={{position: 'relative'}}>
+                      <div className='upload-image-div destination-image-div' key={index} style={{ position: 'relative' }}>
                         <div>
                           <img src={encodeURI(image)} alt="Gallery-Preview" />
                         </div>
-                        <span 
-                          className="delete-image-icon" 
+                        <span
+                          className="delete-image-icon"
                           onClick={() => removeGalleryImage(index)}
                           style={{
-                            position: 'absolute', 
-                            top: '5px', 
-                            right: '5px', 
-                            background: 'red', 
-                            color: 'white', 
-                            borderRadius: '50%', 
-                            width: '20px', 
-                            height: '20px', 
-                            textAlign: 'center', 
-                            cursor: 'pointer', 
+                            position: 'absolute',
+                            top: '5px',
+                            right: '5px',
+                            background: 'red',
+                            color: 'white',
+                            borderRadius: '50%',
+                            width: '20px',
+                            height: '20px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
                             lineHeight: '20px',
                             fontSize: '14px',
                             fontWeight: 'bold',
@@ -1253,7 +1452,7 @@ export default function TourCreation() {
                 <div className="mt-3 destination-faq">
                   <div className="accordion" id="accordionExample">
                     {fixedPackage.map((trip, index) => (
-                      <div className='mt-4' key={index}>
+                      <div className="mt-4" key={index}>
                         <div className="accordion-item">
                           <h2 className="accordion-header d-flex align-items-center justify-content-between">
                             <button
@@ -1267,15 +1466,22 @@ export default function TourCreation() {
                               Available Slots {index + 1}
                             </button>
                             <div className="ms-3 d-flex gap-2">
-                              <button className={`destination-faq-add ${index === 0 && "me-3"}`} onClick={addFixedPackage}>
-                                Add
+                              <button
+                                type="button"
+                                className={`destination-faq-add ${index === 0 ? "me-3" : ""}`}
+                                onClick={addFixedPackage}
+                                style={{ width: "118px" }}
+                              >
+                                Add Slot
                               </button>
                               {index !== 0 && (
                                 <button
+                                  type="button"
                                   className="destination-faq-add faq-delete me-3"
                                   onClick={() => deleteFixedPackage(index)}
+                                  style={{ width: "128px" }}
                                 >
-                                  Delete
+                                  Delete Slot
                                 </button>
                               )}
                             </div>
@@ -1287,7 +1493,7 @@ export default function TourCreation() {
                             data-bs-parent="#accordionExample"
                           >
                             <div className="accordion-body">
-
+                              {/* Slot-level fields */}
                               <div className="row mb-3">
                                 <div className="col-md-4">
                                   <label className="form-label">From Date *</label>
@@ -1319,89 +1525,163 @@ export default function TourCreation() {
                                     placeholder="Enter available slots"
                                     value={trip?.available_slots}
                                     onChange={(e) =>
-                                      updateFixedPackage(index, "available_slots", e.target.value)
+                                      updateFixedPackage(
+                                        index,
+                                        "available_slots",
+                                        e.target.value
+                                      )
                                     }
                                   />
                                 </div>
                               </div>
 
                               <h6 className="fw-bold mb-4 mt-5">Costing Packages</h6>
-                              <div className="row mb-3">
-                                <div className="col-md-6">
-                                  <label className="form-label">Package Title *</label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="e.g. Triple Occupancy"
-                                    value={trip?.title}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "title", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-3">
-                                  <label className="form-label">Base Price (₹) *</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="Enter base price"
-                                    value={trip?.base_price}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "base_price", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-3">
-                                  <label className="form-label">Discount (₹)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="Enter discount price"
-                                    value={trip?.discount}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "discount", e.target.value)
-                                    }
-                                  />
-                                </div>
-                              </div>
 
-                              <div className="row mb-3">
-                                <div className="col-md-4">
-                                  <label className="form-label">Booking Amount (₹)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    value={trip?.booking_amount}
-                                    placeholder="Enter booking amount"
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "booking_amount", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-4">
-                                  <label className="form-label">GST Percentage (%)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    value={trip?.gst_percentage}
-                                    placeholder="Enter GST percentage"
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "gst_percentage", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-4">
-                                  <label className="form-label">Final Price (₹)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    readOnly
-                                    value={trip?.final_price}
-                                    placeholder="Auto-calculated"
-                                  />
-                                </div>
-                              </div>
+                              {/* Map costing packages inside this slot */}
+                              {trip.costingPackages.map((pkg, pkgIndex) => (
+                                <div className="card mb-3 p-3" key={pkgIndex}>
+                                  <div className="d-flex justify-content-between align-items-start">
+                                    <strong>Package {pkgIndex + 1}</strong>
+                                    <div>
+                                      <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-primary me-2"
+                                        onClick={() => addCostingPackage(index)}
+                                      >
+                                        Add Package
+                                      </button>
+                                      {pkgIndex !== 0 && (
+                                        <button
+                                          type="button"
+                                          className="btn btn-sm btn-outline-danger"
+                                          onClick={() =>
+                                            deleteCostingPackage(index, pkgIndex)
+                                          }
+                                        >
+                                          Delete Package
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
 
+                                  <div className="row mt-3">
+                                    <div className="col-md-6">
+                                      <label className="form-label">Package Title *</label>
+                                      <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="e.g. Triple Occupancy"
+                                        value={pkg.title}
+                                        onChange={(e) =>
+                                          updateCostingPackage(
+                                            index,
+                                            pkgIndex,
+                                            "title",
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+
+                                    <div className="col-md-3">
+                                      <label className="form-label">Base Price (₹) *</label>
+                                      <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Enter base price"
+                                        value={pkg.base_price}
+                                        onChange={(e) =>
+                                          updateCostingPackage(
+                                            index,
+                                            pkgIndex,
+                                            "base_price",
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                    <div className="col-md-3">
+                                      <label className="form-label">Discount (₹)</label>
+                                      <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Enter discount"
+                                        value={pkg.discount}
+                                        onChange={(e) =>
+                                          updateCostingPackage(
+                                            index,
+                                            pkgIndex,
+                                            "discount",
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div className="row mt-3">
+                                    <div className="col-md-4">
+                                      <label className="form-label">Booking Amount (₹)</label>
+                                      <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Enter booking amount"
+                                        value={pkg.booking_amount}
+                                        onChange={(e) =>
+                                          updateCostingPackage(
+                                            index,
+                                            pkgIndex,
+                                            "booking_amount",
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+
+                                    <div className="col-md-4">
+                                      <label className="form-label">GST Percentage (%)</label>
+                                      <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Enter GST %"
+                                        value={pkg.gst_percentage}
+                                        onChange={(e) =>
+                                          updateCostingPackage(
+                                            index,
+                                            pkgIndex,
+                                            "gst_percentage",
+                                            e.target.value
+                                          )
+                                        }
+                                      />
+                                    </div>
+
+                                    <div className="col-md-4">
+                                      <label className="form-label">Final Price (₹)</label>
+                                      <input
+                                        type="text"
+                                        className="form-control"
+                                        readOnly
+                                        placeholder="Auto-calculated"
+                                        value={pkg.final_price}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+
+                              {/* If there are no costing packages (edge case), allow adding one */}
+                              {(!trip.costingPackages || trip.costingPackages.length === 0) && (
+                                <div className="mb-3">
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary"
+                                    onClick={() => addCostingPackage(index)}
+                                  >
+                                    Add Costing Package
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -1516,236 +1796,219 @@ export default function TourCreation() {
 
       case "details":
         return (
-          <div className="form-container details">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                margin: "20px",
-              }}
-            >
+          <div className="container">
+            <div className="row" >
               <div
-                style={{
-                  border: "1px solid black",
-                  width: "800px",
-                  padding: "20px",
-                }}
-                className="form-container"
+                className=" col-lg-6"
               >
-                <h3>Trip Highlight</h3>
-                <label>Add Trip Highlight</label>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-around",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="TajMahal"
-                    value={highlightsInput}
-                    onChange={(e) => setHighlightsInput(e.target.value)}
-                    style={{ width: "70%" }}
-                  />
-                  <button onClick={addHighlight}>+</button>
-                </div>
-                <div>
-                  {formData.highlights.map((highlight, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{highlight}</span>
-                      <button onClick={() => removeItem("highlights", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                <div className="form-container">
+                  <h4 className="mb-3">Trip Highlight</h4>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "30px",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter trip highlight"
+                      className="form-control"
+                      value={highlightsInput}
+                      onChange={(e) => setHighlightsInput(e.target.value)}
+                      style={{ width: "70%" }}
+                    />
+                    <button onClick={addHighlight} className="btn btn-sm btn-outline-primary me-2">Add</button>
+                  </div>
+                  <div>
+                    {formData.highlights.map((highlight, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <ul>
+                          <li>{highlight}</li>
+                        </ul>
+                        <button onClick={() => removeItem("highlights", index)} className="btn btn-sm btn-outline-danger">
+                          remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div
-                style={{
-                  border: "1px solid black",
-                  width: "800px",
-                  padding: "20px",
-                }}
-                className="form-container"
+                className="col-lg-6"
               >
-                <h3>Inclusions</h3>
-                <label>Add Inclusions</label>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-around",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="4 Nights"
-                    value={inclusionsInput}
-                    onChange={(e) => setInclusionsInput(e.target.value)}
-                    style={{ width: "70%" }}
-                  />
-                  <button onClick={addInclusion}>+</button>
-                </div>
-                <div>
-                  {formData.inclusions.map((inclusion, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{inclusion}</span>
-                      <button onClick={() => removeItem("inclusions", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                <div className="form-container">
+                  <h4 className="mb-3">Inclusions</h4>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "30px",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter trip inclusion"
+                      className="form-control"
+                      value={inclusionsInput}
+                      onChange={(e) => setInclusionsInput(e.target.value)}
+                      style={{ width: "70%" }}
+                    />
+                    <button onClick={addInclusion} className="btn btn-sm btn-outline-primary me-2">Add</button>
+                  </div>
+                  <div>
+                    {formData.inclusions.map((inclusion, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <span>{inclusion}</span>
+                        <button onClick={() => removeItem("inclusions", index)} className="btn btn-sm btn-outline-danger">
+                          remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
+
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                margin: "20px",
-              }}
-            >
+            <div className="row">
               <div
-                style={{
-                  border: "1px solid black",
-                  width: "800px",
-                  padding: "20px",
-                }}
-                className="form-container"
+                className="col-lg-6"
               >
-                <h3>Exclusions</h3>
-                <label>Add Exclusions</label>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-around",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Personal expenses"
-                    value={exclusionsInput}
-                    onChange={(e) => setExclusionsInput(e.target.value)}
-                    style={{ width: "70%" }}
-                  />
-                  <button onClick={addExclusion}>+</button>
-                </div>
-                <div>
-                  {formData.exclusions.map((exclusion, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{exclusion}</span>
-                      <button onClick={() => removeItem("exclusions", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                <div className="form-container">
+                  <h4 className="mb-3">Exclusions</h4>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "30px",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter trip exclusion"
+                      className="form-control"
+                      value={exclusionsInput}
+                      onChange={(e) => setExclusionsInput(e.target.value)}
+                      style={{ width: "70%" }}
+                    />
+                    <button onClick={addExclusion} className="btn btn-sm btn-outline-primary me-2">Add</button>
+                  </div>
+                  <div>
+                    {formData.exclusions.map((exclusion, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <span>{exclusion}</span>
+                        <button onClick={() => removeItem("exclusions", index)} className="btn btn-sm btn-outline-danger">
+                          remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div
-                style={{
-                  border: "1px solid black",
-                  width: "800px",
-                  padding: "20px",
-                }}
-                className="form-container"
+                className="col-lg-6"
               >
-                <h3>FAQ (Optional)</h3>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-around",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Add FAQ question"
-                    value={faqInput?.question}
-                    onChange={(e) =>
-                      setFaqInput({ ...faqInput, question: e.target.value })
-                    }
-                    style={{ width: "100%" }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Add FAQ answer"
-                    value={faqInput?.answer}
-                    onChange={(e) =>
-                      setFaqInput({ ...faqInput, answer: e.target.value })
-                    }
-                    style={{ width: "100%" }}
-                    className="mt-4"
-                  />
-                  <button onClick={addFaqs} className="mt-2">Add FAQ</button>
-                </div>
-                <div>
-                  {faqs.length > 0 &&
-                    faqs.map((faq, index) =>
-                      faq.question && faq.answer ? (
-                        <div
-                          key={index}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: "8px",
-                            borderBottom: "1px solid #ccc",
-                            paddingBottom: "5px",
-                          }}
-                        >
-                          <div>
-                            <strong>Q:</strong> {faq.question}
-                            <br />
-                            <strong>A:</strong> {faq.answer}
-                          </div>
-                          <button
+                <div className="form-container">
+                  <h4 className="mb-3">FAQ (Optional)</h4>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Add FAQ question"
+                      className="form-control"
+                      value={faqInput?.question}
+                      onChange={(e) =>
+                        setFaqInput({ ...faqInput, question: e.target.value })
+                      }
+                      style={{ width: "100%" }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Add FAQ answer"
+
+                      value={faqInput?.answer}
+                      onChange={(e) =>
+                        setFaqInput({ ...faqInput, answer: e.target.value })
+                      }
+                      style={{ width: "100%" }}
+                      className="form-control mt-4"
+                    />
+                    <button onClick={addFaqs} className="btn btn-sm btn-outline-primary mt-3">Add FAQ</button>
+                  </div>
+                  <div>
+                    {faqs.length > 0 &&
+                      faqs.map((faq, index) =>
+                        faq.question && faq.answer ? (
+                          <div
+                            className="mt-4"
+                            key={index}
                             style={{
-                              color: "white",
-                              background: "red",
-                              border: "none",
-                              padding: "5px 10px",
-                              cursor: "pointer",
-                              borderRadius: "4px",
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              marginBottom: "10px",
+                              borderBottom: "1px solid #ccc",
+                              paddingBottom: "15px",
                             }}
-                            onClick={() => deleteFaqs(index)}
                           >
-                            Delete
-                          </button>
-                        </div>
-                      ) : null
-                    )}
+                            <div>
+                              <strong>Q:</strong> {faq.question}
+                              <br />
+                              <strong>A:</strong> {faq.answer}
+                            </div>
+                            <button
+                              style={{
+                                color: "white",
+                                background: "red",
+                                border: "none",
+                                padding: "5px 10px",
+                                cursor: "pointer",
+                                borderRadius: "4px",
+                              }}
+                              onClick={() => deleteFaqs(index)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        ) : null
+                      )}
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
         );
@@ -1854,16 +2117,16 @@ export default function TourCreation() {
         </span>
         <div style={{ display: "flex", gap: "8px" }}>
           {id ? (
-            <button 
-              className="button button-green" 
+            <button
+              className="button button-green"
               onClick={handleUpdate}
               disabled={isLoading}
             >
               {isLoading ? <CircularProgress size={24} color="inherit" /> : "Update Trip"}
             </button>
           ) : (
-            <button 
-              className="button button-green" 
+            <button
+              className="button button-green"
               onClick={handleSubmit}
               disabled={isLoading}
             >
