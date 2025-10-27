@@ -6,6 +6,7 @@ import TripCard from "./TripCard";
 const DestinationSection = ({ title, trips = [], isLoading, link }) => {
   const swiperRef = useRef(null);
   const [navState, setNavState] = useState({ prev: false, next: true });
+  // Removed: isModalOpen state
 
   const handleSlideChange = (swiper) => {
     setNavState({
@@ -21,6 +22,8 @@ const DestinationSection = ({ title, trips = [], isLoading, link }) => {
       swiperRef.current?.slideNext();
     }
   };
+
+  // Removed: handleModalToggle function
 
   return (
     <section className="section-padding">
@@ -40,14 +43,14 @@ const DestinationSection = ({ title, trips = [], isLoading, link }) => {
                 <button 
                   onClick={() => handleNavClick('prev')} 
                   className={`nav-btn ${navState.prev ? 'active-nav-btn' : 'disabled-nav-btn'}`}
-                  disabled={!navState.prev}
+                  disabled={!navState.prev} // Removed: || isModalOpen
                 >
                   ←
                 </button>
                 <button 
                   onClick={() => handleNavClick('next')} 
                   className={`nav-btn ${navState.next ? 'active-nav-btn' : 'disabled-nav-btn'}`}
-                  disabled={!navState.next}
+                  disabled={!navState.next} // Removed: || isModalOpen
                 >
                   →
                 </button>
@@ -84,10 +87,14 @@ const DestinationSection = ({ title, trips = [], isLoading, link }) => {
                 992: { slidesPerView: 4, slidesPerGroup: 1 },
               }}
               loop={false}
+              // Removed: style={{ overflow: 'visible' }} 
             >
               {trips.map((trip, index) => (
                 <SwiperSlide key={trip.id || index}>
-                  <TripCard trip={trip} />
+                  {/* Removed: onModalToggle prop */}
+                  <TripCard 
+                    trip={trip} 
+                  />
                 </SwiperSlide>
               ))}
             </Swiper>

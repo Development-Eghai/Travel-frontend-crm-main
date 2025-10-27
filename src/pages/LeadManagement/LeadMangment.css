@@ -1,0 +1,631 @@
+/* ============================================
+   LEAD MANAGEMENT PAGE - RESPONSIVE FIXES
+   File: LeadMangment.css
+   
+   Import this file in LeadManagement.jsx:
+   import './LeadMangment.css';
+   ============================================ */
+
+/* Reset and Base Styles */
+.lead-management-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* ============================================
+   ZOOM FIX - FORCE 100% WIDTH
+   ============================================ */
+
+/* Force full width regardless of zoom */
+.lead-management-container * {
+  box-sizing: border-box;
+}
+
+.lead-management-container .MuiContainer-root {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  margin: 0 !important;
+}
+
+/* Fix for browsers at different zoom levels */
+@media screen and (min-width: 1200px) {
+  .lead-management-container .MuiContainer-root {
+    max-width: 100% !important;
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .lead-management-container .MuiContainer-root {
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+
+.lead-management-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+
+.lead-management-header h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.lead-management-header .MuiButton-root {
+  white-space: nowrap;
+  padding: 10px 24px;
+  font-weight: 600;
+}
+
+/* ============================================
+   FILTER SECTION
+   ============================================ */
+
+.lead-filters {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.lead-filters .MuiGrid-container {
+  width: 100%;
+  margin: 0 !important;
+}
+
+.lead-filters .MuiGrid-item {
+  padding: 8px !important;
+}
+
+.lead-filters .MuiTextField-root,
+.lead-filters .MuiFormControl-root {
+  width: 100%;
+}
+
+.lead-filters .MuiInputBase-root {
+  font-size: 0.875rem;
+}
+
+.lead-filters .MuiInputLabel-root {
+  font-size: 0.875rem;
+}
+
+/* Date Picker Container */
+.date-picker-container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.date-picker-container > * {
+  flex: 1;
+}
+
+/* ============================================
+   TABLE STYLES
+   ============================================ */
+
+/* Table Container */
+.lead-management-container .MuiTableContainer-root {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 2rem;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  background-color: #fff;
+  width: 100%;
+}
+
+/* Table */
+.lead-management-container .MuiTable-root {
+  min-width: 100%;
+  table-layout: auto;
+  width: 100%;
+}
+
+/* Table Header */
+.lead-management-container .MuiTableHead-root {
+  background-color: #f5f5f5 !important;
+}
+
+.lead-management-container .MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap;
+  padding: 14px 16px !important;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+/* Table Body */
+.lead-management-container .MuiTableBody-root .MuiTableCell-root {
+  font-size: 0.875rem !important;
+  padding: 14px 16px !important;
+  vertical-align: top;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.lead-management-container .MuiTableRow-root:hover {
+  background-color: #f9f9f9;
+}
+
+/* Lead Info Cell */
+.lead-info-cell {
+  min-width: 200px;
+  max-width: 250px;
+}
+
+.lead-info-cell strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.lead-info-cell small {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ============================================
+   CHIPS AND BADGES
+   ============================================ */
+
+.lead-management-container .MuiChip-root {
+  font-size: 0.75rem !important;
+  height: 24px !important;
+  font-weight: 500 !important;
+}
+
+.lead-management-container .MuiChip-colorSuccess {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+}
+
+.lead-management-container .MuiChip-colorError {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+}
+
+.lead-management-container .MuiChip-colorWarning {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+}
+
+.lead-management-container .MuiChip-colorInfo {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+}
+
+/* ============================================
+   ACTION BUTTONS AND MENU
+   ============================================ */
+
+.lead-management-container .MuiIconButton-root {
+  padding: 8px !important;
+  transition: all 0.2s ease;
+}
+
+.lead-management-container .MuiIconButton-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.lead-management-container .MuiMenu-paper {
+  max-height: 400px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.lead-management-container .MuiMenuItem-root {
+  font-size: 0.875rem !important;
+  padding: 10px 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lead-management-container .MuiMenuItem-root:hover {
+  background-color: #f5f5f5;
+}
+
+/* ============================================
+   DIALOG STYLES
+   ============================================ */
+
+.lead-management-container .MuiDialog-paper {
+  max-width: 900px !important;
+  max-height: 90vh !important;
+  margin: 16px !important;
+  border-radius: 8px !important;
+  width: 90vw !important;
+}
+
+.lead-management-container .MuiDialogTitle-root {
+  padding: 20px 24px !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.lead-management-container .MuiDialogContent-root {
+  padding: 24px !important;
+  overflow-y: auto;
+}
+
+.lead-management-container .MuiDialogActions-root {
+  padding: 16px 24px !important;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* ============================================
+   KANBAN VIEW STYLES
+   ============================================ */
+
+.kanban-container {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.kanban-column {
+  min-width: 300px;
+  max-width: 300px;
+  flex-shrink: 0;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.kanban-column-header {
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.kanban-card {
+  margin-bottom: 12px;
+  cursor: grab;
+  transition: box-shadow 0.2s ease;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+/* ============================================
+   MOBILE CARD VIEW
+   ============================================ */
+
+.mobile-card-view {
+  display: none;
+}
+
+.desktop-table-view {
+  display: block;
+}
+
+.lead-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+}
+
+.lead-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.lead-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.lead-card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.lead-card-info {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.lead-card-info > div {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lead-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lead-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Large Desktop (1200px+) */
+@media screen and (min-width: 1200px) {
+  .lead-management-container .MuiTable-root {
+    min-width: 100%;
+  }
+  
+  .lead-management-container {
+    padding: 24px;
+  }
+}
+
+/* Desktop (992px - 1199px) */
+@media screen and (max-width: 1199px) {
+  .lead-management-container .MuiTable-root {
+    min-width: 1000px;
+  }
+
+  .lead-management-container .MuiTableHead-root .MuiTableCell-root {
+    font-size: 0.8rem !important;
+    padding: 12px !important;
+  }
+
+  .lead-management-container .MuiTableBody-root .MuiTableCell-root {
+    font-size: 0.8rem !important;
+    padding: 12px !important;
+  }
+
+  .lead-info-cell {
+    min-width: 180px;
+    max-width: 200px;
+  }
+}
+
+/* Tablet (768px - 991px) */
+@media screen and (max-width: 991px) {
+  .lead-management-container {
+    padding: 16px;
+  }
+
+  .lead-management-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .lead-management-header h3 {
+    font-size: 1.5rem;
+  }
+
+  .lead-management-header .MuiButton-root {
+    width: 100%;
+  }
+
+  .lead-management-container .MuiTable-root {
+    min-width: 800px;
+  }
+
+  .kanban-container {
+    gap: 0.75rem;
+  }
+
+  .kanban-column {
+    min-width: 280px;
+    max-width: 280px;
+  }
+}
+
+/* Mobile Large (576px - 767px) */
+@media screen and (max-width: 767px) {
+  .lead-management-container {
+    padding: 12px;
+  }
+
+  .lead-management-header h3 {
+    font-size: 1.25rem;
+  }
+
+  /* Stack all filters vertically */
+  .lead-filters .MuiGrid-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-basis: 100% !important;
+  }
+
+  /* Date picker stacking */
+  .date-picker-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Switch to card view on mobile */
+  .desktop-table-view {
+    display: none;
+  }
+
+  .mobile-card-view {
+    display: block;
+  }
+
+  /* Compact table if still showing */
+  .lead-management-container .MuiTableContainer-root {
+    border-radius: 4px !important;
+  }
+
+  .lead-management-container .MuiTableHead-root .MuiTableCell-root,
+  .lead-management-container .MuiTableBody-root .MuiTableCell-root {
+    font-size: 0.75rem !important;
+    padding: 8px !important;
+  }
+
+  .lead-info-cell {
+    min-width: 150px;
+    max-width: 150px;
+  }
+
+  .lead-info-cell strong {
+    font-size: 0.85rem;
+  }
+
+  /* Kanban columns stack */
+  .kanban-container {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+
+  .kanban-column {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  /* Dialog adjustments */
+  .lead-management-container .MuiDialog-paper {
+    margin: 8px !important;
+    max-width: calc(100vw - 16px) !important;
+    width: calc(100vw - 16px) !important;
+  }
+
+  .lead-management-container .MuiDialogContent-root {
+    padding: 12px 16px !important;
+  }
+
+  .lead-management-container .MuiDialogTitle-root {
+    padding: 12px 16px !important;
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Mobile Small (< 576px) */
+@media screen and (max-width: 575px) {
+  .lead-management-container {
+    padding: 8px;
+  }
+
+  .lead-management-container .MuiContainer-root {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .lead-management-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .lead-management-container .MuiTableHead-root .MuiTableCell-root,
+  .lead-management-container .MuiTableBody-root .MuiTableCell-root {
+    font-size: 0.7rem !important;
+    padding: 6px !important;
+  }
+
+  .lead-info-cell {
+    min-width: 120px;
+    max-width: 120px;
+  }
+
+  .lead-info-cell strong {
+    font-size: 0.8rem;
+  }
+
+  .lead-management-container .MuiChip-root {
+    font-size: 0.65rem !important;
+    height: 20px !important;
+  }
+
+  .lead-management-container .MuiIconButton-root {
+    padding: 4px !important;
+  }
+}
+
+/* ============================================
+   PERFORMANCE & ACCESSIBILITY
+   ============================================ */
+
+/* Smooth scrolling */
+.lead-management-container .MuiTableContainer-root {
+  scroll-behavior: smooth;
+}
+
+/* Hardware acceleration */
+.kanban-card,
+.lead-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Touch targets */
+@media (hover: none) and (pointer: coarse) {
+  .lead-management-container .MuiButton-root,
+  .lead-management-container .MuiIconButton-root {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .lead-management-container * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .lead-management-header .MuiButton-root,
+  .lead-management-container .MuiIconButton-root,
+  .lead-filters {
+    display: none !important;
+  }
+
+  .lead-management-container .MuiTableContainer-root {
+    box-shadow: none !important;
+  }
+
+  .lead-management-container .MuiTable-root {
+    page-break-inside: auto;
+  }
+
+  .lead-management-container .MuiTableRow-root {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}

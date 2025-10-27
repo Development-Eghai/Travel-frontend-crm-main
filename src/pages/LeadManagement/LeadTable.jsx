@@ -21,7 +21,7 @@ import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import EmailIcon from '@mui/icons-material/Email';
 import LeadDetailsDialog from './LeadDetailsDialog';
 
-const LeadTable = ({ leads, onRefresh }) => {
+const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
   const [selectedLead, setSelectedLead] = React.useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedLeadId, setSelectedLeadId] = React.useState(null);
@@ -42,39 +42,42 @@ const LeadTable = ({ leads, onRefresh }) => {
   };
 
   const handleEdit = async () => {
-    // Implement edit functionality
+    // TODO: implement edit functionality
     handleClose();
   };
 
-  const handleDelete = async (leadId) => {
-    try {
-      await fetch(`/api/leads/${leadId}`, {
-        method: 'DELETE',
-      });
-      onRefresh();
-    } catch (error) {
-      console.error('Error deleting lead:', error);
+  // ✅ Delete now calls parent handler
+  const handleDelete = async () => {
+    const leadToDelete = leads.find((l) => l.id === selectedLeadId);
+    if (!leadToDelete) {
+      console.warn('⚠️ Lead not found for deletion');
+      handleClose();
+      return;
     }
+
+    console.log('🗑️ Deleting lead:', leadToDelete);
+
+    await onDeleteLead(leadToDelete); // calls the function from LeadManagement.jsx
     handleClose();
   };
 
   const handleCreateQuotation = () => {
-    // Implement create quotation functionality
+    // TODO: implement quotation creation
     handleClose();
   };
 
   const handleCreateInvoice = () => {
-    // Implement create invoice functionality
+    // TODO: implement invoice creation
     handleClose();
   };
 
   const handleWhatsApp = () => {
-    // Implement WhatsApp functionality
+    // TODO: implement WhatsApp integration
     handleClose();
   };
 
   const handleEmail = () => {
-    // Implement email functionality
+    // TODO: implement email functionality
     handleClose();
   };
 
@@ -143,14 +146,30 @@ const LeadTable = ({ leads, onRefresh }) => {
                 <TableCell>{lead.destination_type}</TableCell>
                 <TableCell>{lead.trip_type}</TableCell>
                 <TableCell>
-                  <Chip label={lead.status} color={getStatusColor(lead.status)} size="small" />
+                  <Chip
+                    label={lead.status}
+                    color={getStatusColor(lead.status)}
+                    size="small"
+                  />
                 </TableCell>
                 <TableCell>
-                  <Chip label={lead.priority} color={getPriorityColor(lead.priority)} size="small" />
+                  <Chip
+                    label={lead.priority}
+                    color={getPriorityColor(lead.priority)}
+                    size="small"
+                  />
                 </TableCell>
                 <TableCell>{lead.assigned_to}</TableCell>
-                <TableCell>{lead.follow_up_date ? new Date(lead.follow_up_date).toLocaleDateString() : '-'}</TableCell>
-                <TableCell>{lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '-'}</TableCell>
+                <TableCell>
+                  {lead.follow_up_date
+                    ? new Date(lead.follow_up_date).toLocaleDateString()
+                    : '-'}
+                </TableCell>
+                <TableCell>
+                  {lead.created_at
+                    ? new Date(lead.created_at).toLocaleDateString()
+                    : '-'}
+                </TableCell>
                 <TableCell>{lead.source}</TableCell>
                 <TableCell>
                   <IconButton onClick={(e) => handleActionClick(e, lead.id)}>
@@ -163,18 +182,19 @@ const LeadTable = ({ leads, onRefresh }) => {
         </Table>
       </TableContainer>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={() => handleView(leads.find(l => l.id === selectedLeadId))}>
+      {/* Action Menu */}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem
+          onClick={() =>
+            handleView(leads.find((l) => l.id === selectedLeadId))
+          }
+        >
           <VisibilityIcon fontSize="small" sx={{ mr: 1 }} /> View
         </MenuItem>
         <MenuItem onClick={() => handleEdit(selectedLeadId)}>
           <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
         </MenuItem>
-        <MenuItem onClick={() => handleDelete(selectedLeadId)}>
+        <MenuItem onClick={handleDelete}>
           <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
         </MenuItem>
         <MenuItem onClick={() => handleCreateQuotation(selectedLeadId)}>
@@ -191,6 +211,7 @@ const LeadTable = ({ leads, onRefresh }) => {
         </MenuItem>
       </Menu>
 
+      {/* Lead Details Dialog */}
       {selectedLead && (
         <LeadDetailsDialog
           lead={selectedLead}

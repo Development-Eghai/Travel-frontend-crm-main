@@ -916,3 +916,36 @@
     height: 34px;
   }
 }
+
+/* =================================================================
+   CRITICAL FIX: Allow modals to escape Swiper overflow clipping
+   Add this to your homepage.css or style.css
+   ================================================================= */
+
+/* Override Swiper's default overflow hidden */
+.swiper {
+    overflow: visible !important;
+}
+
+.swiper-wrapper {
+    overflow: visible !important;
+}
+
+.swiper-slide {
+    overflow: visible !important;
+}
+
+/* Specific fixes for your homepage sections */
+.featured-slider-wrapper,
+.featured-slider-wrapper .swiper,
+.section-padding .swiper,
+.destination-slider-section .swiper,
+.featured-trips-section .swiper {
+    overflow: visible !important;
+}
+
+/* Body scroll lock when modal is open */
+/* Body scroll lock when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}

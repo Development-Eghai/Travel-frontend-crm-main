@@ -1431,7 +1431,7 @@ button:focus:not(:focus-visible) {
 
 .Layout-container {
   display: flex;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 .sidebar-container-main {
@@ -1449,14 +1449,15 @@ button:focus:not(:focus-visible) {
 .Layout-right-container {
   width: 100%;
   /* padding: 24px; */
-  height: 100vh;
+  /* height: 100vh; */
   overflow-y: scroll;
 }
 
+/* Important to enable view at 100% */
 .page-content {
-  /* margin: 20px 4px; */
+  margin: 20px 4px;
   width: 100%;
-  /* max-width: 1200px; */
+  max-width: 1200px; 
   margin: 0 auto;
 }
 
@@ -2555,7 +2556,7 @@ button:focus:not(:focus-visible) {
 .admin-content-main {
   padding: 28px 40px 20px 40px;
   border-radius: 5px;
-  height: 93vh;
+  /* height: 93vh; */
   background-color: #f9fafb !important;
 }
 

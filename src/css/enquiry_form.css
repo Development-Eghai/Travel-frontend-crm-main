@@ -1,0 +1,150 @@
+/* --- Modal Overlay (The "Toppest" Layer) --- */
+.enquiry-modal-overlay {
+    /* Use position: fixed and maximum z-index to break out of parent stacking contexts */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85); /* Darkened background for maximum contrast */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999999; /* Higher aggressive Z-index */
+    padding: 20px;
+    overflow-y: auto;
+    
+    /* Ensure the backdrop covers the entire viewport without being scrolled by parent */
+    transform: translateZ(99999999px); /* Optional: Forces a new stacking context */
+}
+
+/* --- Modal Content Card --- */
+.enquiry-modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    width: 100%;
+    max-width: 550px;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    min-width: 300px;
+    margin: auto;
+    color: #3b2a1a;
+}
+
+/* --- Form Elements --- */
+.modal-title {
+    margin-bottom: 24px;
+    font-size: 26px;
+    font-weight: 700;
+    padding-right: 40px;
+}
+
+.form-group-modal {
+    margin-bottom: 18px;
+}
+
+.form-group-modal label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.form-group-modal input,
+.form-group-modal select,
+.form-group-modal textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+    color: #3b2a1a;
+}
+
+.form-group-modal input:focus,
+.form-group-modal select:focus,
+.form-group-modal textarea:focus {
+    border-color: #3b2a1a;
+}
+
+.form-group-modal textarea {
+    height: 90px;
+    resize: vertical;
+}
+
+.read-only-input {
+    background-color: #f5f5f5 !important;
+    font-weight: 600 !important;
+}
+
+/* --- Close Button --- */
+.modal-close-btn {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    font-weight: bold;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal-close-btn:hover {
+    background-color: #f0f0f0;
+    color: #3b2a1a;
+}
+
+/* --- Submit Button --- */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #3b2a1a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background-color: #2d1f13;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 42, 26, 0.4);
+}
+
+.submit-btn.submitting {
+    background-color: #999;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .enquiry-modal-content {
+        padding: 20px;
+        max-width: 95vw;
+        margin-top: 5vh;
+        margin-bottom: 5vh;
+    }
+    .modal-title {
+        font-size: 22px;
+    }
+}

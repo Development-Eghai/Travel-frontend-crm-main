@@ -561,8 +561,8 @@ const fetchAllDestinationsWithTrips = async () => {
 
                 <section >
                     <div className='container'>
-                        <div className="row">
-                            <div className="col-lg-6 p-lg-0">
+                        <div className='row'>
+                            <div className='col-lg-6 p-lg-0'>
                                 <div className='offer-left'>
                                     <div>
                                         <h4 className='offer-left-heading'>Grab up to <span className='offer-span-head'>35% off </span><br className='break-tag' />
@@ -573,7 +573,7 @@ const fetchAllDestinationsWithTrips = async () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-lg-6 p-lg-0">
+                            <div className='col-lg-6 p-lg-0'>
                                 <img src={Images.offer_right} alt="offer-right" className='w-100 h-auto' />
                             </div>
                         </div>
