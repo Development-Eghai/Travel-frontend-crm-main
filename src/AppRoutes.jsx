@@ -51,9 +51,7 @@ const AppRoutes = () => {
                     <Route path="/trips-detail" element={<TripsDetail />} />
                     <Route path="/trips-bookings" element={<TripBookings />} />
                     
-                    {/* 🆕 Promotions Route */}
-                    <Route path="/promotions" element={<Promotions />} />
-
+                
                     {/* Preview Routes */}
                     <Route path="/destination/:slug?/:id?" element={<DestinationPreview />} />
                     <Route path="/trip-preview/:slug?/:id?" element={<TourPreview />} />

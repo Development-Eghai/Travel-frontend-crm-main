@@ -15,7 +15,7 @@ const Header = () => {
     "/terms-and-conditions",
     "/tour-overview",
     "/trips-bookings",
-    "/promotions",
+   
   ];
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -294,16 +294,7 @@ const Header = () => {
                   </Link>
                 </li>
 
-                {/* 🆕 Promotions Link */}
-                <li className="nav-item">
-                  <Link
-                    to="/promotions"
-                    className="nav-link text-decoration-none promotions-link"
-                    onClick={() => handleLinkClick("/promotions")}
-                  >
-                    🔥 Promotions
-                  </Link>
-                </li>
+                
               </ul>
             </div>
 
@@ -387,16 +378,7 @@ const Header = () => {
                 Honeymoon Trips
               </Link>
             </li>
-            {/* 🆕 Promotions Link for Mobile */}
-            <li>
-              <Link
-                to="/promotions"
-                className="text-decoration-none text-white promotions-link-mobile"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                🔥 Promotions
-              </Link>
-            </li>
+            
           </ul>
         </div>
       </div>
