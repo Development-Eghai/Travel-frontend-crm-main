@@ -15,6 +15,7 @@ const Header = () => {
     "/terms-and-conditions",
     "/tour-overview",
     "/trips-bookings",
+    "/promotions",
   ];
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -271,7 +272,7 @@ const Header = () => {
                   </ul>
                 </li>
 
-                {/* Upcoming Group Trips (Added as normal links) */}
+                {/* Upcoming Group Trips */}
                 <li className="nav-item">
                   <Link
                     to="/upcoming-group-trips"
@@ -282,7 +283,7 @@ const Header = () => {
                   </Link>
                 </li>
 
-                {/* Honeymoon Trips (Added as normal links) */}
+                {/* Honeymoon Trips */}
                 <li className="nav-item">
                   <Link
                     to="/honeymoon-trips"
@@ -290,6 +291,17 @@ const Header = () => {
                     onClick={() => handleLinkClick("/honeymoon-trips")}
                   >
                     Honeymoon Trips
+                  </Link>
+                </li>
+
+                {/* 🆕 Promotions Link */}
+                <li className="nav-item">
+                  <Link
+                    to="/promotions"
+                    className="nav-link text-decoration-none promotions-link"
+                    onClick={() => handleLinkClick("/promotions")}
+                  >
+                    🔥 Promotions
                   </Link>
                 </li>
               </ul>
@@ -357,8 +369,6 @@ const Header = () => {
                 About Us
               </Link>
             </li>
-
-            {/* Added Items for Mobile Menu */}
             <li>
               <Link
                 to="/upcoming-group-trips"
@@ -375,6 +385,16 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Honeymoon Trips
+              </Link>
+            </li>
+            {/* 🆕 Promotions Link for Mobile */}
+            <li>
+              <Link
+                to="/promotions"
+                className="text-decoration-none text-white promotions-link-mobile"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                🔥 Promotions
               </Link>
             </li>
           </ul>

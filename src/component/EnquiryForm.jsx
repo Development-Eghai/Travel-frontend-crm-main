@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
+const EnquiryForm = ({ trip, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     departure_city: '',
     travel_date: '',
     adults: 1,
     children: 0,
+    infants: 0,
     hotel_category: '',
     full_name: '',
     email: '',
@@ -34,9 +35,71 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!formData.full_name || !formData.email || !formData.contact_number || !formData.travel_date) {
+      alert("Please fill in Full Name, Email, Contact Number, and Travel Date.");
+      return;
+    }
+
+    if (!trip?.title) {
+      alert("Tour details are not loaded. Cannot submit enquiry.");
+      return;
+    }
+
+    const payload = {
+      destination: trip.title, // Auto-filled from trip data
+      departure_city: formData.departure_city || "N/A",
+      travel_date: formData.travel_date,
+      adults: formData.adults || 1,
+      children: formData.children || 0,
+      infants: formData.infants || 0,
+      hotel_category: formData.hotel_category || "N/A",
+      full_name: formData.full_name,
+      contact_number: formData.contact_number,
+      email: formData.email,
+      additional_comments: formData.additional_comments || ""
+    };
+
     setIsSubmitting(true);
-    await onFormSubmit(formData, trip); 
-    setIsSubmitting(false);
+    try {
+      const res = await fetch('https://api.yaadigo.com/public/api/enquires/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': 'bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data?.success === true) {
+        alert("Your enquiry has been submitted successfully! We will contact you soon.");
+        // Reset form
+        setFormData({
+          departure_city: '',
+          travel_date: '',
+          adults: 1,
+          children: 0,
+          infants: 0,
+          hotel_category: '',
+          full_name: '',
+          contact_number: '',
+          email: '',
+          additional_comments: ''
+        });
+        // Close modal after successful submission
+        setTimeout(() => onClose(), 2000);
+      } else {
+        alert(data?.message || "Failed to submit enquiry. Please try again.");
+      }
+    } catch (error) {
+      console.error("Enquiry submission error:", error);
+      alert("An error occurred during submission. Please check your network and try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // 🎯 Render modal using React Portal at document.body level
@@ -110,9 +173,12 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
           &times;
         </button>
         
-        <h3 style={{ marginBottom: '24px', fontSize: '26px', fontWeight: '700', color: '#3b2a1a', paddingRight: '40px' }}>
-          Send Query for {trip?.title}
+        <h3 style={{ marginBottom: '8px', fontSize: '26px', fontWeight: '700', color: '#3b2a1a', paddingRight: '40px' }}>
+          Enquiry Now!
         </h3>
+        <p style={{ marginBottom: '24px', color: '#666', fontSize: '14px' }}>
+          Allow Us to Call You Back!
+        </p>
         
         <form onSubmit={handleSubmit}>
           {/* Travel To (Destination) - Read Only */}
@@ -120,7 +186,7 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Travel To (Destination)</label>
             <input 
               type="text" 
-              value={trip?.title} 
+              value={trip?.title || 'Loading...'} 
               readOnly 
               style={{ 
                 width: '100%', 
@@ -187,6 +253,7 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
               value={formData.adults} 
               onChange={handleChange} 
               required 
+              placeholder="e.g. 2"
               style={{ 
                 width: '100%', 
                 padding: '12px 14px', 
@@ -209,6 +276,7 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
               min="0" 
               value={formData.children} 
               onChange={handleChange} 
+              placeholder="e.g. 0"
               style={{ 
                 width: '100%', 
                 padding: '12px 14px', 
@@ -240,11 +308,12 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
               onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
               onBlur={(e) => e.target.style.borderColor = '#ddd'}
             >
-              <option value="">Select Category</option>
-              <option value="Five Star">⭐⭐⭐⭐⭐ Five Star</option>
-              <option value="Four Star">⭐⭐⭐⭐ Four Star</option>
-              <option value="Three Star">⭐⭐⭐ Three Star</option>
-              <option value="Budget">💰 Budget</option>
+              <option value="">Select Hotel Category</option>
+              <option value="Five Star">⭐⭐⭐⭐⭐ (Five Star)</option>
+              <option value="Four Star">⭐⭐⭐⭐ (Four Star)</option>
+              <option value="Three Star">⭐⭐⭐ (Three Star)</option>
+              <option value="Two Star">⭐⭐ (Two Star)</option>
+              <option value="Budget">Budget</option>
             </select>
           </div>
           
@@ -278,7 +347,7 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
               name="email" 
               value={formData.email} 
               onChange={handleChange} 
-              placeholder="e.g. johndoe@gmail.com" 
+              placeholder="e.g. JohnDoe@gmail.com" 
               required 
               style={{ 
                 width: '100%', 
@@ -301,7 +370,7 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
               name="contact_number" 
               value={formData.contact_number} 
               onChange={handleChange} 
-              placeholder="e.g. 9876543210" 
+              placeholder="e.g. 1234567890" 
               required 
               style={{ 
                 width: '100%', 
@@ -329,7 +398,7 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
                 padding: '12px 14px', 
                 border: '2px solid #ddd', 
                 borderRadius: '8px', 
-                height: '90px',
+                height: '100px',
                 resize: 'vertical',
                 boxSizing: 'border-box',
                 transition: 'border-color 0.3s ease'
@@ -386,6 +455,10 @@ const EnquiryForm = ({ trip, onClose, onFormSubmit }) => {
             opacity: 1;
             transform: scale(1) translateY(0);
           }
+        }
+        
+        body.modal-open {
+          overflow: hidden;
         }
       `}</style>
     </div>,

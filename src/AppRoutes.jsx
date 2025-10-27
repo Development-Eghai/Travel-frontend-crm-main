@@ -23,6 +23,7 @@ import DestinationCreation from "./pages/admin/TripManagement/Destination/Destin
 import TourCreation from "./pages/admin/TripManagement/Tour/TourCreation";
 import CategoryPreview from "./pages/admin/TripManagement/Category/CategoryPreview";
 import NotFound from "./common/NotFound";
+import Promotions from "./pages/user/Promotions/Promotions"; // 🆕 Import Promotions
 
 
 const DestinationDetail = lazy(() => import("./pages/user/DestinationDetail"));
@@ -49,6 +50,9 @@ const AppRoutes = () => {
                     <Route path="/about-us" element={<AboutUs />} />
                     <Route path="/trips-detail" element={<TripsDetail />} />
                     <Route path="/trips-bookings" element={<TripBookings />} />
+                    
+                    {/* 🆕 Promotions Route */}
+                    <Route path="/promotions" element={<Promotions />} />
 
                     {/* Preview Routes */}
                     <Route path="/destination/:slug?/:id?" element={<DestinationPreview />} />
