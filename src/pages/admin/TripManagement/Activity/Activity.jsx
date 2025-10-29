@@ -9,9 +9,8 @@ import { CreateActivity, deleteActivity, GetAllActivity, GetSpecificActivity, Si
 import { APIBaseUrl } from '../../../../common/api/api';
 
 
-
 const TourType = () => {
-
+    // ... (Existing state definitions)
     const [open, setOpen] = useState(false)
     const [activityData, setActivityData] = useState({})
     const [activityList, setActivityList] = useState([])
@@ -22,31 +21,127 @@ const TourType = () => {
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [isLoading, setIsLoading] = useState(true);
 
+    // ⭐ NEW: State for selected rows (for bulk actions)
+    const [selectionModel, setSelectionModel] = useState([]);
+    const [duplicateId, setDuplicateId] = useState("");
+    const [openDuplicateModal, setOpenDuplicateModal] = useState(false);
+    const [isDuplicating, setIsDuplicating] = useState(false);
+
+
+    // --- API FUNCTIONS (Updated) ---
+
+    // ⭐ NEW: Helper for generating unique slug
+    const generateUniqueSlug = (originalSlug) => {
+        const timestamp = Date.now();
+        return `${originalSlug.toLowerCase().replace(/[^a-z0-9]/g, '-')}-copy-${timestamp}`;
+    };
+    
+    // ⭐ NEW: Function to handle bulk delete for activities
+    const handleBulkDelete = async () => {
+        if (selectionModel.length === 0) return;
+
+        try {
+            const deletePromises = selectionModel.map(id => 
+                APIBaseUrl.delete(`activities/${id}`, {
+                    headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
+                })
+            );
+
+            await Promise.allSettled(deletePromises);
+
+            successMsg(`${selectionModel.length} activities deleted successfully.`);
+            setOpenDeleteModal(false);
+            setSelectionModel([]); // Clear selection
+            getAllActivity(); // Refresh the list
+        } catch (error) {
+            console.error("Error performing bulk delete:", error);
+            errorMsg("An error occurred during bulk deletion.");
+            setOpenDeleteModal(false);
+        }
+    }
+
+    // ⭐ NEW: Function to handle duplicate activity
+    const handleDuplicateActivity = async () => {
+        if (!duplicateId) return;
+        
+        setIsDuplicating(true);
+        try {
+            const getRes = await APIBaseUrl.get(`activities/${duplicateId}`, {
+                headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
+            });
+
+            if (getRes?.data?.success === true) {
+                const originalActivity = getRes?.data?.data;
+                const { _id, createdAt, updatedAt, __v, id, ...restOfActivityData } = originalActivity;
+
+                const duplicatePayload = {
+                    ...restOfActivityData,
+                    name: `${originalActivity.name} (Copy)`,
+                    slug: generateUniqueSlug(originalActivity.slug),
+                    tenant_id: 1,
+                };
+
+                const createRes = await APIBaseUrl.post("activities/", duplicatePayload, {
+                    headers: { "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M" },
+                });
+
+                if (createRes?.data?.success === true) {
+                    successMsg("Activity duplicated successfully!");
+                    setOpenDuplicateModal(false);
+                    setDuplicateId("");
+                    await getAllActivity(); 
+                } else {
+                    errorMsg(createRes?.data?.message || "Failed to duplicate activity.");
+                }
+            } else {
+                errorMsg("Failed to fetch original activity data.");
+            }
+        } catch (error) {
+            console.error("Error duplicating activity:", error);
+            errorMsg(error?.response?.data?.message || "An error occurred while duplicating the activity.");
+        } finally {
+            setIsDuplicating(false);
+        }
+    };
+
+
     const columns = [
-        { field: 'sno', headerName: 'SNO', flex: 1 },
-        { field: 'name', headerName: 'Name', flex: 1 },
-        { field: 'slug', headerName: 'Slug', flex: 1 },
+        { field: 'sno', headerName: 'SNO', width: 80 },
+        { field: 'name', headerName: 'Name', width: 250 },
+        { field: 'slug', headerName: 'Slug', width: 300 },
         {
             field: '_id',
             headerName: 'Actions',
-            flex: 1,
+            minWidth: 150,
             sortable: false,
             filterable: false,
             disableColumnMenu: true,
-            renderCell: (params) => (
-                <>
-                    <div>
-                        <div className='admin-actions'>
-                            <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificActivity(params?.row?.id); setIsUpdate(true) }}></i>
-                            <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(params?.row?.id); setOpenDeleteModal(true) }}></i>
-                            <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificActivity(params?.row?.id); setIsViewOnly(true) }} ></i>
-                        </div>
+            renderCell: (params) => {
+                const id = params?.row?.id;
+                return (
+                    <div className='admin-actions d-flex'>
+                        <i className="fa-solid fa-pen-to-square" onClick={() => { setOpen(true); getSpecificActivity(id); setIsUpdate(true) }}></i>
+                        
+                        {/* ⭐ NEW: Duplicate Icon */}
+                        <i 
+                            className="fa-regular fa-copy mx-1 ms-3" 
+                            style={{ cursor: "pointer", color: "#17a2b8" }}
+                            onClick={() => { 
+                                setDuplicateId(id); 
+                                setOpenDuplicateModal(true) 
+                            }}
+                            title="Duplicate"
+                        ></i>
+
+                        <i className="fa-solid fa-trash ms-3" onClick={() => { setDeleteId(id); setOpenDeleteModal(true) }}></i>
+                        <i className="fa-solid fa-eye ms-3" onClick={() => { setOpen(true); getSpecificActivity(id); setIsViewOnly(true) }} ></i>
                     </div>
-                </>
-            ),
+                );
+            },
         },
     ];
 
+    // ... (All other functions (numberedRows, handleChange, validateDetails, handleSubmit, handleUpdate, handleDelete, etc.) are included here and updated where necessary)
     const numberedRows = Array.isArray(activityList?.reverse())
         ? activityList.map((row, index) => ({
             ...row,
@@ -143,7 +238,6 @@ const TourType = () => {
 
         try {
             const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
-            console.log(res.data, "res?.data");
 
             if (res?.data?.message === "Upload successful") {
                 successMsg("Image uploaded successfully");
@@ -168,7 +262,6 @@ const TourType = () => {
             }
 
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
             throw error;
         }
     }
@@ -197,7 +290,6 @@ const TourType = () => {
                 }
 
             } catch (error) {
-                console.error("Error fetching trips:", error?.response?.data || error.message);
                 throw error;
             }
 
@@ -205,7 +297,8 @@ const TourType = () => {
 
     }
 
-    const handleDelete = async () => {
+    // ⭐ Changed handleDelete to handle single delete
+    const handleSingleDelete = async () => {
         try {
             const res = await APIBaseUrl.delete(`activities/${deleteId}`, {
                 headers: {
@@ -216,13 +309,15 @@ const TourType = () => {
                 successMsg("Activity Deleted Successsfully")
                 getAllActivity()
                 setOpenDeleteModal(false)
+                setDeleteId("")
             }
 
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
             throw error;
         }
     }
+
+    const handleDelete = handleSingleDelete;
 
     const getAllActivity = async () => {
         try {
@@ -241,7 +336,6 @@ const TourType = () => {
                     params: { skip, limit }
                 });
 
-                console.log(`API Response for activities (skip: ${skip}):`, res?.data);
                 
                 if (res?.data?.success === true) {
                     const activities = res?.data?.data || [];
@@ -251,19 +345,14 @@ const TourType = () => {
                     hasMore = activities.length === limit;
                     skip += limit;
                 } else {
-                    console.error("API returned unsuccessful response:", res?.data);
                     hasMore = false;
                 }
             }
 
-            console.log("Total activities fetched:", allActivities.length);
             setActivityList(allActivities);
             setIsLoading(false);
 
         } catch (error) {
-            console.error("Error fetching activities - Full error:", error);
-            console.error("Error response data:", error?.response?.data);
-            console.error("Error status:", error?.response?.status);
             setActivityList([]);
             setIsLoading(false);
         }
@@ -275,9 +364,25 @@ const TourType = () => {
 
     return (
         <div className='admin-content-main'>
-            <div className='d-flex justify-content-between'>
+            <div className='d-flex justify-content-between align-items-center'>
                 <h4 className='my-auto admin-right-title'>Activity</h4>
-                <button className='admin-add-button mt-0' onClick={() => { setOpen(true) }}><i class="fa-solid fa-plus me-2"></i> Add Activity</button>
+                <div className='d-flex align-items-center'>
+                    {/* ⭐ NEW: Bulk Delete Button */}
+                    {selectionModel.length > 0 && (
+                        <button 
+                            className='admin-add-button mt-0 me-3' 
+                            style={{ backgroundColor: '#dc3545', border: '1px solid #dc3545' }}
+                            onClick={() => { 
+                                setDeleteId(null); // Indicates bulk delete
+                                setOpenDeleteModal(true);
+                            }}
+                        >
+                            <i className="fa-solid fa-trash me-2"></i> 
+                            Delete ({selectionModel.length}) Selected
+                        </button>
+                    )}
+                    <button className='admin-add-button mt-0' onClick={() => { setOpen(true) }}><i className="fa-solid fa-plus me-2"></i> Add Activity</button>
+                </div>
             </div>
 
             <div className='my-5'>
@@ -286,9 +391,17 @@ const TourType = () => {
                     columns={columns}
                     getRowId={(row) => row.id || row._id}
                     isLoading={isLoading}
+                    // ⭐ CRITICAL FIX: Enable checkbox selection
+                    checkboxSelection 
+                    // ⭐ NEW: Handle row selection changes
+                    onRowSelectionModelChange={(newSelectionModel) => { 
+                        setSelectionModel(newSelectionModel); 
+                    }}
+                    selectionModel={selectionModel}
                 />
             </div>
 
+            {/* Modal remains the same */}
             <CustomModal
                 open={open}
                 onClickOutside={() => {
@@ -383,6 +496,7 @@ const TourType = () => {
 
             </CustomModal>
 
+            {/* Single/Bulk Delete Modal (Updated handler) */}
             <CustomModal
                 open={openDeleteModal}
                 onClickOutside={() => {
@@ -392,11 +506,18 @@ const TourType = () => {
                 <>
                     <div className='delete-model-view-main'>
                         <p className="text-center">
-                            Are you sure do you want to delete?
+                            {selectionModel.length > 0 && deleteId === null
+                                ? `Are you sure you want to delete the ${selectionModel.length} selected activities?`
+                                : "Are you sure do you want to delete?"}
                         </p>
                         <div className="row">
                             <div className="col-6">
-                                <button className="delete-btn yes" onClick={handleDelete}>Yes</button>
+                                <button 
+                                    className="delete-btn yes" 
+                                    onClick={deleteId !== null ? handleDelete : handleBulkDelete}
+                                >
+                                    Yes
+                                </button>
                             </div>
                             <div className="col-6">
                                 <button className="delete-btn no" onClick={() => setOpenDeleteModal(false)}>No</button>
@@ -405,6 +526,45 @@ const TourType = () => {
                     </div>
                 </>
 
+            </CustomModal>
+            
+            {/* ⭐ NEW: Duplicate Modal */}
+            <CustomModal
+                open={openDuplicateModal}
+                onClickOutside={() => {
+                    if (!isDuplicating) {
+                        setOpenDuplicateModal(false);
+                    }
+                }}
+            >
+                <div className='delete-model-view-main'>
+                    <p className="text-center">
+                        Are you sure you want to duplicate this activity?
+                    </p>
+                    <p className="text-center text-muted" style={{ fontSize: '14px' }}>
+                        A new draft will be created with "(Copy)" appended to the name.
+                    </p>
+                    <div className="row">
+                        <div className="col-6">
+                            <button 
+                                className="delete-btn yes" 
+                                onClick={handleDuplicateActivity}
+                                disabled={isDuplicating}
+                            >
+                                {isDuplicating ? 'Duplicating...' : 'Yes, Duplicate'}
+                            </button>
+                        </div>
+                        <div className="col-6">
+                            <button 
+                                className="delete-btn no" 
+                                onClick={() => setOpenDuplicateModal(false)}
+                                disabled={isDuplicating}
+                            >
+                                No
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </CustomModal>
 
         </div>
