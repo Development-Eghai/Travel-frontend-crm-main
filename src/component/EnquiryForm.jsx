@@ -3,23 +3,20 @@ import { createPortal } from 'react-dom';
 
 const EnquiryForm = ({ trip, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     departure_city: '',
     travel_date: '',
     adults: 1,
     children: 0,
-    infants: 0,
     hotel_category: '',
     full_name: '',
     email: '',
-    contact_number: '',
-    additional_comments: ''
+    contact_number: ''
   });
 
-  // 🔒 Lock body scroll when modal opens
   useEffect(() => {
     document.body.classList.add('modal-open');
-    
     return () => {
       document.body.classList.remove('modal-open');
     };
@@ -36,7 +33,6 @@ const EnquiryForm = ({ trip, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!formData.full_name || !formData.email || !formData.contact_number || !formData.travel_date) {
       alert("Please fill in Full Name, Email, Contact Number, and Travel Date.");
       return;
@@ -48,17 +44,17 @@ const EnquiryForm = ({ trip, onClose }) => {
     }
 
     const payload = {
-      destination: trip.title, // Auto-filled from trip data
+      destination: trip.title,
       departure_city: formData.departure_city || "N/A",
       travel_date: formData.travel_date,
       adults: formData.adults || 1,
       children: formData.children || 0,
-      infants: formData.infants || 0,
+      infants: 0,
       hotel_category: formData.hotel_category || "N/A",
       full_name: formData.full_name,
       contact_number: formData.contact_number,
       email: formData.email,
-      additional_comments: formData.additional_comments || ""
+      additional_comments: ""
     };
 
     setIsSubmitting(true);
@@ -75,22 +71,21 @@ const EnquiryForm = ({ trip, onClose }) => {
       const data = await res.json();
 
       if (data?.success === true) {
-        alert("Your enquiry has been submitted successfully! We will contact you soon.");
-        // Reset form
+        setShowSuccess(true);
         setFormData({
           departure_city: '',
           travel_date: '',
           adults: 1,
           children: 0,
-          infants: 0,
           hotel_category: '',
           full_name: '',
           contact_number: '',
-          email: '',
-          additional_comments: ''
+          email: ''
         });
-        // Close modal after successful submission
-        setTimeout(() => onClose(), 2000);
+        setTimeout(() => {
+          setShowSuccess(false);
+          onClose();
+        }, 2000);
       } else {
         alert(data?.message || "Failed to submit enquiry. Please try again.");
       }
@@ -102,9 +97,80 @@ const EnquiryForm = ({ trip, onClose }) => {
     }
   };
 
-  // 🎯 Render modal using React Portal at document.body level
   return createPortal(
-    <div 
+    <>
+      {/* ✅ Success Notification */}
+      {showSuccess && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 1000000,
+            background: 'linear-gradient(135deg, #25d366 0%, #20b358 100%)',
+            color: 'white',
+            padding: '18px 24px',
+            borderRadius: '12px',
+            boxShadow: '0 8px 30px rgba(37, 211, 102, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            animation: 'slideInRight 0.4s ease-out',
+            minWidth: '320px',
+            maxWidth: '400px'
+          }}
+        >
+          <div style={{
+            width: '24px',
+            height: '24px',
+            borderRadius: '50%',
+            background: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7L5.5 10.5L12 4" stroke="#25d366" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ 
+              margin: 0, 
+              fontWeight: '700', 
+              fontSize: '15px',
+              lineHeight: '1.4'
+            }}>
+              Your enquiry has been submitted successfully! We will contact you soon.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowSuccess(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              fontSize: '20px',
+              cursor: 'pointer',
+              padding: '0',
+              width: '24px',
+              height: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0.8,
+              transition: 'opacity 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.opacity = '1'}
+            onMouseLeave={(e) => e.target.style.opacity = '0.8'}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* ✅ Modal Overlay */}
+      <div 
         style={{
           position: 'fixed',
           top: 0,
@@ -121,330 +187,278 @@ const EnquiryForm = ({ trip, onClose }) => {
           transform: 'translateZ(0)'
         }}
         onClick={onClose}
-    >
-      <div 
-        style={{
-          background: 'white',
-          borderRadius: '12px',
-          padding: '32px',
-          width: '100%',
-          maxWidth: '550px',
-          position: 'relative',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
-          minWidth: '300px',
-          margin: 'auto',
-          color: '#3b2a1a',
-          animation: 'modalScaleIn 0.3s ease-out'
-        }}
-        onClick={(e) => e.stopPropagation()}
       >
-        <button 
+        <div 
           style={{
-            position: 'absolute',
-            right: '16px',
-            top: '16px',
-            background: 'none',
-            border: 'none',
-            fontSize: '28px',
-            cursor: 'pointer',
-            color: '#666',
-            fontWeight: 'bold',
-            padding: 0,
-            width: '36px',
-            height: '36px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            transition: 'all 0.3s ease'
+            background: 'white',
+            borderRadius: '12px',
+            padding: '24px 28px',
+            width: '100%',
+            maxWidth: '650px',
+            position: 'relative',
+            maxHeight: '95vh',
+            overflowY: 'auto',
+            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
+            minWidth: '300px',
+            margin: 'auto',
+            color: '#3b2a1a',
+            animation: 'modalScaleIn 0.3s ease-out'
           }}
-          onClick={onClose}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#f0f0f0';
-            e.target.style.color = '#3b2a1a';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.color = '#666';
-          }}
+          onClick={(e) => e.stopPropagation()}
         >
-          &times;
-        </button>
-        
-        <h3 style={{ marginBottom: '8px', fontSize: '26px', fontWeight: '700', color: '#3b2a1a', paddingRight: '40px' }}>
-          Enquiry Now!
-        </h3>
-        <p style={{ marginBottom: '24px', color: '#666', fontSize: '14px' }}>
-          Allow Us to Call You Back!
-        </p>
-        
-        <form onSubmit={handleSubmit}>
-          {/* Travel To (Destination) - Read Only */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Travel To (Destination)</label>
-            <input 
-              type="text" 
-              value={trip?.title || 'Loading...'} 
-              readOnly 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px', 
-                backgroundColor: '#f5f5f5',
-                fontWeight: '600',
-                boxSizing: 'border-box'
-              }} 
-            />
-          </div>
-
-          {/* Travel From (Departure City) */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Travel From (Departure City)</label>
-            <input 
-              name="departure_city" 
-              value={formData.departure_city} 
-              onChange={handleChange} 
-              placeholder="e.g. Delhi, Mumbai" 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* Travel Date * */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Travel Date *</label>
-            <input 
-              type="date" 
-              name="travel_date" 
-              value={formData.travel_date} 
-              onChange={handleChange} 
-              required 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* No. of Adults * */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>No. of Adults *</label>
-            <input 
-              type="number" 
-              name="adults" 
-              min="1" 
-              value={formData.adults} 
-              onChange={handleChange} 
-              required 
-              placeholder="e.g. 2"
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* No. of Children */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>No. of Children</label>
-            <input 
-              type="number" 
-              name="children" 
-              min="0" 
-              value={formData.children} 
-              onChange={handleChange} 
-              placeholder="e.g. 0"
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* Hotel Category */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Hotel Category</label>
-            <select 
-              name="hotel_category" 
-              value={formData.hotel_category} 
-              onChange={handleChange} 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            >
-              <option value="">Select Hotel Category</option>
-              <option value="Five Star">⭐⭐⭐⭐⭐ (Five Star)</option>
-              <option value="Four Star">⭐⭐⭐⭐ (Four Star)</option>
-              <option value="Three Star">⭐⭐⭐ (Three Star)</option>
-              <option value="Two Star">⭐⭐ (Two Star)</option>
-              <option value="Budget">Budget</option>
-            </select>
-          </div>
-          
-          {/* Full Name * */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Full Name *</label>
-            <input 
-              name="full_name" 
-              value={formData.full_name} 
-              onChange={handleChange} 
-              placeholder="e.g. John Doe" 
-              required 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* Email * */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Email *</label>
-            <input 
-              type="email" 
-              name="email" 
-              value={formData.email} 
-              onChange={handleChange} 
-              placeholder="e.g. JohnDoe@gmail.com" 
-              required 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* Contact Number * */}
-          <div style={{ marginBottom: '18px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Contact Number *</label>
-            <input 
-              type="tel" 
-              name="contact_number" 
-              value={formData.contact_number} 
-              onChange={handleChange} 
-              placeholder="e.g. 1234567890" 
-              required 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
-          {/* Additional Comments */}
-          <div style={{ marginBottom: '22px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '14px' }}>Additional Comments</label>
-            <textarea 
-              name="additional_comments" 
-              value={formData.additional_comments} 
-              onChange={handleChange} 
-              placeholder="Write any message or special requests here..." 
-              style={{ 
-                width: '100%', 
-                padding: '12px 14px', 
-                border: '2px solid #ddd', 
-                borderRadius: '8px', 
-                height: '100px',
-                resize: 'vertical',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s ease'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#3b2a1a'}
-              onBlur={(e) => e.target.style.borderColor = '#ddd'}
-            />
-          </div>
-
           <button 
-            type="submit" 
-            disabled={isSubmitting} 
             style={{
-              width: '100%',
-              padding: '14px',
-              backgroundColor: isSubmitting ? '#999' : '#3b2a1a',
-              color: 'white',
+              position: 'absolute',
+              right: '16px',
+              top: '16px',
+              background: 'none',
               border: 'none',
-              borderRadius: '8px',
-              fontWeight: '700',
-              fontSize: '16px',
-              cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              transition: 'all 0.3s ease',
-              boxSizing: 'border-box'
+              fontSize: '28px',
+              cursor: 'pointer',
+              color: '#666',
+              fontWeight: 'bold',
+              padding: 0,
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              transition: 'all 0.3s ease'
             }}
+            onClick={onClose}
             onMouseEnter={(e) => {
-              if (!isSubmitting) {
-                e.target.style.backgroundColor = '#2d1f13';
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 6px 15px rgba(59, 42, 26, 0.4)';
-              }
+              e.target.style.backgroundColor = '#f0f0f0';
+              e.target.style.color = '#3b2a1a';
             }}
             onMouseLeave={(e) => {
-              if (!isSubmitting) {
-                e.target.style.backgroundColor = '#3b2a1a';
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
-              }
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#666';
             }}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
+            &times;
           </button>
-        </form>
+          
+          <h3 style={{ marginBottom: '4px', fontSize: '24px', fontWeight: '700', color: '#3b2a1a', paddingRight: '40px' }}>
+            Enquiry Now!
+          </h3>
+          <p style={{ marginBottom: '16px', color: '#666', fontSize: '13px' }}>
+            Allow Us to Call You Back!
+          </p>
+          
+          <form onSubmit={handleSubmit}>
+            {/* Travel To (Destination) */}
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Travel To (Destination)</label>
+              <input 
+                type="text" 
+                value={trip?.title || 'Loading...'} 
+                readOnly 
+                style={{ 
+                  width: '100%', 
+                  padding: '10px 12px', 
+                  border: '2px solid #ddd', 
+                  borderRadius: '8px', 
+                  backgroundColor: '#f5f5f5',
+                  fontWeight: '600',
+                  fontSize: '13px',
+                  boxSizing: 'border-box'
+                }} 
+              />
+            </div>
+
+            {/* Departure City + Travel Date */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Travel From (Departure City)</label>
+                <input 
+                  name="departure_city" 
+                  value={formData.departure_city} 
+                  onChange={handleChange} 
+                  placeholder="e.g. Delhi" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Travel Date *</label>
+                <input 
+                  type="date" 
+                  name="travel_date" 
+                  value={formData.travel_date} 
+                  onChange={handleChange} 
+                  required 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Adults + Children */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Adults (11+ yrs) *</label>
+                <input 
+                  type="number" 
+                  name="adults" 
+                  min="1" 
+                  value={formData.adults} 
+                  onChange={handleChange} 
+                  required 
+                  placeholder="1"
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Children (5–11 yrs)</label>
+                <input 
+                  type="number" 
+                  name="children" 
+                  min="0" 
+                  value={formData.children}
+                  onChange={handleChange} 
+                  placeholder="0"
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Email + Hotel Category */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '14px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Email *</label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  value={formData.email} 
+                  onChange={handleChange} 
+                  placeholder="e.g. JohnDoe@gmail.com" 
+                  required 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Hotel Category</label>
+                <select 
+                  name="hotel_category" 
+                  value={formData.hotel_category} 
+                  onChange={handleChange} 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                >
+                  <option value="">Select Category</option>
+                  <option value="Five Star">⭐⭐⭐⭐⭐ Five Star</option>
+                  <option value="Four Star">⭐⭐⭐⭐ Four Star</option>
+                  <option value="Three Star">⭐⭐⭐ Three Star</option>
+                  <option value="Budget">Budget</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Full Name + Contact Number */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Full Name *</label>
+                <input 
+                  name="full_name" 
+                  value={formData.full_name} 
+                  onChange={handleChange} 
+                  placeholder="e.g. John Doe" 
+                  required 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px' }}>Contact Number *</label>
+                <input 
+                  type="tel" 
+                  name="contact_number" 
+                  value={formData.contact_number} 
+                  onChange={handleChange} 
+                  placeholder="e.g. 1234567890" 
+                  required 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 12px', 
+                    border: '2px solid #ddd', 
+                    borderRadius: '8px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              disabled={isSubmitting} 
+              style={{
+                width: '100%',
+                padding: '14px',
+                background: isSubmitting 
+                  ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)' 
+                  : 'linear-gradient(135deg, #25d366 0%, #20b358 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontWeight: '700',
+                fontSize: '16px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px'
+              }}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
+            </button>
+          </form>
+        </div>
       </div>
 
-      {/* Keyframe animation */}
       <style>{`
         @keyframes modalScaleIn {
           from {
@@ -456,13 +470,12 @@ const EnquiryForm = ({ trip, onClose }) => {
             transform: scale(1) translateY(0);
           }
         }
-        
         body.modal-open {
           overflow: hidden;
         }
       `}</style>
-    </div>,
-    document.body // 🎯 Portal renders directly to document.body
+    </>,
+    document.body
   );
 };
 

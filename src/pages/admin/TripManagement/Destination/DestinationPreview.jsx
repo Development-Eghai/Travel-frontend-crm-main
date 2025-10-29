@@ -44,7 +44,7 @@ const DestinationPreview = () => {
     const contentEl = contentRef.current;
     if (contentEl) {
       const contentHeight = contentEl.scrollHeight;
-      const containerHeight = 70;
+      const containerHeight = 120;
       setShowReadMore(contentHeight > containerHeight);
     }
   }, [destinationContent]);
@@ -173,183 +173,166 @@ const DestinationPreview = () => {
       </section>
 
       {/* About Destination */}
-      <section className="section-padding">
+      <section className="about-section">
         <div className="container">
-          <div className="destination-about-tour">
-            <div className="section-header text-center mb-5">
-              <h2 className="section-title">
-                Discover {destinationContent?.title}
-              </h2>
-              <div className="title-underline"></div>
-            </div>
+          <div className="section-header text-center">
+            <h2 className="section-title">Discover {destinationContent?.title}</h2>
+            <div className="title-underline"></div>
+          </div>
 
-            <div className={`destination-about-tour-content ${readMore ? "destination-about-tour-content-expand" : ""}`}>
-              {showReadMore && (
-                <div className="destination-read-more-main">
-                  <button
-                    className="destination-read-more-btn"
-                    onClick={() => setReadMore(!readMore)}
-                  >
-                    {readMore ? "Read Less..." : "Read More..."}
-                  </button>
-                </div>
-              )}
-              <div ref={contentRef}>
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: destinationContent?.overview || "<p>No description available</p>",
-                  }}
-                ></p>
-              </div>
+          <div className={`about-content ${readMore ? "expanded" : ""}`}>
+            <div ref={contentRef}>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: destinationContent?.overview || "<p>No description available</p>",
+                }}
+              ></div>
             </div>
+            {showReadMore && (
+              <button
+                className="read-more-btn"
+                onClick={() => setReadMore(!readMore)}
+              >
+                {readMore ? "Show Less" : "Read More"}
+              </button>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="why-choose-section section-padding-bottom">
+      {/* Popular Packages */}
+      <section className="packages-section" id="packages-section">
         <div className="container">
-          <div className="section-header text-center mb-5">
+          <div className="section-header text-center">
+            <h2 className="section-title">Popular Trip Packages</h2>
+            <div className="title-underline"></div>
+          </div>
+
+          <div className="packages-grid">
+            {trips.slice(0, visibleCount).map((trip, index) => (
+              <div className="package-item" key={index}>
+                <TripCard trip={trip} />
+              </div>
+            ))}
+          </div>
+
+          {trips.length > 4 && (
+            <div className="text-center mt-4">
+              <button className="view-more-btn" onClick={handleToggle}>
+                {visibleCount >= trips.length ? (
+                  <>
+                    Show Less <i className="fa-solid fa-chevron-up ms-2"></i>
+                  </>
+                ) : (
+                  <>
+                    View More Packages <i className="fa-solid fa-chevron-down ms-2"></i>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Custom Packages */}
+      {destinationContent?.custom_packages?.map((pkg, pkgIndex) => {
+        const isExpanded = expandedSections[pkgIndex];
+        const tripsToShow = isExpanded ? pkg.trips : pkg.trips.slice(0, 4);
+
+        return (
+          <section className="packages-section" key={pkgIndex}>
+            <div className="container">
+              <div className="section-header text-center">
+                <h2 className="section-title">{pkg.title}</h2>
+                <div className="title-underline"></div>
+                {pkg.description && (
+                  <p className="section-subtitle">{pkg.description}</p>
+                )}
+              </div>
+
+              <div className="packages-grid">
+                {tripsToShow.map((trip, index) => (
+                  <div className="package-item" key={index}>
+                    <TripCard trip={trip} />
+                  </div>
+                ))}
+              </div>
+
+              {pkg.trips.length > 4 && (
+                <div className="text-center mt-4">
+                  <button
+                    className="view-more-btn"
+                    onClick={() => toggleViewMore(pkgIndex)}
+                  >
+                    {isExpanded ? (
+                      <>
+                        Show Less <i className="fa-solid fa-chevron-up ms-2"></i>
+                      </>
+                    ) : (
+                      <>
+                        View More <i className="fa-solid fa-chevron-down ms-2"></i>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      })}
+
+      {/* Why Choose Us */}
+      <section className="why-choose-section">
+        <div className="container">
+          <div className="section-header text-center">
             <h2 className="section-title">Why Book With Us</h2>
             <div className="title-underline"></div>
-            <p className="section-subtitle">Experience hassle-free travel with our trusted services</p>
           </div>
-          <div className="row">
+          <div className="why-choose-grid">
             {whyChooseUs.map((item, index) => (
-              <div className="col-lg-3 col-md-6 mb-4" key={index}>
-                <div className="why-choose-card">
-                  <div className="why-icon">
-                    <i className={`fa-solid ${item.icon}`}></i>
-                  </div>
-                  <h5>{item.title}</h5>
-                  <p>{item.description}</p>
+              <div className="why-choose-card" key={index}>
+                <div className="why-icon">
+                  <i className={`fa-solid ${item.icon}`}></i>
                 </div>
+                <h5>{item.title}</h5>
+                <p>{item.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Popular Packages */}
-      <section className="section-padding-bottom" id="packages-section">
-        <div className="container">
-          <div className="section-header text-center mb-5">
-            <h2 className="section-title">Popular Trip Packages</h2>
-            <div className="title-underline"></div>
-            <p className="section-subtitle">
-              Handpicked tours designed for unforgettable experiences
-            </p>
-          </div>
-
-          <div className="mt-4">
-            <div className="row">
-              {trips.slice(0, visibleCount).map((trip, index) => (
-                <div className="col-lg-3 col-md-6 mb-4" key={index}>
-                  <TripCard trip={trip} />
-                </div>
-              ))}
-
-              {trips.length > 4 && (
-                <div className="destination-viewall-main d-flex justify-content-center mt-4">
-                  <button className="destination-viewall" onClick={handleToggle}>
-                    {visibleCount >= trips.length ? "Show Less" : "Show More"}
-                    <i className={`fa-solid ms-2 ${visibleCount >= trips.length ? "fa-arrow-up" : "fa-arrow-right"}`}></i>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Custom Packages */}
-      <section className="section-padding-bottom">
-        <div className="container">
-          {destinationContent?.custom_packages?.map((pkg, pkgIndex) => {
-            const isExpanded = expandedSections[pkgIndex];
-            const tripsToShow = isExpanded ? pkg.trips : pkg.trips.slice(0, 4);
-
-            return (
-              <div key={pkgIndex} className="mb-5">
-                <div className="section-header text-center mb-5">
-                  <h2 className="section-title">{pkg.title}</h2>
-                  <div className="title-underline"></div>
-                  {pkg.description && (
-                    <p className="section-subtitle">{pkg.description}</p>
-                  )}
-                </div>
-
-                <div className="mt-4">
-                  <div className="row">
-                    {tripsToShow.map((trip, index) => (
-                      <div className="col-lg-3 col-md-6 mb-4" key={index}>
-                        <TripCard trip={trip} />
-                      </div>
-                    ))}
-
-                    <div className="d-flex justify-content-center w-100">
-                      {pkg.trips.length > 4 && (
-                        <button
-                          className="destination-viewall btn btn-outline-dark mt-3"
-                          onClick={() => toggleViewMore(pkgIndex)}
-                        >
-                          {isExpanded ? (
-                            <>
-                              Show Less <i className="fa-solid fa-arrow-up ms-2"></i>
-                            </>
-                          ) : (
-                            <>
-                              Show More <i className="fa-solid fa-arrow-down ms-2"></i>
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       {/* Travel Guidelines */}
-      <section className="section-padding-bottom">
+      <section className="guidelines-section">
         <div className="container">
-          <div className="section-header text-center mb-5">
-            <h2 className="section-title">
-              {destinationContent?.title} Travel Guidelines
-            </h2>
+          <div className="section-header text-center">
+            <h2 className="section-title">{destinationContent?.title} Travel Guidelines</h2>
             <div className="title-underline"></div>
           </div>
 
-          <div className="travel-guide-content">
-            <p
+          <div className="guidelines-content">
+            <div
               dangerouslySetInnerHTML={{
                 __html: destinationContent?.travel_guidelines || "<p>No guidance available</p>",
               }}
-            ></p>
+            ></div>
           </div>
         </div>
       </section>
 
       {/* Call to Action */}
-      <section className="cta-section section-padding-bottom">
+      <section className="cta-section">
         <div className="container">
           <div className="cta-card">
-            <div className="row align-items-center">
-              <div className="col-lg-8">
-                <h2 className="cta-title">Ready to Explore {destinationContent?.title}?</h2>
-                <p className="cta-text">
-                  Book your dream vacation today and create unforgettable memories!
-                </p>
-              </div>
-              <div className="col-lg-4 text-lg-end">
-                <button className="cta-button" onClick={handleOpenModal}>
-                  <i className="fa-solid fa-phone me-2"></i>
-                  Contact Us Now
-                </button>
-              </div>
+            <div className="cta-content">
+              <h2 className="cta-title">Ready to Explore {destinationContent?.title}?</h2>
+              <p className="cta-text">
+                Book your dream vacation today and create unforgettable memories
+              </p>
+              <button className="cta-button" onClick={handleOpenModal}>
+                <i className="fa-solid fa-phone me-2"></i>
+                Contact Us Now
+              </button>
             </div>
           </div>
         </div>
