@@ -1,371 +1,23 @@
 /* ============================================
-   READ MORE BUTTON
+   COLOR THEME DEFINITIONS
+   Primary Brand Color: #3b2a1a (Brown - for text, main backgrounds)
+   Accent Color: #25d366 (Green - for highlights, active states)
+   Secondary Brown: #5d4a36 (Darker Brown)
+   Light Backgrounds: #f8f9fa, #ffffff, #e9ecef
    ============================================ */
-.read-more {
-    color: #25d366;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 8px 16px;
-    border-radius: 8px;
-    background: rgba(37, 211, 102, 0.1);
-    border: 2px solid transparent;
-}
 
-.read-more:hover {
-    color: #20b358;
-    transform: translateX(5px);
-    background: rgba(37, 211, 102, 0.15);
-    border-color: #25d366;
-}
-
-.read-more::after {
-    content: '→';
-    transition: transform 0.3s ease;
-}
-
-.read-more:hover::after {
-    transform: translateX(4px);
-}
 
 /* ============================================
-   ACCORDION STYLING - Green & Brown Theme
-   ============================================ */
-.trip-detail-faqs .accordion-item {
-    border: none;
-    background: #ffffff;
-    margin-bottom: 18px;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 
-        0 3px 20px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(59, 42, 26, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-left: 4px solid transparent;
-}
-
-.trip-detail-faqs .accordion-item:hover {
-    box-shadow: 
-        0 6px 30px rgba(0, 0, 0, 0.12),
-        0 0 0 1px rgba(37, 211, 102, 0.2);
-    border-left-color: #25d366;
-}
-
-.trip-detail-faqs .accordion-header {
-    background: transparent;
-}
-
-.trip-detail-faqs .accordion-button {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    color: #3b2a1a;
-    font-weight: 700;
-    padding: 20px 28px;
-    border: none;
-    box-shadow: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.trip-detail-faqs .accordion-button:hover {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-}
-
-.trip-detail-faqs .accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, #25d366 0%, #20b358 100%);
-    color: #ffffff;
-    box-shadow: 
-        0 4px 15px rgba(37, 211, 102, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.trip-detail-faqs .accordion-button:focus {
-    box-shadow: none;
-    border: none;
-}
-
-.trip-detail-faqs .accordion-button::after {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2325d366'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-    transform: scale(1.3);
-    transition: transform 0.3s ease;
-}
-
-.trip-detail-faqs .accordion-button:not(.collapsed)::after {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-    transform: scale(1.3) rotate(180deg);
-}
-
-.trip-detail-faqs .accordion-body {
-    padding: 25px 28px;
-    background: #ffffff;
-    color: #495057;
-    line-height: 1.8;
-    font-size: 15px;
-}
-
-.trip-faq-accordion {
-    background: black;
-    padding: 6px 14px;
-    border-radius: 8px;
-    display: inline-block;
-    margin-right: 12px;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-/* ============================================
-   INCLUSION/EXCLUSION LISTS - Green & Brown Theme
-   ============================================ */
-.inclusion-exclusion-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.inclusion-exclusion-list li {
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
-    padding: 18px 20px;
-    border-radius: 12px;
-    margin-bottom: 14px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.inclusion-exclusion-list li:hover {
-    background: linear-gradient(135deg, #ffffff, #f8f9fa);
-    transform: translateX(8px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.inclusion-item {
-    border-left: 4px solid #28a745;
-}
-
-.inclusion-item:hover {
-    border-left-width: 6px;
-}
-
-.inclusion-item i {
-    color: #28a745;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.exclusion-item {
-    border-left: 4px solid #dc3545;
-}
-
-.exclusion-item:hover {
-    border-left-width: 6px;
-}
-
-.exclusion-item i {
-    color: #dc3545;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.highlight-item {
-    border-left: 4px solid #ffc107;
-}
-
-.highlight-item:hover {
-    border-left-width: 6px;
-}
-
-.highlight-item i {
-    color: #ffc107;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-.inclusion-exclusion-list li span {
-    flex: 1;
-    line-height: 1.6;
-    color: #495057;
-    font-weight: 500;
-}
-
-/* ============================================
-   RESPONSIVE ADJUSTMENTS
-   ============================================ */
-@media (max-width: 991px) {
-    .trip-detail-right {
-        position: static;
-        margin-top: 30px;
-    }
-    
-    .trip-detail-tabs-main {
-        position: static;
-        top: auto;
-    }
-    
-    .trip-detail-section {
-        padding: 25px;
-    }
-}
-
-@media (max-width: 768px) {
-    .trip-detail-tabs-main {
-        gap: 8px;
-        padding: 15px;
-    }
-    
-    .tip-detail-tabs {
-        min-width: 110px;
-        padding: 12px 18px;
-    }
-    
-    .tip-detail-tabs p {
-        font-size: 13px;
-    }
-    
-    .trip-detail-contact-input-container {
-        padding: 25px;
-    }
-    
-    .trip-price {
-        font-size: 34px;
-    }
-    
-    .trip-detail-section {
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .trip-detail-section h3 {
-        font-size: 24px;
-    }
-    
-    .trip-pickup-parent {
-        padding: 20px;
-    }
-    
-    .trip-pickup-drop {
-        min-width: 100%;
-        margin-bottom: 15px;
-    }
-}
-
-@media (max-width: 480px) {
-    .trip-detail-tabs-main {
-        gap: 6px;
-        padding: 12px;
-        border-radius: 12px;
-    }
-    
-    .tip-detail-tabs {
-        min-width: 90px;
-        padding: 10px 12px;
-        border-radius: 8px;
-    }
-    
-    .tip-detail-tabs p {
-        font-size: 11px;
-    }
-    
-    .trip-detail-contact-input-container {
-        padding: 20px;
-    }
-    
-    .trip-detail-contact-form-head {
-        padding: 20px;
-    }
-    
-    .trip-detail-contact-form-head .head-1 {
-        font-size: 22px;
-    }
-    
-    .trip-price {
-        font-size: 28px;
-    }
-    
-    .trip-detail-price-card {
-        padding: 25px;
-    }
-    
-    .trip-detail-section {
-        padding: 18px;
-    }
-    
-    .trip-detail-section h3 {
-        font-size: 20px;
-    }
-    
-    .inclusion-exclusion-list li {
-        padding: 14px 16px;
-        font-size: 14px;
-    }
-    
-    .trip-detail-faqs .accordion-button {
-        padding: 16px 20px;
-        font-size: 14px;
-    }
-    
-    .trip-detail-faqs .accordion-body {
-        padding: 18px 20px;
-        font-size: 14px;
-    }
-}
-
-/* ============================================
-   SMOOTH SCROLL BEHAVIOR
+   GENERAL STYLING & STRUCTURE
    ============================================ */
 html {
     scroll-behavior: smooth;
 }
 
-.trip-detail-section {
-    scroll-margin-top: 150px; /* Offset for sticky tabs */
+.overflow-hidden-page {
+    overflow-x: hidden;
 }
 
-/* ============================================
-   ADDITIONAL POLISH
-   ============================================ */
-
-/* Add animation to sections on scroll */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.trip-detail-section {
-    animation: fadeInUp 0.6s ease-out;
-}
-
-/* Enhance hover effects for better UX */
-.trip-detail-contact-input input:hover,
-.trip-detail-contact-input select:hover,
-.trip-detail-contact-input textarea:hover {
-    border-color: #25d366;
-}
-
-/* Add loading state styles if needed */
-.trip-detail-contact-input-container button[type="submit"]:disabled {
-    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.trip-detail-contact-input-container button[type="submit"]:disabled:hover {
-    box-shadow: 0 6px 20px rgba(156, 163, 175, 0.4);
-}/* ============================================
-   STICKY TABS & SIDEBAR STYLING
-   ============================================ */
-
-/* Main container adjustments */
 .trip-detail-content-main {
     padding: 40px 0;
     background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
@@ -374,8 +26,6 @@ html {
 /* Left column - scrollable content */
 .trip-detail-left {
     padding-right: 20px;
-    max-height: none; /* Remove height restriction */
-    overflow: visible; /* Allow natural scrolling */
 }
 
 /* Right column - sticky container */
@@ -388,11 +38,108 @@ html {
     top: 100px;
     z-index: 10;
     margin-bottom: 20px;
-    align-self: flex-start; /* Important for sticky behavior */
+    align-self: flex-start;
+}
+
+.trip-detail-section {
+    scroll-margin-top: 150px; /* Offset for sticky tabs */
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 
+        0 6px 25px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(59, 42, 26, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid transparent;
+    animation: fadeInUp 0.6s ease-out; /* Animation */
+}
+
+.trip-detail-section:hover {
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(37, 211, 102, 0.2);
+    transform: translateX(4px);
+    border-left-color: #25d366;
+}
+
+.trip-detail-section h3 {
+    color: #3b2a1a;
+    font-weight: 800;
+    font-size: 28px;
+    margin-bottom: 25px;
+    padding-bottom: 18px;
+    border-bottom: 3px solid transparent;
+    background: linear-gradient(90deg, #25d366, transparent) bottom;
+    background-size: 80px 3px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    position: relative;
+}
+
+.trip-detail-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #25d366, #20b358);
+    border-radius: 2px;
+}
+
+.trip-detail-heading {
+    /* New Heading for Tour Title - Moved from Hero */
+    color: #3b2a1a;
+    font-weight: 800;
+    font-size: 36px;
+    margin-bottom: 20px;
+    padding-top: 10px;
+    line-height: 1.3;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ============================================
-   STICKY TABS STYLING - Green & Brown Theme
+   HERO BANNER - Text Removed as per request
+   ============================================ */
+.destination-detail-banner-main {
+    /* Standard banner styling */
+    height:70vh;
+    /* max-height: 50vh; */
+}
+
+.destination-swiper, .destination-slide {
+    height: 100%;
+}
+
+.destination-overlay {
+    /* Overlay for darkening the image */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.destination-slide-content {
+    /* Removed text content from banner */
+    display: none; 
+}
+
+
+/* ============================================
+   STICKY TABS STYLING
    ============================================ */
 .trip-detail-tabs-main {
     position: sticky;
@@ -462,10 +209,6 @@ html {
     border-color: #25d366;
 }
 
-.tip-detail-tabs:hover p {
-    color: #25d366;
-}
-
 .tip-detail-tabs.active {
     background: linear-gradient(135deg, #25d366 0%, #20b358 100%);
     border-color: #25d366;
@@ -490,8 +233,275 @@ html {
     border-radius: 2px 2px 0 0;
 }
 
+
 /* ============================================
-   PRICE CARD STYLING - Green & Brown Theme
+   PICKUP & DROP STYLING
+   ============================================ */
+.trip-pickup-parent {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 35px;
+    box-shadow: 
+        0 6px 25px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(59, 42, 26, 0.05);
+    display: flex; /* Ensure it's a flex container */
+    flex-wrap: wrap;
+    border-left: 4px solid #25d366;
+    transition: all 0.3s ease;
+}
+
+.trip-pickup-parent:hover {
+    box-shadow: 
+        0 10px 35px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(37, 211, 102, 0.2);
+    transform: translateY(-2px);
+}
+
+.trip-pickup-drop {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    flex: 1;
+    min-width: 250px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.trip-pickup-drop:hover {
+    background: rgba(37, 211, 102, 0.05);
+}
+
+.trip-pickup-drop i {
+    font-size: 28px;
+    color: #25d366;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+
+.trip-pickup-drop:hover i {
+    transform: scale(1.1);
+    color: #20b358;
+}
+
+.trip-pickup-drop p {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.trip-pickup-drop h3 {
+    font-size: 18px;
+    color: #3b2a1a;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ============================================
+   READ MORE BUTTON
+   ============================================ */
+.read-more {
+    color: #25d366;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(37, 211, 102, 0.1);
+    border: 2px solid transparent;
+}
+
+.read-more:hover {
+    color: #20b358;
+    transform: translateX(5px);
+    background: rgba(37, 211, 102, 0.15);
+    border-color: #25d366;
+}
+
+.read-more::after {
+    content: '→';
+    transition: transform 0.3s ease;
+}
+
+.read-more:hover::after {
+    transform: translateX(4px);
+}
+
+
+/* ============================================
+   ACCORDION STYLING - Green & Brown Theme (Itinerary/FAQ)
+   ============================================ */
+.trip-detail-faqs .accordion-item {
+    border: none;
+    background: #ffffff;
+    margin-bottom: 18px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 
+        0 3px 20px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(59, 42, 26, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid transparent;
+}
+
+.trip-detail-faqs .accordion-item:hover {
+    box-shadow: 
+        0 6px 30px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(37, 211, 102, 0.2);
+    border-left-color: #25d366;
+}
+
+.trip-detail-faqs .accordion-header {
+    background: transparent;
+}
+
+.trip-detail-faqs .accordion-button {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    color: #3b2a1a;
+    font-weight: 700;
+    padding: 20px 28px;
+    border: none;
+    box-shadow: none;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.trip-detail-faqs .accordion-button:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.trip-detail-faqs .accordion-button:not(.collapsed) {
+    background: linear-gradient(135deg, #25d366 0%, #20b358 100%);
+    color: #ffffff;
+    box-shadow: 
+        0 4px 15px rgba(37, 211, 102, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.trip-detail-faqs .accordion-button:focus {
+    box-shadow: none;
+    border: none;
+}
+
+.trip-detail-faqs .accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%233b2a1a'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    transform: scale(1.3);
+    transition: transform 0.3s ease;
+}
+
+.trip-detail-faqs .accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    transform: scale(1.3) rotate(180deg);
+}
+
+.trip-detail-faqs .accordion-body {
+    padding: 25px 28px;
+    background: #ffffff;
+    color: #495057;
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+.trip-faq-accordion {
+    /* Day 1 badge styling */
+    background: #3b2a1a; 
+    padding: 6px 14px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-right: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+/* ============================================
+   INCLUSION/EXCLUSION LISTS STYLING
+   ============================================ */
+.inclusion-exclusion-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.inclusion-exclusion-list li {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    padding: 18px 20px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.inclusion-exclusion-list li:hover {
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    transform: translateX(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.inclusion-item {
+    border-left: 4px solid #25d366; /* Using Accent Color for Inclusion */
+}
+
+.inclusion-item:hover {
+    border-left-width: 6px;
+}
+
+.inclusion-item i {
+    color: #25d366;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.exclusion-item {
+    border-left: 4px solid #dc3545; /* Red for Exclusion */
+}
+
+.exclusion-item:hover {
+    border-left-width: 6px;
+}
+
+.exclusion-item i {
+    color: #dc3545;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.highlight-item {
+    border-left: 4px solid #ffc107; /* Yellow for Highlight */
+}
+
+.highlight-item:hover {
+    border-left-width: 6px;
+}
+
+.highlight-item i {
+    color: #ffc107;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.inclusion-exclusion-list li span {
+    flex: 1;
+    line-height: 1.6;
+    color: #495057;
+    font-weight: 500;
+}
+
+
+/* ============================================
+   PRICE CARD STYLING
    ============================================ */
 .trip-detail-price-card {
     background: linear-gradient(135deg, #3b2a1a 0%, #5d4a36 100%);
@@ -562,457 +572,308 @@ html {
     font-weight: 500;
 }
 
-/* ============================================
-   ENQUIRY FORM STYLING - Green & Brown Theme
-   ============================================ */
-.trip-detail-contact-form {
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 
-        0 15px 50px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(59, 42, 26, 0.05);
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
+/* ================================
+   FINAL ENQUIRY FORM STYLING
+   ================================ */
 
-.trip-detail-contact-form:hover {
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.15),
-        0 0 0 1px rgba(37, 211, 102, 0.2);
-    transform: translateY(-2px);
+.trip-detail-contact-form {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 0 auto;
+  max-width: 100%;
 }
 
 .trip-detail-contact-form-head {
-    background: linear-gradient(135deg, #3b2a1a 0%, #5d4a36 100%);
-    padding: 30px;
-    color: #ffffff;
-    position: relative;
-    overflow: hidden;
-}
-
-.trip-detail-contact-form-head::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(37, 211, 102, 0.2) 0%, transparent 70%);
-    border-radius: 50%;
+  background: #fff;
+  padding: 16px 20px 8px 20px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .trip-detail-contact-form-head .head-1 {
-    font-size: 26px;
-    font-weight: 800;
-    margin: 0;
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 1;
-    background: linear-gradient(195deg, #ffffff, #25d366);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  color: #25d366;
+  font-weight: 800;
+  font-size: 22px;
+  margin: 0;
 }
 
 .trip-detail-contact-form-head .head-2 {
-    font-size: 15px;
-    margin: 0;
-    opacity: 0.95;
-    font-weight: 500;
-    position: relative;
-    z-index: 1;
-    color: #e9ecef;
+  color: #3b2a1a;
+  font-size: 12px;
+  margin: 2px 0 0 0;
 }
 
+/* Container */
 .trip-detail-contact-input-container {
-    padding: 35px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.trip-detail-contact-input {
-    margin-bottom: 22px;
-}
-
+/* Label */
 .trip-detail-contact-input label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: #3b2a1a;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3b2a1a;
+  margin-bottom: 6px;
+  text-transform: uppercase;
 }
 
+/* Input wrappers */
+.input-with-icon-wrapper,
+.input-stepper-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 42px;
+}
+
+/* Icons */
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: #9ca3af;
+  font-size: 14px;
+  z-index: 2;
+}
+
+/* Inputs and selects */
 .trip-detail-contact-input input,
-.trip-detail-contact-input select,
-.trip-detail-contact-input textarea {
-    width: 100%;
-    padding: 14px 18px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #f8f9fa;
-    color: #2c3e50;
-    font-weight: 500;
-}
-
-.trip-detail-contact-input input::placeholder,
-.trip-detail-contact-input textarea::placeholder {
-    color: #adb5bd;
-    font-weight: 400;
+.trip-detail-contact-input select {
+  width: 100%;
+  height: 42px;
+  padding: 8px 38px 8px 35px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 13px;
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  appearance: none;
 }
 
 .trip-detail-contact-input input:focus,
-.trip-detail-contact-input select:focus,
-.trip-detail-contact-input textarea:focus {
-    outline: none;
-    border-color: #25d366;
-    background: #ffffff;
-    box-shadow: 
-        0 0 0 4px rgba(37, 211, 102, 0.1),
-        0 4px 12px rgba(37, 211, 102, 0.15);
-    transform: translateY(-1px);
+.trip-detail-contact-input select:focus {
+  border-color: #25d366;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+  outline: none;
 }
 
+/* Read-only field */
 .trip-detail-contact-input input.form-control-plaintext {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-color: #dee2e6;
-    font-weight: 700;
-    color: #3b2a1a;
-    cursor: not-allowed;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  color: #3b2a1a;
+  font-weight: 700;
+  cursor: not-allowed;
+  padding-left: 35px;
 }
 
-.trip-detail-contact-input textarea {
-    resize: vertical;
-    min-height: 120px;
-    font-family: inherit;
+/* Stepper input box */
+.input-stepper-wrapper {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  background: #f8f9fa;
+  position: relative;
+  height: 42px;
+  overflow: hidden;
 }
 
+.input-stepper-wrapper input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+  padding-left: 12px;
+  padding-right: 26px;
+  text-align: left;
+  font-weight: 500;
+}
+
+/* Stepper controls inside field */
+.stepper-controls {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 26px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #e9ecef;
+}
+
+.stepper-controls button {
+  background: transparent;
+  border: none;
+  flex: 1;
+  font-size: 11px;
+  cursor: pointer;
+  color: #3b2a1a;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.stepper-controls button:hover {
+  background: rgba(37, 211, 102, 0.12);
+}
+
+/* Submit Button */
 .trip-detail-contact-input-container button[type="submit"] {
-    width: 100%;
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #25d366 0%, #20b358 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 4px;
+}
+
+.trip-detail-contact-input-container button[type="submit"]:hover {
+  background: linear-gradient(135deg, #20b358 0%, #1a9e4c 100%);
+  transform: translateY(-2px);
+}
+
+/* Two fields per row */
+.trip-combined-line-group {
+  display: flex;
+  gap: 12px;
+}
+
+.trip-combined-line-group .trip-detail-contact-input {
+  flex: 1;
+}
+
+/* Remove scroll on desktop */
+body,
+html {
+  overflow-x: hidden;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .trip-combined-line-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .trip-detail-contact-input-container {
     padding: 16px;
-    background: linear-gradient(135deg, #25d366 0%, #20b358 100%);
-    color: #ffffff;
-    border: none;
-    border-radius: 12px;
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    box-shadow: 
-        0 6px 20px rgba(37, 211, 102, 0.4),
-        0 0 0 1px rgba(37, 211, 102, 0.2);
-    position: relative;
-    overflow: hidden;
+  }
+
+  .trip-detail-contact-form {
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  }
 }
 
-.trip-detail-contact-input-container button[type="submit"]::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s ease;
-}
-
-.trip-detail-contact-input-container button[type="submit"]:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow: 
-        0 10px 30px rgba(37, 211, 102, 0.5),
-        0 0 0 1px rgba(37, 211, 102, 0.3);
-    background: linear-gradient(135deg, #20b358 0%, #1a9e4c 100%);
-}
-
-.trip-detail-contact-input-container button[type="submit"]:hover:not(:disabled)::before {
-    left: 100%;
-}
-
-.trip-detail-contact-input-container button[type="submit"]:active:not(:disabled) {
-    transform: translateY(-1px);
-}
-
-.trip-detail-contact-input-container button[type="submit"]:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ============================================
-   CONTENT SECTIONS STYLING - Green & Brown Theme
-   ============================================ */
-.trip-detail-section {
-    background: #ffffff;
-    padding: 35px;
-    border-radius: 20px;
-    margin-bottom: 30px;
-    box-shadow: 
-        0 6px 25px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(59, 42, 26, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-left: 4px solid transparent;
-}
-
-.trip-detail-section:hover {
-    box-shadow: 
-        0 12px 40px rgba(0, 0, 0, 0.12),
-        0 0 0 1px rgba(37, 211, 102, 0.2);
-    transform: translateX(4px);
-    border-left-color: #25d366;
-}
-
-.trip-detail-section h3 {
-    color: #3b2a1a;
-    font-weight: 800;
-    font-size: 28px;
-    margin-bottom: 25px;
-    padding-bottom: 18px;
-    border-bottom: 3px solid transparent;
-    background: linear-gradient(90deg, #25d366, transparent) bottom;
-    background-size: 80px 3px;
-    background-repeat: no-repeat;
-    display: inline-block;
-    position: relative;
-}
-
-.trip-detail-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: -3px;
-    left: 0;
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, #25d366, #20b358);
-    border-radius: 2px;
-}
-
-.trip-detail-heading {
-    color: #3b2a1a;
-    font-weight: 800;
-    font-size: 32px;
-    margin-bottom: 30px;
-    line-height: 1.3;
-}
-
-/* ============================================
-   PICKUP & DROP STYLING - Green & Brown Theme
-   ============================================ */
-.trip-pickup-parent {
-    background: linear-gradient(135deg, #f8f9fa, #ffffff);
-    padding: 30px;
-    border-radius: 16px;
-    margin-bottom: 35px;
-    box-shadow: 
-        0 6px 25px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(59, 42, 26, 0.05);
-    flex-wrap: wrap;
-    border-left: 4px solid #25d366;
-    transition: all 0.3s ease;
-}
-
-.trip-pickup-parent:hover {
-    box-shadow: 
-        0 10px 35px rgba(0, 0, 0, 0.12),
-        0 0 0 1px rgba(37, 211, 102, 0.2);
-    transform: translateY(-2px);
-}
-
-.trip-pickup-drop {
-    display: flex;
-    align-items: flex-start;
-    gap: 18px;
-    flex: 1;
-    min-width: 250px;
-    padding: 10px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.trip-pickup-drop:hover {
-    background: rgba(37, 211, 102, 0.05);
-}
-
-.trip-pickup-drop i {
-    font-size: 28px;
-    color: #25d366;
-    margin-top: 5px;
-    transition: all 0.3s ease;
-}
-
-.trip-pickup-drop:hover i {
-    transform: scale(1.1);
-    color: #20b358;
-}
-
-.trip-pickup-drop p {
-    font-size: 12px;
-    color: #6c757d;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-}
-
-.trip-pickup-drop h3 {
-    font-size: 18px;
-    color: #3b2a1a;
-    font-weight: 800;
-    margin: 0;
-    line-height: 1.4;
-}
-
-/* ============================================
-   READ MORE BUTTON
-   ============================================ */
-.read-more {
-    color: #667eea;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 15px;
-    display: inline-block;
-    transition: all 0.3s ease;
-}
-
-.read-more:hover {
-    color: #764ba2;
-    transform: translateX(5px);
-}
-
-/* ============================================
-   ACCORDION STYLING
-   ============================================ */
-.trip-detail-faqs .accordion-item {
-    border: none;
-    background: #ffffff;
-    margin-bottom: 15px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-}
-
-.trip-detail-faqs .accordion-item:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.trip-detail-faqs .accordion-header {
-    background: transparent;
-}
-
-.trip-detail-faqs .accordion-button {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    color: #2c3e50;
-    font-weight: 600;
-    padding: 18px 25px;
-    border: none;
-    box-shadow: none;
-}
-
-.trip-detail-faqs .accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #ffffff;
-    box-shadow: none;
-}
-
-.trip-detail-faqs .accordion-button:focus {
-    box-shadow: none;
-    border: none;
-}
-
-.trip-detail-faqs .accordion-button::after {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23667eea'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-    transform: scale(1.2);
-}
-
-.trip-detail-faqs .accordion-button:not(.collapsed)::after {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-}
-
-.trip-detail-faqs .accordion-body {
-    padding: 20px 25px;
-    background: #ffffff;
-    color: #495057;
-    line-height: 1.8;
-}
-
-.trip-faq-accordion {
-    background: black;
-    padding: 5px 12px;
-    border-radius: 6px;
-    display: inline-block;
-    margin-right: 10px;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-/* ============================================
-   INCLUSION/EXCLUSION LISTS
-   ============================================ */
-.inclusion-exclusion-list li {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-}
-
-.inclusion-exclusion-list li:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
-}
-
-.inclusion-item {
-    border-left: 3px solid #28a745;
-}
-
-.exclusion-item {
-    border-left: 3px solid #dc3545;
-}
-
-.highlight-item {
-    border-left: 3px solid #ffc107;
-}
-
-/* ============================================
-   RESPONSIVE ADJUSTMENTS
-   ============================================ */
-@media (max-width: 991px) {
-    .trip-detail-right {
-        position: static;
-        margin-top: 30px;
-    }
-    
-    .trip-detail-tabs-main {
-        position: static;
-    }
-}
 
 @media (max-width: 768px) {
     .trip-detail-tabs-main {
-        gap: 5px;
+        gap: 8px;
+        padding: 15px;
     }
     
     .tip-detail-tabs {
-        min-width: 100px;
-        padding: 10px 15px;
+        min-width: 110px;
+        padding: 12px 18px;
     }
     
     .tip-detail-tabs p {
-        font-size: 12px;
+        font-size: 13px;
     }
     
-    .trip-detail-contact-input-container {
+    .trip-price {
+        font-size: 34px;
+    }
+    
+    .trip-detail-section {
         padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .trip-detail-section h3 {
+        font-size: 24px;
+    }
+    
+    .trip-pickup-parent {
+        padding: 20px;
+    }
+    
+    .trip-pickup-drop {
+        min-width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .trip-detail-heading {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .trip-detail-tabs-main {
+        gap: 6px;
+        padding: 12px;
+        border-radius: 12px;
+    }
+    
+    .tip-detail-tabs {
+        min-width: 90px;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+    
+    .tip-detail-tabs p {
+        font-size: 11px;
+    }
+    
+    .trip-detail-contact-form-head .head-1 {
+        font-size: 22px;
     }
     
     .trip-price {
         font-size: 28px;
     }
     
+    .trip-detail-price-card {
+        padding: 25px;
+    }
+    
     .trip-detail-section {
-        padding: 20px;
+        padding: 18px;
+    }
+    
+    .trip-detail-section h3 {
+        font-size: 20px;
+    }
+    
+    .inclusion-exclusion-list li {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+    
+    .trip-detail-faqs .accordion-button {
+        padding: 16px 20px;
+        font-size: 14px;
+    }
+    
+    .trip-detail-faqs .accordion-body {
+        padding: 18px 20px;
+        font-size: 14px;
+    }
+
+    .trip-detail-heading {
+        font-size: 24px;
     }
 }

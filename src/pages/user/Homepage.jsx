@@ -19,29 +19,58 @@ import { useNavigate } from 'react-router-dom';
 const Homepage = () => {
     const featuredSwiperRef = useRef(null);
     const heroSwiperRef = useRef(null);
-    const destinationSwiperRef = useRef(null); // <-- NEW REF for Destinations
+    const destinationSwiperRef = useRef(null);
 
     const [featuredNavState, setFeaturedNavState] = useState({ prev: false, next: true });
     const [heroNavState, setHeroNavState] = useState({ prev: true, next: true });
-    const [destNavState, setDestNavState] = useState({ prev: false, next: true }); // <-- NEW STATE for Dest Slider Nav
+    const [destNavState, setDestNavState] = useState({ prev: false, next: true });
 
     // New states for Categories and Destinations
     const [homeCategories, setHomeCategories] = useState([]); 
     const [isLoadingCategories, setIsLoadingCategories] = useState(true); 
-    const [destinations, setDestinations] = useState([]); // Destinations with popular trips
+    const [destinations, setDestinations] = useState([]);
     const [isLoadingDestinations, setIsLoadingDestinations] = useState(true); 
 
+    // MODAL STATE AND HANDLERS
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
+    // END MODAL
+
     const allTrips = useSelector((state) => state.home_page_slice.featured_trips);
-    const allDestination = useSelector((state) => state.home_page_slice.all_destination); // Kept for legacy compatibility but not used in new sections
     const lastFourTrips = allTrips.slice(-4);
-    // Removed firstSixDestination as it is replaced by the 'destinations' state
 
     const [upcomingGroupTrips, setUpcomingGroupTrips] = useState([]);
     const [honeymoonTrips, setHoneymoonTrips] = useState([]);
     const [indiaTrips, setIndiaTrips] = useState([]);
-    const [isLoading, setIsLoading] = useState(true); // For CategorySection loading
+    const [isLoading, setIsLoading] = useState(true);
 
     const navigate = useNavigate();
+
+    // ADDED: Why choose us data (Copied from DestinationPreview.jsx)
+    const whyChooseUs = [
+        {
+            icon: "fa-shield-halved",
+            title: "Best Price Guarantee",
+            description: "Get the best deals with our price match guarantee"
+        },
+        {
+            icon: "fa-headset",
+            title: "24/7 Support",
+            description: "Round the clock customer support for all needs"
+        },
+        {
+            icon: "fa-certificate",
+            title: "Verified Tours",
+            description: "All tours are verified and quality assured"
+        },
+        {
+            icon: "fa-calendar-check",
+            title: "Easy Booking",
+            description: "Simple and secure booking with instant confirmation"
+        }
+    ];
+    // END ADDED
 
     // ----------------------------------------------------------------
     // HANDLER & UTILITY FUNCTIONS
@@ -74,7 +103,6 @@ const Homepage = () => {
 
     // Utility function to get minimum price from popular trips
     const getDestinationStartingPrice = (destination) => {
-        // This function requires 'popular_trips' to be present and populated
         if (!destination?.popular_trips || destination.popular_trips.length === 0) {
             return null;
         }
@@ -229,7 +257,7 @@ const fetchAllDestinationsWithTrips = async () => {
         // Call all necessary fetches
         fetchAllTrips();
         fetchHomeCategories(); 
-        fetchAllDestinationsWithTrips(); // This function uses the correct endpoint
+        fetchAllDestinationsWithTrips();
     }, []);
 
     const handleFeaturedSlideChange = (swiper) => {
@@ -300,6 +328,7 @@ const fetchAllDestinationsWithTrips = async () => {
                             <div className="home-banner-content">
                                 <h1 className="banner-heading">Discover Paradise <br /> Globally</h1>
                                 <p className="banner-para">Search, compare and book 15,000+ multiday tours all over the world.</p>
+                                
                             </div>
                         </div>
                     </SwiperSlide>
@@ -310,6 +339,8 @@ const fetchAllDestinationsWithTrips = async () => {
                             <div className="home-banner-content">
                                 <h1 className="banner-heading">Adventure Awaits <br /> Globally</h1>
                                 <p className="banner-para">Search, compare and book 15,000+ multiday tours all over the world.</p>
+                            
+                                {/* END ADDED */}
                             </div>
                         </div>
                     </SwiperSlide>
@@ -448,7 +479,6 @@ const fetchAllDestinationsWithTrips = async () => {
 
                 {/* ========================================
                 // SECTION 2: Popular Destinations - Slider with Prices 
-                // This replaces the old Trending Destinations grid.
                 // ======================================== */}
                 <section className="section-padding destination-slider-section">
                     <div className="container">
@@ -544,20 +574,20 @@ const fetchAllDestinationsWithTrips = async () => {
                     isLoading={isLoading}
                     link="/category-preview/group-trips/6"
                 />
-
+{/* 
                 <CategorySection
                     title="Honeymoon Trips"
                     trips={honeymoonTrips}
                     isLoading={isLoading}
                     link="/category-preview/honeymoon-trips/2"
-                />
+                /> */}
 
-                <DestinationSection
+                {/* <DestinationSection
                     title="India Trips"
                     trips={indiaTrips}
                     isLoading={isLoading}
                     link="/destination/india/10"
-                />
+                /> */}
 
                 <section >
                     <div className='container'>
@@ -569,11 +599,12 @@ const fetchAllDestinationsWithTrips = async () => {
                                             on your favorite<br className='break-tag' />
                                             Destination</h4>
                                         <p>Limited time offer, don't miss the opportunity</p>
-                                        <button className='offer-button'>Book Now</button>
+                                        <button className='offer-button' onClick={handleOpenModal}>Plan Your Trip</button>
                                     </div>
                                 </div>
                             </div>
                             <div className='col-lg-6 p-lg-0'>
+                                {/* Image file name changed to match uploaded content */}
                                 <img src={Images.offer_right} alt="offer-right" className='w-100 h-auto' />
                             </div>
                         </div>
@@ -581,7 +612,29 @@ const fetchAllDestinationsWithTrips = async () => {
                     </div>
                 </section>
 
-                <section className='section-padding'>
+                {/* ADDED: Why Choose Us Section (Copied from DestinationPreview.jsx) */}
+                <section className="why-choose-section section-padding">
+                    <div className="container">
+                        <div className="section-header text-center">
+                            <h4 className="common-section-heading">Why Book With Us</h4>
+                            <div className="title-underline"></div>
+                        </div>
+                        <div className="why-choose-grid">
+                            {whyChooseUs.map((item, index) => (
+                                <div className="why-choose-card" key={index}>
+                                    <div className="why-icon">
+                                        <i className={`fa-solid ${item.icon}`}></i>
+                                    </div>
+                                    <h5>{item.title}</h5>
+                                    <p>{item.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+                {/* END ADDED */}
+
+                {/* <section className='section-padding'>
                     <div className='container'>
                         <div className='d-flex justify-content-between'>
                             <div>
@@ -602,8 +655,9 @@ const fetchAllDestinationsWithTrips = async () => {
                             </div>
                         </div>
                     </div>
-                </section>
+                </section> */}
 
+                {/* ... (Customer Reviews Section) ... */}
                 <section className='section-padding'>
                     <div className='container'>
                         <div>
@@ -673,39 +727,14 @@ const fetchAllDestinationsWithTrips = async () => {
                     </div>
                 </section>
 
-                <section className='section-padding-bottom'>
-                    <div className="container">
-                        <div className='booking-offer-main'>
-                            <div className='row'>
-                                <div className='col-lg-6 p-0'>
-                                    <div className='first-booking-left'>
-                                        <h4 className='first-booking-head'>Get 5% off your 1st<br className='break-tag' />
-                                            app booking</h4>
-                                        <p className='text-white'>Booking's better on the app. Use promo code<br className='break-tag' />
-                                            "TourBooking" to save!</p>
-                                        <div className='get-link-input'>
-                                            <p className='get-link-para'>Get a magic link sent to your email</p>
-                                            <div className='mt-2'>
-                                                <input type='email' placeholder='Email' />
-                                                <button className='mt-lg-0 mt-3'>Send</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='col-lg-6 p-0'>
-                                    <div className='first-booking-left'>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 <section>
-                    <ContactForm />
+                    {/* The ContactForm component is now rendered as a modal at the end */}
                 </section>
 
             </div>
+            {/* ADDED: Contact Form Modal at the root level */}
+            <ContactForm isOpen={isModalOpen} onClose={handleCloseModal} />
+            {/* END ADDED */}
         </div>
     )
 }

@@ -599,16 +599,21 @@
     .search-input-wrapper-main {
         flex-direction: column;
         gap: 0.5rem;
+        border-radius: 10px;
+        padding: 10px;
+        
     }
     
     .search-input-main {
         padding: 0.6rem 0.6rem 0.6rem 2.5rem;
+        text-align: start;
         font-size: 0.9rem;
     }
     
     .search-icon-main {
         left: 10px;
         font-size: 1rem;
+        visibility: hidden;
     }
     
     .search-button-main {

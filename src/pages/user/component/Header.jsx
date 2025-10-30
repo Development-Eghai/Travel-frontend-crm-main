@@ -275,9 +275,9 @@ const Header = () => {
                 {/* Upcoming Group Trips */}
                 <li className="nav-item">
                   <Link
-                    to="/upcoming-group-trips"
+                    to="/category-preview/group-tours/6"
                     className="nav-link text-decoration-none"
-                    onClick={() => handleLinkClick("/upcoming-group-trips")}
+                    onClick={() => handleLinkClick("/category-preview/group-tours/6")}
                   >
                     Upcoming Group Trips
                   </Link>
@@ -286,9 +286,9 @@ const Header = () => {
                 {/* Honeymoon Trips */}
                 <li className="nav-item">
                   <Link
-                    to="/honeymoon-trips"
+                    to="/category-preview/honeymoon-trips/5"
                     className="nav-link text-decoration-none"
-                    onClick={() => handleLinkClick("/honeymoon-trips")}
+                    onClick={() => handleLinkClick("/category-preview/honeymoon-trips/5")}
                   >
                     Honeymoon Trips
                   </Link>
@@ -362,7 +362,7 @@ const Header = () => {
             </li>
             <li>
               <Link
-                to="/upcoming-group-trips"
+                to="/category-preview/group-tours/6"
                 className="text-decoration-none text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -371,7 +371,7 @@ const Header = () => {
             </li>
             <li>
               <Link
-                to="/honeymoon-trips"
+                to="/category-preview/honeymoon-trips/5"
                 className="text-decoration-none text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
