@@ -96,7 +96,7 @@ p {
   height: 100vh;
   width: 100% !important;
   overflow: hidden;
-  background-image: url("../assets/images/banner-slider-1.png");
+  background-image: url("../assets/images/1.png");
   background-size: cover;
   background-position: center;
   position: relative;
@@ -106,7 +106,17 @@ p {
   height: 100vh;
   width: 100% !important;
   overflow: hidden;
-  background-image: url("../assets/images/banner-slider-2.png");
+  background-image: url("../assets/images/2.png");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.homepaage-banner-image-3 {
+  height: 100vh;
+  width: 100% !important;
+  overflow: hidden;
+  background-image: url("../assets/images/3.png");
   background-size: cover;
   background-position: center;
   position: relative;
@@ -3994,7 +4004,7 @@ textarea:focus {
 }
 
 /* Add overlay for better text readability */
-.banner-slider-container .homepaage-banner-image-1::before,
+/* .banner-slider-container .homepaage-banner-image-1::before,
 .banner-slider-container .homepaage-banner-image-2::before {
   content: "";
   position: absolute;
@@ -4016,10 +4026,10 @@ textarea:focus {
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
-}
+} */
 
 /* Add overlay for better text readability */
-.destination-detail-banner-main .destination-slide::before {
+/* .destination-detail-banner-main .destination-slide::before {
   content: "";
   position: absolute;
   top: 0;
@@ -4031,7 +4041,7 @@ textarea:focus {
       rgba(0, 0, 0, 0.1) 50%,
       rgba(0, 0, 0, 0.4) 100%);
   z-index: 2;
-}
+} */
 
 
 

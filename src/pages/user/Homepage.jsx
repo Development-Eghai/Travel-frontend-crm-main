@@ -335,7 +335,7 @@ const fetchAllDestinationsWithTrips = async () => {
 
                     {/* Slide 3 */}
                     <SwiperSlide>
-                        <div className="homepaage-banner-image-1">
+                        <div className="homepaage-banner-image-3">
                             <div className="home-banner-content">
                                 <h1 className="banner-heading">Adventure Awaits <br /> Globally</h1>
                                 <p className="banner-para">Search, compare and book 15,000+ multiday tours all over the world.</p>
