@@ -56,39 +56,39 @@ export default function TourCreation() {
     gallery_images: [],
     pricing: {
       pricing_model: "",
-      fixed_departure: [
-        {
-          from_date: "",
-          to_date: "",
-          available_slots: "",
-          title: "",
-          description: "",
-          base_price: "",
-          discount: "",
-          final_price: "",
-          booking_amount: "",
-          gst_percentage: "",
-        },
-      ],
-
       // fixed_departure: [
       //   {
       //     from_date: "",
       //     to_date: "",
       //     available_slots: "",
+      //     title: "",
       //     description: "",
-      //     costingPackages: [
-      //       {
-      //         title: "",
-      //         base_price: "",
-      //         discount: "",
-      //         final_price: "",
-      //         booking_amount: "",
-      //         gst_percentage: "",
-      //       },
-      //     ],
+      //     base_price: "",
+      //     discount: "",
+      //     final_price: "",
+      //     booking_amount: "",
+      //     gst_percentage: "",
       //   },
       // ],
+
+      fixed_departure: [
+        {
+          from_date: "",
+          to_date: "",
+          available_slots: "",
+          description: "",
+          costingPackages: [
+            {
+              title: "",
+              base_price: "",
+              discount: "",
+              final_price: "",
+              booking_amount: "",
+              gst_percentage: "",
+            },
+          ],
+        },
+      ],
 
       customized: {
         pricing_type: "",
@@ -115,10 +115,10 @@ export default function TourCreation() {
   const [faqs, setFaqs] = useState([]);
   const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
   const [categoryList, setcategoryList] = useState([]);
-  const [fixedPackage, setFixedPackage] = useState([{
-    from_date: "", to_date: "", description: "",
-    available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-  }]);
+  // const [fixedPackage, setFixedPackage] = useState([{
+  //   from_date: "", to_date: "", description: "",
+  //   available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
+  // }]);
 
   const steps = [
     { id: "basic", label: "Basic Info", icon: Info },
@@ -450,70 +450,70 @@ export default function TourCreation() {
         hotel_name: day.hotel_name,
         meal_plan: day.meal_plan,
       })),
-      pricing: {
-        pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
-        ...(formData.pricing_model === "fixed" && {
-          fixed_departure: fixedPackage?.map(
-            (item) => ({
-              from_date: `${item.from_date}T00:00:00`,
-              to_date: `${item.to_date}T00:00:00`,
-              available_slots: parseInt(item.available_slots),
-              title: item.title,
-              description: item.description || "",
-              base_price: parseFloat(item.base_price),
-              discount: parseFloat(item.discount) || 0,
-              final_price: parseFloat(item.final_price),
-              booking_amount: parseFloat(item.booking_amount) || 0,
-              gst_percentage: parseFloat(item.gst_percentage) || 0,
-            })
-          ),
-        }),
-        ...(formData.pricing_model === "custom" && {
-          customized: {
-            pricing_type: formData.pricing.customized.pricing_type,
-            base_price: parseFloat(formData.pricing.customized.base_price),
-            discount: parseFloat(formData.pricing.customized.discount) || 0,
-            final_price: parseFloat(formData.pricing.customized.final_price),
-            gst_percentage: parseFloat(formData.pricing.customized.gst_percentage) || 0,
-          },
-        }),
-      },
-
-
       // pricing: {
-      //   pricing_model:
-      //     formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
-
+      //   pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
       //   ...(formData.pricing_model === "fixed" && {
-      //     fixed_departure: fixedPackage?.map((slot) => ({
-      //       from_date: slot?.from_date ? `${slot.from_date}T00:00:00` : null,
-      //       to_date: slot?.to_date ? `${slot.to_date}T00:00:00` : null,
-      //       available_slots: Number(slot?.available_slots) || 0,
-      //       description: slot?.description || "",
-
-      //       costing_packages: (slot?.costingPackages || []).map((pkg) => ({
-      //         title: pkg?.title || "",
-      //         base_price: Number(pkg?.base_price) || 0,
-      //         discount: Number(pkg?.discount) || 0,
-      //         final_price:
-      //           Number(pkg?.final_price) || 0,
-      //         booking_amount: Number(pkg?.booking_amount) || 0,
-      //         gst_percentage: Number(pkg?.gst_percentage) || 0,
-      //       })),
-      //     })),
+      //     fixed_departure: fixedPackage?.map(
+      //       (item) => ({
+      //         from_date: `${item.from_date}T00:00:00`,
+      //         to_date: `${item.to_date}T00:00:00`,
+      //         available_slots: parseInt(item.available_slots),
+      //         title: item.title,
+      //         description: item.description || "",
+      //         base_price: parseFloat(item.base_price),
+      //         discount: parseFloat(item.discount) || 0,
+      //         final_price: parseFloat(item.final_price),
+      //         booking_amount: parseFloat(item.booking_amount) || 0,
+      //         gst_percentage: parseFloat(item.gst_percentage) || 0,
+      //       })
+      //     ),
       //   }),
-
       //   ...(formData.pricing_model === "custom" && {
       //     customized: {
       //       pricing_type: formData.pricing.customized.pricing_type,
-      //       base_price: Number(formData.pricing.customized.base_price) || 0,
-      //       discount: Number(formData.pricing.customized.discount) || 0,
-      //       final_price: Number(formData.pricing.customized.final_price) || 0,
-      //       gst_percentage:
-      //         Number(formData.pricing.customized.gst_percentage) || 0,
+      //       base_price: parseFloat(formData.pricing.customized.base_price),
+      //       discount: parseFloat(formData.pricing.customized.discount) || 0,
+      //       final_price: parseFloat(formData.pricing.customized.final_price),
+      //       gst_percentage: parseFloat(formData.pricing.customized.gst_percentage) || 0,
       //     },
       //   }),
       // },
+
+
+      pricing: {
+        pricing_model:
+          formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
+
+        ...(formData.pricing_model === "fixed" && {
+          fixed_departure: fixedPackage?.map((slot) => ({
+            from_date: slot?.from_date ? `${slot.from_date}T00:00:00` : null,
+            to_date: slot?.to_date ? `${slot.to_date}T00:00:00` : null,
+            available_slots: Number(slot?.available_slots) || 0,
+            description: slot?.description || "",
+
+            costingPackages: (slot?.costingPackages || []).map((pkg) => ({
+              title: pkg?.title || "",
+              base_price: Number(pkg?.base_price) || 0,
+              discount: Number(pkg?.discount) || 0,
+              final_price:
+                Number(pkg?.final_price) || 0,
+              booking_amount: Number(pkg?.booking_amount) || 0,
+              gst_percentage: Number(pkg?.gst_percentage) || 0,
+            })),
+          })),
+        }),
+
+        ...(formData.pricing_model === "custom" && {
+          customized: {
+            pricing_type: formData.pricing.customized.pricing_type,
+            base_price: Number(formData.pricing.customized.base_price) || 0,
+            discount: Number(formData.pricing.customized.discount) || 0,
+            final_price: Number(formData.pricing.customized.final_price) || 0,
+            gst_percentage:
+              Number(formData.pricing.customized.gst_percentage) || 0,
+          },
+        }),
+      },
 
 
       policies: [
@@ -537,6 +537,7 @@ export default function TourCreation() {
     try {
       setIsLoading(true);
       const submissionData = await prepareSubmissionData();
+      console.log(submissionData, "submissionData--submissionData")
 
       const res = await APIBaseUrl.post("trips/", submissionData, {
         headers: {
@@ -544,6 +545,8 @@ export default function TourCreation() {
         },
       });
       if (res?.data?.success === true) {
+
+        console.log(res?.data?.data, "res?.data?.data")
         toast.success("Trip created successfully!");
         setFormData({});
         setIsLoading(false);
@@ -594,41 +597,6 @@ export default function TourCreation() {
     }
   }
 
-  // const [fixedPackage, setFixedPackage] = useState([{
-  //   from_date: "", to_date: "", description: "",
-  //   available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-  // }]);
-
-  // const addFixedPackage = () => {
-  //   setFixedPackage([...fixedPackage, {
-  //     from_date: "", to_date: "", description: "",
-  //     available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-  //   }]);
-  // };
-
-  // const deleteFixedPackage = (indexToRemove) => {
-  //   if (indexToRemove !== 0) {
-  //     const updatedFaqs = fixedPackage.filter((_, index) => index !== indexToRemove);
-  //     setFixedPackage(updatedFaqs);
-  //   }
-  // };
-
-  // const updateFixedPackage = (index, key, value) => {
-  //   const updatedPackages = [...fixedPackage];
-  //   updatedPackages[index][key] = value;
-
-  //   const basePrice = parseFloat(updatedPackages[index].base_price) || 0;
-  //   const discount = parseFloat(updatedPackages[index].discount) || 0;
-  //   const gst = parseFloat(updatedPackages[index].gst_percentage) || 0;
-
-  //   const discountedPrice = basePrice - discount;
-  //   const finalPrice = discountedPrice + (discountedPrice * gst / 100);
-
-  //   updatedPackages[index].final_price = finalPrice.toFixed(2);
-
-  //   setFixedPackage(updatedPackages);
-  // };
-
 
   const [fixedPackage, setFixedPackage] = useState([
     {
@@ -650,7 +618,6 @@ export default function TourCreation() {
     },
   ]);
 
-  // Add a new Available Slot
   const addFixedPackage = () => {
     setFixedPackage((prev) => [
       ...prev,
@@ -673,14 +640,12 @@ export default function TourCreation() {
     ]);
   };
 
-  // Delete a slot (keeps index 0 non-deletable as original)
   const deleteFixedPackage = (indexToRemove) => {
     if (indexToRemove !== 0) {
       setFixedPackage((prev) => prev.filter((_, i) => i !== indexToRemove));
     }
   };
 
-  // Update top-level slot fields (from_date, to_date, available_slots, description)
   const updateFixedPackage = (slotIndex, field, value) => {
     setFixedPackage((prev) =>
       prev.map((slot, i) =>
@@ -689,7 +654,6 @@ export default function TourCreation() {
     );
   };
 
-  // Add a costing package inside a specific slot
   const addCostingPackage = (slotIndex) => {
     setFixedPackage((prev) =>
       prev.map((slot, i) =>
@@ -713,7 +677,6 @@ export default function TourCreation() {
     );
   };
 
-  // Delete a costing package inside a slot
   const deleteCostingPackage = (slotIndex, pkgIndex) => {
     setFixedPackage((prev) =>
       prev.map((slot, i) =>
@@ -729,7 +692,6 @@ export default function TourCreation() {
     );
   };
 
-  // Update a field inside a costing package and recalc final_price
   const updateCostingPackage = (slotIndex, pkgIndex, field, value) => {
     setFixedPackage((prev) =>
       prev.map((slot, i) => {
@@ -738,22 +700,17 @@ export default function TourCreation() {
         const updatedPackages = slot.costingPackages.map((pkg, j) => {
           if (j !== pkgIndex) return pkg;
 
-          // create temp package with updated field
           const temp = { ...pkg, [field]: value };
 
-          // parse numeric values safely
           const base = parseFloat(temp.base_price) || 0;
           const discount = parseFloat(temp.discount) || 0;
           const gst = parseFloat(temp.gst_percentage) || 0;
 
-          // compute taxable amount (base - discount)
           const taxable = Math.max(base - discount, 0);
 
-          // final price = taxable + gst% of taxable
           const final = taxable + (taxable * gst) / 100;
 
           temp.final_price =
-            // show empty string if all fields are empty to keep UI clean
             base === 0 && discount === 0 && gst === 0
               ? ""
               : final.toFixed(2);
@@ -767,9 +724,6 @@ export default function TourCreation() {
   };
 
 
-
-
-
   const getSpecificTrip = async (tripId) => {
     try {
       const res = await APIBaseUrl.get(`trips/${tripId}`, {
@@ -779,6 +733,8 @@ export default function TourCreation() {
       });
       if (res?.data?.success === true) {
         const tripData = res?.data?.data;
+
+        console.log(tripData, "tripDatatripDatatripDatatripData")
 
         const highlightsArray = tripData.highlights ? tripData.highlights.split("; ") : [];
         const inclusionsArray = tripData.inclusions ? tripData.inclusions.split("; ") : [];
@@ -825,35 +781,85 @@ export default function TourCreation() {
           payment_terms: tripData.payment_terms || "",
           pricing_model: tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom",
           itineraryDays: itineraryDays,
+
+
+
           pricing: {
-            ...prev.pricing,
-            customized: {
-              pricing_type: tripData.pricing?.customized?.pricing_type || "",
-              base_price: tripData.pricing?.customized?.base_price || "",
-              discount: tripData.pricing?.customized?.discount || "",
-              final_price: tripData.pricing?.customized?.final_price || "",
-              gst_percentage: tripData.pricing?.customized?.gst_percentage || "",
-            }
-          }
+            pricing_model:
+              tripData?.pricing?.pricing_model === "fixed_departure"
+                ? "fixed_departure"
+                : "customized",
+
+            ...(tripData?.pricing?.pricing_model === "fixed_departure" && {
+              fixed_departure: tripData?.pricing?.fixed_departure?.map((slot) => ({
+                from_date: slot?.from_date || null,
+                to_date: slot?.to_date || null,
+                available_slots: Number(slot?.available_slots) || 0,
+                description: slot?.description || "",
+                costingPackages: (slot?.costingPackages || slot?.costing_packages || []).map((pkg) => ({
+                  title: pkg?.title || "",
+                  base_price: Number(pkg?.base_price) || 0,
+                  discount: Number(pkg?.discount) || 0,
+                  final_price: Number(pkg?.final_price) || 0,
+                  booking_amount: Number(pkg?.booking_amount) || 0,
+                  gst_percentage: Number(pkg?.gst_percentage) || 0,
+                })),
+              })),
+            }),
+
+            ...(tripData?.pricing?.pricing_model === "customized" && {
+              customized: {
+                pricing_type: tripData?.pricing?.customized?.pricing_type || "",
+                base_price: Number(tripData?.pricing?.customized?.base_price) || 0,
+                discount: Number(tripData?.pricing?.customized?.discount) || 0,
+                final_price: Number(tripData?.pricing?.customized?.final_price) || 0,
+                gst_percentage: Number(tripData?.pricing?.customized?.gst_percentage) || 0,
+              },
+            }),
+          },
+
+
+
+
+
+          // pricing: {
+          //   ...prev.pricing,
+          //   customized: {
+          //     pricing_type: tripData.pricing?.customized?.pricing_type || "",
+          //     base_price: tripData.pricing?.customized?.base_price || "",
+          //     discount: tripData.pricing?.customized?.discount || "",
+          //     final_price: tripData.pricing?.customized?.final_price || "",
+          //     gst_percentage: tripData.pricing?.customized?.gst_percentage || "",
+          //   }
+          // }
         }));
+
+
+        if (tripData?.pricing?.fixed_departure) {
+          setFixedPackage(
+            tripData.pricing.fixed_departure.map((pkg) => ({
+              from_date: pkg.from_date?.split("T")[0] || "",
+              to_date: pkg.to_date?.split("T")[0] || "",
+              available_slots: pkg.available_slots || "",
+              description: pkg.description || "",
+              costingPackages: (pkg?.costingPackages || pkg?.costing_packages || []).map((c) => ({
+                title: c.title || "",
+                base_price: c.base_price || "",
+                discount: c.discount || "",
+                final_price: c.final_price || "",
+                booking_amount: c.booking_amount || "",
+                gst_percentage: c.gst_percentage || "",
+              })),
+            }))
+          );
+        }
+
 
         setFaqs(tripData.faqs || []);
         setSelectedPricing(tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom");
 
-        if (tripData.pricing?.fixed_departure) {
-          setFixedPackage(tripData.pricing.fixed_departure.map(pkg => ({
-            from_date: pkg.from_date?.split('T')[0] || "",
-            to_date: pkg.to_date?.split('T')[0] || "",
-            available_slots: pkg.available_slots || "",
-            title: pkg.title || "",
-            description: pkg.description || "",
-            base_price: pkg.base_price || "",
-            discount: pkg.discount || "",
-            final_price: pkg.final_price || "",
-            booking_amount: pkg.booking_amount || "",
-            gst_percentage: pkg.gst_percentage || "",
-          })));
-        }
+
+
       }
     } catch (error) {
       console.error("Error fetching trip:", error?.response?.data || error.message);
@@ -873,9 +879,11 @@ export default function TourCreation() {
     }
   }, [id]);
 
+  console.log(fixedPackage, "fixedPackage--fixedPackage")
+
   const renderStepContent = () => {
     switch (activeStep) {
-      
+
       case "basic":
         return (
           <div className="container">
@@ -964,7 +972,7 @@ export default function TourCreation() {
                   <label className="form-label d-block">Categories *</label>
                   {categoryList?.length > 0 &&
                     categoryList.map((cat) => (
-                      <div className="form-check" key={cat.id}>
+                      <div className="form-check mb-2" key={cat.id}>
                         <input
                           type="checkbox" // FIX 3: Changed to checkbox for multiselect
                           name="category"
@@ -994,7 +1002,7 @@ export default function TourCreation() {
                     "Wildlife",
                     "Water Activities",
                   ].map((cat) => (
-                    <div className="form-check" key={cat}>
+                    <div className="form-check mb-2" key={cat}>
                       <input
                         type="checkbox"
                         className="form-check-input"
@@ -1727,7 +1735,7 @@ export default function TourCreation() {
                         name="pricingType"
                         className="form-check-input"
                         checked={
-                          formData.pricing.customized.pricing_type ===
+                          formData?.pricing?.customized?.pricing_type ===
                           "Price Per Person"
                         }
                         onChange={() =>
@@ -1747,7 +1755,7 @@ export default function TourCreation() {
                         name="pricingType"
                         className="form-check-input"
                         checked={
-                          formData.pricing.customized?.pricing_type ===
+                          formData?.pricing?.customized?.pricing_type ===
                           "Price Per Package"
                         }
                         onChange={() =>
