@@ -1,0 +1,957 @@
+/* Hero Banner Styles */
+.hero-banner-reduced {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+}
+
+.homepaage-banner-image-1,
+.homepaage-banner-image-2,
+.homepaage-banner-image-3n {
+    height: 70vh;
+    min-height: 500px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+/* --- REPLACEMENT START (Text Position) --- */
+.home-banner-content {
+   position: absolute;
+    top: 30%; /* ADJUSTED: Moves text block slightly down to sit above the raised search bar */
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    text-align: center; 
+    color: white;
+    width: 100%;
+    padding: 0 2rem;
+    z-index: 3;
+}
+/* --- REPLACEMENT END --- */
+
+/* --- REPLACEMENT START (Text Spacing) --- */
+.banner-heading {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem; /* Reduced space below main heading */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+/* --- REPLACEMENT END --- */
+
+/* --- REPLACEMENT START (Text Spacing) --- */
+.banner-para {
+    display: none;
+    font-size: 1.1rem;
+    font-weight: 400;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.5rem; /* Reduced space below paragraph */
+}
+/* --- REPLACEMENT END --- */
+
+/* Search Bar Overlay - More Compact */
+/* --- REPLACEMENT START (Search Bar Position) --- */
+.search-bar-overlay {
+    position: absolute;
+    bottom: 180px; /* ADJUSTED: Moves search bar significantly higher */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 900px;
+    z-index: 10;
+    padding: 0 2rem;
+}
+/* --- REPLACEMENT END --- */
+
+.search-bar-main {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.search-input-wrapper-main {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.search-icon-main {
+    position: absolute;
+    left: 15px;
+    color: #666;
+    font-size: 1.1rem;
+    z-index: 2;
+}
+
+.search-input-main {
+    flex: 1;
+    padding: 0.75rem 0.75rem 0.75rem 3rem;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.search-button-main {
+    background: linear-gradient(135deg, #25d366, #1ebe5a);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
+
+.search-button-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+}
+
+/* Hero Swiper Navigation - Fixed positioning */
+.hero-swiper-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+    z-index: 11;
+    pointer-events: none;
+}
+
+.hero-swiper-nav .nav-btn {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    pointer-events: all;
+}
+
+.hero-swiper-nav .prev-btn {
+    visibility: hidden;;
+}
+
+.hero-swiper-nav .next-btn {
+    visibility: hidden;;
+}
+
+.hero-swiper-nav .nav-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+/* Category & Destination Navigation - Smaller */
+.slider-navigation {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.slider-navigation .nav-btn {
+    background: #25d366;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.slider-navigation .nav-btn:hover:not(:disabled) {
+    background: #1ebe5a;
+    transform: scale(1.1);
+}
+
+.slider-navigation .nav-btn.disabled-nav-btn {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* ========================================
+// CATEGORY SECTION STYLES
+// ======================================== */
+.categories-section {
+    background-color: #f9fafb; /* Light background for contrast */
+}
+
+/* FIX: Changed to flexbox to center the grid content itself if items don't fill the row */
+.categories-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.categories-grid {
+    display: grid;
+    /* Responsive grid: 8 columns desktop, fewer on mobile */
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+    gap: 2rem;
+    /* Remove justify-items: center as it's not needed if we center the container */
+    max-width: 1200px; /* Optional: Limit the width if needed */
+    width: 100%;
+}
+
+.category-circle-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Center the card content within its grid cell */
+    justify-self: center; 
+}
+
+.category-circle-card:hover {
+    transform: translateY(-8px);
+}
+
+.category-circle-image {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: 4px solid #fff; /* White border for lift effect */
+}
+
+.category-circle-card:hover .category-circle-image {
+    box-shadow: 0 12px 30px rgba(37, 211, 102, 0.3);
+    border-color: #25d366; /* Green border on hover */
+}
+
+.category-circle-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.category-circle-card:hover .category-circle-image img {
+    transform: scale(1.1);
+}
+
+.category-circle-name {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.category-circle-card:hover .category-circle-name {
+    color: #25d366;
+}
+/* ========================================
+// END CATEGORY SECTION STYLES
+// ======================================== */
+
+
+/* ========================================
+// DESTINATION SLIDER SECTION STYLES
+// ======================================== */
+.destination-slider-section {
+    background-color: #fff;
+}
+
+.destination-slider-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    height: 350px;
+}
+
+.destination-slider-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.destination-slider-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.destination-slider-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.destination-slider-card:hover .destination-slider-image img {
+    transform: scale(1.1);
+}
+
+.destination-overlay-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 1;
+}
+
+.destination-slider-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    color: white;
+    z-index: 2;
+}
+
+.destination-slider-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.destination-slider-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.destination-slider-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.destination-slider-price .price-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.destination-slider-price .price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #25d366;
+}
+/* ========================================
+// END DESTINATION SLIDER SECTION STYLES
+// ======================================== */
+
+
+/* Dropdown Styles */
+.dropdown-main {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.dropdown-item-main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item-main:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item-main:hover {
+    background: #f8f9fa;
+}
+
+.location-icon-main {
+    color: #25d366;
+    font-size: 1.25rem;
+}
+
+.dest-info-main {
+    flex: 1;
+}
+
+.dest-title-main {
+    font-weight: 600;
+    color: #333;
+}
+
+.dest-type-main {
+    display: inline-block;
+    background: #e8f5e9;
+    color: #25d366;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.no-results-main {
+    text-align: center;
+    padding: 2rem;
+}
+
+.no-results-icon-main {
+    font-size: 3rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+}
+
+.no-results-text-main {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.no-results-subtext-main {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+/* Swiper Pagination Dots */
+.swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+    width: 8px;
+    height: 8px;
+}
+
+.swiper-pagination-bullet-active {
+    background: white;
+    width: 24px;
+    border-radius: 5px;
+}
+
+/* Common Section Styles */
+.section-padding {
+    padding: 80px 0px;
+}
+
+.common-section-heading {
+    font-size: 30px;
+    color: black;
+    font-weight: 600;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .banner-heading {
+        font-size: 3rem;
+    }
+    
+    .hero-swiper-nav .prev-btn {
+        left: 20px;
+    }
+    
+    .hero-swiper-nav .next-btn {
+        right: 20px;
+    }
+    
+    .search-bar-overlay {
+        max-width: 800px;
+    }
+    
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .category-circle-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .destination-slider-card {
+        height: 300px;
+    }
+}
+
+@media (max-width: 992px) {
+    .hero-banner-reduced {
+        height: 60vh;
+        min-height: 450px;
+    }
+    
+    .homepaage-banner-image-1,
+    .homepaage-banner-image-2 {
+        height: 60vh;
+        min-height: 450px;
+    }
+    
+    .banner-heading {
+        font-size: 2.5rem;
+    }
+    
+    .banner-para {
+        font-size: 1rem;
+    }
+    
+    .search-bar-overlay {
+        bottom: 90px; /* Adjusted slightly higher for this breakpoint too */
+        max-width: 700px;
+    }
+    
+    .hero-swiper-nav .prev-btn {
+        left: 15px;
+    }
+    
+    .hero-swiper-nav .next-btn {
+        right: 15px;
+    }
+    
+    .hero-swiper-nav .nav-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .category-circle-image {
+        width: 100px;
+        height: 100px;
+    }
+
+    .destination-slider-card {
+        height: 300px;
+    }
+
+    .destination-slider-title {
+        font-size: 1.25rem;
+    }
+
+    .destination-slider-price .price-amount {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-banner-reduced {
+        height: 55vh;
+        min-height: 400px;
+    }
+    
+    .homepaage-banner-image-1,
+    .homepaage-banner-image-2 {
+        height: 55vh;
+        min-height: 400px;
+    }
+    
+    .banner-heading {
+        font-size: 2rem;
+    }
+    
+    .banner-para {
+        font-size: 0.9rem;
+        padding: 0 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-bar-overlay {
+        bottom: 60px; /* Adjusted for tablet */
+        padding: 0 1rem;
+        max-width: 100%;
+    }
+    
+    .search-bar-main {
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .search-input-wrapper-main {
+        flex-direction: column;
+        gap: 0.5rem;
+        border-radius: 10px;
+        padding: 10px;
+        
+    }
+    
+    .search-input-main {
+        padding: 0.6rem 0.6rem 0.6rem 2.5rem;
+        text-align: start;
+        font-size: 0.9rem;
+    }
+    
+    .search-icon-main {
+        left: 10px;
+        font-size: 1rem;
+        visibility: hidden;
+    }
+    
+    .search-button-main {
+        width: 100%;
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+    
+    .hero-swiper-nav .prev-btn {
+        left: 10px;
+    }
+    
+    .hero-swiper-nav .next-btn {
+        right: 10px;
+    }
+    
+    .hero-swiper-nav .nav-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .slider-navigation {
+        display: none;
+    }
+    
+    /* Featured Trips Section */
+    .featured-trips-section .common-section-heading {
+        font-size: 1.5rem;
+    }
+    
+    /* Trending Destinations */
+    .trending-destination-section .row {
+        gap: 1rem;
+    }
+    
+    .trending-grid-one .mt-4 {
+        margin-top: 1rem !important;
+    }
+    
+    .trending-image {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 1rem;
+    }
+
+    .category-circle-image {
+        width: 80px;
+        height: 80px;
+        border: 3px solid #fff;
+    }
+
+    .category-circle-name {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+    .destination-slider-card {
+        height: 280px;
+    }
+    
+    .destination-slider-content {
+        padding: 1rem;
+    }
+    
+    .destination-slider-title {
+        font-size: 1.25rem;
+    }
+
+    .destination-slider-price .price-amount {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-banner-reduced {
+        height: 50vh;
+        min-height: 350px;
+    }
+    
+    .homepaage-banner-image-1,
+    .homepaage-banner-image-2 {
+        height: 50vh;
+        min-height: 350px;
+    }
+    
+    .banner-heading {
+        font-size: 1.75rem;
+        line-height: 1.2;
+    }
+    
+    .banner-para {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+    
+    .search-bar-overlay {
+        bottom: 50px; /* Adjusted for mobile */
+        padding: 0 0.75rem;
+    }
+    
+    .search-bar-main {
+        padding: 0.35rem 0.6rem;
+    }
+    
+    .search-input-main {
+        padding: 0.5rem 0.5rem 0.5rem 2.25rem;
+        font-size: 0.85rem;
+    }
+    
+    .search-icon-main {
+        left: 8px;
+        font-size: 0.95rem;
+    }
+    
+    .search-button-main {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    .hero-swiper-nav .prev-btn {
+        left: 8px;
+    }
+    
+    .hero-swiper-nav .next-btn {
+        right: 8px;
+    }
+    
+    .hero-swiper-nav .nav-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    /* Make sections more compact on mobile */
+    .section-padding {
+        padding: 40px 0;
+    }
+    
+    .section-padding-bottom {
+        padding-bottom: 40px;
+    }
+    
+    .common-section-heading {
+        font-size: 1.25rem;
+    }
+    
+    /* Offer Section */
+    .offer-left {
+        padding: 30px 20px;
+    }
+    
+    .offer-left-heading {
+        font-size: 1.5rem;
+        line-height: 1.8rem;
+    }
+    
+    /* Booking Offer */
+    .booking-offer-main {
+        padding: 30px 20px;
+    }
+    
+    .first-booking-head {
+        font-size: 1.5rem;
+    }
+    
+    .get-link-input input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .get-link-input button {
+        width: 100%;
+    }
+    
+    /* Reviews Section */
+    .reviews-main {
+        padding: 20px;
+    }
+    
+    .reviews-content-para {
+        font-size: 0.9rem;
+    }
+    
+    /* Trip Cards */
+    .featured-card-main {
+        margin-bottom: 20px;
+    }
+    
+    .featured-trip-title {
+        font-size: 1rem;
+    }
+    
+    /* Trending Grid Mobile Layout */
+    .trending-destination-section .col-lg-3,
+    .trending-destination-section .col-lg-5,
+    .trending-destination-section .col-lg-4 {
+        margin-bottom: 1rem;
+    }
+
+    /* Category Section - Responsive */
+    .categories-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    .category-circle-image {
+        width: 70px;
+        height: 70px;
+        border: 2px solid #fff;
+    }
+
+    .category-circle-name {
+        font-size: 0.75rem;
+        margin-top: 0.4rem;
+    }
+
+    .destination-slider-card {
+        height: 250px;
+    }
+    
+    .destination-slider-content {
+        padding: 1rem;
+    }
+    
+    .destination-slider-title {
+        font-size: 1.1rem;
+    }
+
+    .destination-slider-price .price-amount {
+        font-size: 1.1rem;
+    }
+}
+
+
+/* Temporarily hide the hero slider arrows */
+.hero-swiper-nav {
+  display: none !important;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: white;
+  outline: none;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.search-btn {
+  background: #ffffff33;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  background: #ffffff55;
+}
+
+/* Make it clean on mobile */
+@media (max-width: 768px) {
+  .search-bar {
+    width: 90%;
+    gap: 6px;
+    padding: 6px 10px;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+  }
+
+  .search-btn {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* =================================================================
+   CRITICAL FIX: Allow modals to escape Swiper overflow clipping
+   Add this to your homepage.css or style.css
+   ================================================================= */
+
+/* Override Swiper's default overflow hidden */
+.swiper {
+    overflow: visible !important;
+}
+
+.swiper-wrapper {
+    overflow: visible !important;
+}
+
+.swiper-slide {
+    overflow: visible !important;
+}
+
+/* Specific fixes for your homepage sections */
+.featured-slider-wrapper,
+.featured-slider-wrapper .swiper,
+.section-padding .swiper,
+.destination-slider-section .swiper,
+.featured-trips-section .swiper {
+    overflow: visible !important;
+}
+
+/* Body scroll lock when modal is open */
+/* Body scroll lock when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+}

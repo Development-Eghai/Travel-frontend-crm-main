@@ -29,11 +29,12 @@ export default function TourCreation() {
   // Form state
   const [formData, setFormData] = useState({
     title: "",
-    slug: "", // Added slug field
+    slug: "",
     overview: "",
     destination_id: "",
     destination_type: "",
-    category_id: null,
+    // FIX 1: category_id remains an array for multiselect, populated with strings
+    category_id: [],
     themes: [],
     hotel_category: "",
     pickup_location: "",
@@ -111,6 +112,13 @@ export default function TourCreation() {
   const [highlightsInput, setHighlightsInput] = useState("");
   const [inclusionsInput, setInclusionsInput] = useState("");
   const [exclusionsInput, setExclusionsInput] = useState("");
+  const [faqs, setFaqs] = useState([]);
+  const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
+  const [categoryList, setcategoryList] = useState([]);
+  const [fixedPackage, setFixedPackage] = useState([{
+    from_date: "", to_date: "", description: "",
+    available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
+  }]);
 
   const steps = [
     { id: "basic", label: "Basic Info", icon: Info },
@@ -122,7 +130,7 @@ export default function TourCreation() {
   ];
 
   const dispatch = useDispatch();
-  const { data, loading, error } = useSelector((state) => state.destination);
+  const { data: destinationData, loading, error } = useSelector((state) => state.destination);
 
   useEffect(() => {
     dispatch(getSpecificDestination());
@@ -171,6 +179,7 @@ export default function TourCreation() {
       const gst = parseFloat(updatedCustomized.gst_percentage) || 0;
 
       const discountedPrice = basePrice - discount;
+      // Recalculate final price
       const finalPrice = discountedPrice + (discountedPrice * gst / 100);
 
       updatedCustomized.final_price = finalPrice.toFixed(2);
@@ -185,6 +194,7 @@ export default function TourCreation() {
     });
   };
 
+  // Utility function for managing multiselect (themes and now categories)
   const handleArrayChange = (field, value, isChecked) => {
     setFormData((prev) => ({
       ...prev,
@@ -288,9 +298,6 @@ export default function TourCreation() {
     }
   };
 
-  const [faqs, setFaqs] = useState([]);
-  const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
-
   const addFaqs = () => {
     if (faqInput?.question?.trim() && faqInput?.answer?.trim()) {
       setFaqs([...faqs, faqInput]);
@@ -312,7 +319,7 @@ export default function TourCreation() {
     }));
   };
 
-  const handleFileUpload = async (e, key) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -330,12 +337,12 @@ export default function TourCreation() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("storage", "local");
+    const formDataForUpload = new FormData();
+    formDataForUpload.append("image", file);
+    formDataForUpload.append("storage", "local");
 
     try {
-      const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formData);
+      const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formDataForUpload);
 
       if (res?.data?.message === "Upload successful") {
         successMsg("Image uploaded successfully");
@@ -350,7 +357,7 @@ export default function TourCreation() {
     }
   };
 
-  const handleMultipleFileUpload = async (e, key) => {
+  const handleMultipleFileUpload = async (e) => {
     const file = e.target.files[0];
 
     if (!file) return;
@@ -414,7 +421,8 @@ export default function TourCreation() {
       overview: formData.overview,
       destination_id: parseInt(formData.destination_id),
       destination_type: formData.destination_type,
-      category_id: formData?.category_id,
+      // category_id is already an array of strings in formData, so we send it directly
+      category_id: formData.category_id,
       themes: formData.themes,
       hotel_category: parseInt(formData.hotel_category) || 0,
       pickup_location: formData.pickup_location,
@@ -422,7 +430,7 @@ export default function TourCreation() {
       days: parseInt(formData.days),
       nights: parseInt(formData.nights),
       meta_tags: `${formData.title}, ${formData.themes.join(", ")}`,
-      slug: id ? formData.slug : generateSlug(formData.title), // Use existing slug if editing
+      slug: id ? formData.slug : generateSlug(formData.title),
       pricing_model: formData.pricing_model,
       highlights: formData.highlights.join("; "),
       inclusions: formData.inclusions.join("; "),
@@ -452,21 +460,21 @@ export default function TourCreation() {
               available_slots: parseInt(item.available_slots),
               title: item.title,
               description: item.description || "",
-              base_price: parseInt(item.base_price),
-              discount: parseInt(item.discount) || 0,
-              final_price: parseInt(item.final_price),
-              booking_amount: parseInt(item.booking_amount) || 0,
-              gst_percentage: parseInt(item.gst_percentage) || 0,
+              base_price: parseFloat(item.base_price),
+              discount: parseFloat(item.discount) || 0,
+              final_price: parseFloat(item.final_price),
+              booking_amount: parseFloat(item.booking_amount) || 0,
+              gst_percentage: parseFloat(item.gst_percentage) || 0,
             })
           ),
         }),
         ...(formData.pricing_model === "custom" && {
           customized: {
             pricing_type: formData.pricing.customized.pricing_type,
-            base_price: parseInt(formData.pricing.customized.base_price),
-            discount: parseInt(formData.pricing.customized.discount) || 0,
-            final_price: parseInt(formData.pricing.customized.final_price),
-            gst_percentage: parseInt(formData.pricing.customized.gst_percentage) || 0,
+            base_price: parseFloat(formData.pricing.customized.base_price),
+            discount: parseFloat(formData.pricing.customized.discount) || 0,
+            final_price: parseFloat(formData.pricing.customized.final_price),
+            gst_percentage: parseFloat(formData.pricing.customized.gst_percentage) || 0,
           },
         }),
       },
@@ -570,7 +578,6 @@ export default function TourCreation() {
     }
   };
 
-  const [categoryList, setcategoryList] = useState([])
 
   const getAllTourCategory = async () => {
     try {
@@ -787,14 +794,21 @@ export default function TourCreation() {
           meal_plan: day.meal_plan || [],
         })) || [];
 
-        setFormData({
-          ...formData,
+        // FIX 2: Ensure categoryId is always an array of STRINGS when loading from the API.
+        const categoryId = tripData.category_id
+          ? (Array.isArray(tripData.category_id)
+            ? tripData.category_id.map(String) // If already an array, convert elements to string
+            : [String(tripData.category_id)]) // If single number/string, wrap in array and convert to string
+          : [];
+
+        setFormData((prev) => ({
+          ...prev,
           title: tripData.title || "",
-          slug: tripData.slug || "", // IMPORTANT: Preserve the slug
+          slug: tripData.slug || "",
           overview: tripData.overview || "",
           destination_id: tripData.destination_id || "",
           destination_type: tripData.destination_type || "",
-          category_id: tripData.category_id || null,
+          category_id: categoryId, // FIXED: Use the corrected array of strings
           themes: tripData.themes || [],
           hotel_category: tripData.hotel_category?.toString() || "",
           pickup_location: tripData.pickup_location || "",
@@ -812,7 +826,7 @@ export default function TourCreation() {
           pricing_model: tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom",
           itineraryDays: itineraryDays,
           pricing: {
-            ...formData.pricing,
+            ...prev.pricing,
             customized: {
               pricing_type: tripData.pricing?.customized?.pricing_type || "",
               base_price: tripData.pricing?.customized?.base_price || "",
@@ -821,7 +835,7 @@ export default function TourCreation() {
               gst_percentage: tripData.pricing?.customized?.gst_percentage || "",
             }
           }
-        });
+        }));
 
         setFaqs(tripData.faqs || []);
         setSelectedPricing(tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom");
@@ -851,6 +865,11 @@ export default function TourCreation() {
     getAllTourCategory();
     if (id) {
       getSpecificTrip(id);
+    }
+    // Set initial pricing model if none is set
+    if (!id && !formData.pricing_model) {
+      handleInputChange("pricing_model", "custom");
+      setSelectedPricing("custom");
     }
   }, [id]);
 
@@ -901,7 +920,7 @@ export default function TourCreation() {
                     }
                   >
                     <option value="">Select destination</option>
-                    {data?.data?.map((destination) => (
+                    {destinationData?.data?.map((destination) => (
                       <option key={destination.id} value={destination.id}>
                         {destination.title}
                       </option>
@@ -947,15 +966,18 @@ export default function TourCreation() {
                     categoryList.map((cat) => (
                       <div className="form-check" key={cat.id}>
                         <input
-                          type="radio"
+                          type="checkbox" // FIX 3: Changed to checkbox for multiselect
                           name="category"
                           className="form-check-input"
-                          checked={Number(formData?.category_id) === Number(cat?.id)}
-                          onChange={() =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              category_id: Number(cat?.id),
-                            }))
+                          // Check if the current category ID (converted to string) is included in the formData array
+                          checked={formData.category_id.includes(String(cat.id))}
+                          onChange={(e) =>
+                            // Use handleArrayChange for multiselect, passing the ID as a STRING
+                            handleArrayChange(
+                              "category_id",
+                              String(cat.id),
+                              e.target.checked
+                            )
                           }
                         />
                         <label className="form-check-label">{cat.name}</label>
@@ -1271,7 +1293,7 @@ export default function TourCreation() {
                     name='hero_image'
                     accept='.png,.jpeg,.jpg,.pdf,.webp'
                     className="file-input"
-                    onChange={(e) => { handleFileUpload(e, "image"); }}
+                    onChange={handleFileUpload}
                   />
                 </div>
                 <div className="file-restrictions">
@@ -1332,7 +1354,7 @@ export default function TourCreation() {
                     name='gallery_images'
                     accept='.png,.jpeg,.jpg,.pdf,.webp'
                     className="file-input"
-                    onChange={(e) => { handleMultipleFileUpload(e, "image"); }}
+                    onChange={handleMultipleFileUpload}
                   />
                 </div>
                 <div className="file-restrictions">

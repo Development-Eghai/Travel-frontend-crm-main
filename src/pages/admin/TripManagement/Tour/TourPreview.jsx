@@ -25,16 +25,16 @@ const TourPreview = () => {
 
     // --- NEW: Enquiry Form State ---
     const [enquiryFormData, setEnquiryFormData] = useState({
-        departure_city: '',
+        departure_city: '', // Kept in state but hidden from UI
         travel_date: '',
         adults: 1, // Default minimum 1 adult
         children: 0,
-        infants: 0,
+        infants: 0, 
         hotel_category: '',
         full_name: '',
         contact_number: '',
         email: '',
-        additional_comments: ''
+        additional_comments: '' // Kept in state but hidden from UI
     })
     // -------------------------------
 
@@ -122,13 +122,13 @@ const TourPreview = () => {
         const lowerTitle = title.toLowerCase();
 
         if (lowerTitle.includes('terms') || lowerTitle.includes('condition')) {
-            return <i className="fa-solid fa-file-contract text-primary me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+            return <i className="fa-solid fa-file-contract text-primary me-2" style={{ marginTop: '3px', fontSize: '18px', color: '#3b2a1a' }}></i>;
         } else if (lowerTitle.includes('cancel') || lowerTitle.includes('privacy')) {
-            return <i className="fa-solid fa-ban text-danger me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+            return <i className="fa-solid fa-ban text-danger me-2" style={{ marginTop: '3px', fontSize: '18px', color: '#dc3545' }}></i>;
         } else if (lowerTitle.includes('payment')) {
-            return <i className="fa-solid fa-credit-card text-success me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+            return <i className="fa-solid fa-credit-card text-success me-2" style={{ marginTop: '3px', fontSize: '18px', color: '#25d366' }}></i>;
         } else {
-            return <i className="fa-solid fa-circle-info text-info me-2" style={{ marginTop: '3px', fontSize: '18px' }}></i>;
+            return <i className="fa-solid fa-circle-info text-info me-2" style={{ marginTop: '3px', fontSize: '18px', color: '#17a2b8' }}></i>;
         }
     };
 
@@ -149,6 +149,24 @@ const TourPreview = () => {
         return title;
     };
 
+    // --- NEW: Stepper functions ---
+    const handleStepper = (field, increment) => {
+        setEnquiryFormData(prev => {
+            let newValue = prev[field] + increment;
+            
+            if (field === 'adults') {
+                newValue = Math.max(1, newValue); // Adults minimum 1
+            } else if (field === 'children') {
+                newValue = Math.max(0, newValue); // Children minimum 0
+            }
+
+            return {
+                ...prev,
+                [field]: newValue,
+            };
+        });
+    };
+    // ------------------------------
 
     const getSpecificTour = async () => {
         try {
@@ -193,8 +211,7 @@ const TourPreview = () => {
     useEffect(() => {
         getSpecificTour()
         getAlltrip()
-    }, [])
-
+    }, [id])
 
     const [visibleCount, setVisibleCount] = useState(4);
 
@@ -239,8 +256,8 @@ const TourPreview = () => {
         }
 
         const payload = {
-            destination: specificTourData.title, // Auto-filled from trip data (This is "Travel To")
-            departure_city: enquiryFormData.departure_city || "N/A", // This is "Travel From"
+            destination: specificTourData.title, 
+            departure_city: enquiryFormData.departure_city || "N/A", 
             travel_date: enquiryFormData.travel_date,
             adults: enquiryFormData.adults || 1, 
             children: enquiryFormData.children || 0,
@@ -254,8 +271,7 @@ const TourPreview = () => {
 
         setIsSubmitting(true);
         try {
-            // CORRECTED FIX: Only using the endpoint path, assuming APIBaseUrl is configured with the base prefix, and maintaining the trailing slash.
-            // This fixes the "Not Found" error caused by double-prefixing.
+            
             const res = await APIBaseUrl.post(`https://api.yaadigo.com/public/api/enquires/`, payload, {
                 headers: {
                     "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
@@ -283,7 +299,6 @@ const TourPreview = () => {
 
         } catch (error) {
             console.error("Enquiry submission error:", error?.response?.data || error.message);
-            // Display a more specific error message based on the API response structure if available
             const apiError = error?.response?.data?.detail || error?.response?.data?.message;
             errorMsg(apiError || "An error occurred during submission. Please check your network and API configuration.");
         } finally {
@@ -320,12 +335,7 @@ const TourPreview = () => {
                                 >
                                     <div className="destination-overlay"></div>
                                     <div className="destination-slide-content">
-                                        <h3 className="dest-package-name text-center">
-                                            {specificTourData?.title}
-                                        </h3>
-                                        <p className="dest-package-para">
-                                            {specificTourData?.overview}
-                                        </p>
+                                        {/* Tour Title and Overview removed from banner */}
                                     </div>
                                 </div>
                             </SwiperSlide>
@@ -339,7 +349,12 @@ const TourPreview = () => {
                     <div className='row'>
                         <div className='col-lg-8'>
                             <div className='trip-detail-left'>
-                                <h2 className='trip-detail-heading'>{specificTourData?.short_description}</h2>
+                                
+                                {/* Tour Title here */}
+                                <h2 className='trip-detail-heading'>{specificTourData?.title}</h2>
+                                {/* Tour Short Description/Tagline below the main title */}
+                                <p className='lead' style={{color: '#495057', fontSize: '18px', marginBottom: '30px'}}>{specificTourData?.short_description}</p>
+
 
                                 <div className='d-flex trip-pickup-parent'>
                                     <div className='trip-pickup-drop me-lg-4 me-0'>
@@ -602,158 +617,171 @@ const TourPreview = () => {
 
                                         <div className='trip-detail-contact-input-container'>
                                             
-                                            {/* --- 1. Travel To (Destination) --- */}
+                                            {/* --- 1. Travel To (Destination) - Read Only with Icon --- */}
                                             <div className='trip-detail-contact-input'>
-                                                <label>Travel To (Destination)</label>
-                                                <input
-                                                    type='text'
-                                                    name='destination_display'
-                                                    value={specificTourData?.title || 'Loading...'}
-                                                    readOnly // The destination is the tour title, so it should not be editable
-                                                    className="form-control-plaintext"
-                                                    style={{ fontWeight: 'bold' }}
-                                                />
+                                                <label>TRAVEL TO (DESTINATION)</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-plane-departure input-icon"></i>
+                                                    <input
+                                                        type='text'
+                                                        name='destination_display'
+                                                        value={specificTourData?.title || 'Loading...'}
+                                                        readOnly 
+                                                        className="form-control-plaintext"
+                                                    />
+                                                </div>
                                             </div>
-                                            {/* ---------------------------------- */}
                                             
-                                            {/* --- 2. Travel From (Departure City) --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Travel From (Departure City)</label>
-                                                <input
-                                                    type='text'
-                                                    name='departure_city'
-                                                    value={enquiryFormData.departure_city}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. Delhi, Mumbai'
-                                                />
-                                            </div>
+                                            {/* --- 2. Travel From (Departure City) - HIDDEN --- */}
+                                            <input
+                                                type='hidden'
+                                                name='departure_city'
+                                                value={enquiryFormData.departure_city}
+                                                onChange={handleEnquiryChange}
+                                            />
                                             
                                            
+                                            {/* --- 3. Travel Date and Hotel Category - COMBINED IN ONE LINE --- */}
+                                            <div className='trip-combined-line-group d-flex' style={{ gap: '10px' }}>
+                                                {/* Travel Date */}
+                                                <div className='trip-detail-contact-input flex-grow-1 date-category-item' style={{ flexBasis: '50%' }}>
+                                                    <label>TRAVEL DATE *</label>
+                                                    <div className='input-with-icon-wrapper'>
+                                                        <i className="fa-solid fa-calendar-day input-icon"></i>
+                                                        <input
+                                                            type='date'
+                                                            name='travel_date'
+                                                            value={enquiryFormData.travel_date}
+                                                            onChange={handleEnquiryChange}
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
 
-                                            {/* --- 6. Travel Date --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Travel Date *</label>
-                                                <input
-                                                    type='date'
-                                                    name='travel_date'
-                                                    value={enquiryFormData.travel_date}
-                                                    onChange={handleEnquiryChange}
-                                                    required
-                                                />
-                                            </div>
-
-
-                                            {/* --- 7. No. of Adults --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>No. of Adults *</label>
-                                                <input
-                                                    type='number'
-                                                    name='adults'
-                                                    value={enquiryFormData.adults}
-                                                    onChange={handleEnquiryChange}
-                                                    min='1'
-                                                    placeholder='eg. 2'
-                                                    required
-                                                />
-                                            </div>
-
-                                            {/* --- 8. No. of Children --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>No. of Children</label>
-                                                <input
-                                                    type='number'
-                                                    name='children'
-                                                    value={enquiryFormData.children}
-                                                    onChange={handleEnquiryChange}
-                                                    min='0'
-                                                    placeholder='eg. 0'
-                                                />
-                                            </div>
-
-                                            {/* --- 9. No. of Infants ---
-                                            <div className='trip-detail-contact-input'>
-                                                <label>No. of Infants</label>
-                                                <input
-                                                    type='number'
-                                                    name='infants'
-                                                    value={enquiryFormData.infants}
-                                                    onChange={handleEnquiryChange}
-                                                    min='0'
-                                                    placeholder='eg. 0'
-                                                />
-                                            </div> */}
-
-                                            {/* --- 10. Hotel Category --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <div className='admin-input-div mt-0'>
-                                                    <label>Hotel Category</label>
-                                                    <select
-                                                        name="hotel_category"
-                                                        value={enquiryFormData.hotel_category}
-                                                        onChange={handleEnquiryChange}
-                                                    >
-                                                        <option value="">Select Hotel Category</option>
-                                                        <option value="Five Star">⭐⭐⭐⭐⭐ (Five Star)</option>
-                                                        <option value="Four Star">⭐⭐⭐⭐ (Four Star)</option>
-                                                        <option value="Three Star">⭐⭐⭐ (Three Star)</option>
-                                                        <option value="Two Star">⭐⭐ (Two Star)</option>
-                                                        <option value="Budget">Budget</option>
-                                                    </select>
+                                                {/* Hotel Category */}
+                                                <div className='trip-detail-contact-input flex-grow-1 date-category-item' style={{ flexBasis: '50%' }}>
+                                                    <div className='admin-input-div mt-0'>
+                                                        <label>HOTEL CATEGORY</label>
+                                                        <div className='input-with-icon-wrapper'>
+                                                            <i className="fa-solid fa-hotel input-icon"></i>
+                                                            <select
+                                                                name="hotel_category"
+                                                                value={enquiryFormData.hotel_category}
+                                                                onChange={handleEnquiryChange}
+                                                            >
+                                                                <option value="">Select Category</option>
+                                                                <option value="Five Star">⭐⭐⭐⭐⭐</option>
+                                                                <option value="Four Star">⭐⭐⭐⭐</option>
+                                                                <option value="Three Star">⭐⭐⭐</option>
+                                                                <option value="Budget">Budget</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                                 {/* --- 3. Full Name --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Full Name *</label>
-                                                <input
-                                                    type='text'
-                                                    name='full_name'
-                                                    value={enquiryFormData.full_name}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. John Doe'
-                                                    required
-                                                />
-                                            </div>
 
-                                            {/* --- 4. Email --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Email *</label>
-                                                <input
-                                                    type='email'
-                                                    name='email'
-                                                    value={enquiryFormData.email}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. JohnDoe@gmail.com'
-                                                    required
-                                                />
-                                            </div>
+                                            {/* --- 4. Adults and Children - COMBINED IN ONE LINE --- */}
+                                            <div className='trip-combined-line-group d-flex' style={{ gap: '10px' }}>
+                                                {/* No. of Adults */}
+                                                <div className='trip-detail-contact-input flex-grow-1 stepper-item' style={{ flexBasis: '50%' }}>
+                                                    <label>ADULTS *</label>
+                                                    <div className='input-stepper-wrapper'>
+                                                        <input
+                                                            type='number'
+                                                            name='adults'
+                                                            value={enquiryFormData.adults}
+                                                            onChange={handleEnquiryChange}
+                                                            min='1'
+                                                            placeholder='1'
+                                                            required
+                                                            readOnly
+                                                        />
+                                                        <div className='stepper-controls'>
+                                                            <button type='button' onClick={() => handleStepper('adults', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
+                                                            <button type='button' onClick={() => handleStepper('adults', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                            {/* --- 5. Contact Number --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <label>Contact Number *</label>
-                                                <input
-                                                    type='tel'
-                                                    name='contact_number'
-                                                    value={enquiryFormData.contact_number}
-                                                    onChange={handleEnquiryChange}
-                                                    placeholder='eg. 1234567890'
-                                                    required
-                                                />
-                                            </div>
-                                            {/* --- 11. Additional Comments --- */}
-                                            <div className='trip-detail-contact-input'>
-                                                <div className='admin-input-div mt-0'>
-                                                    <label>Additional Comments</label>
-                                                    <textarea
-                                                        name='additional_comments'
-                                                        value={enquiryFormData.additional_comments}
-                                                        onChange={handleEnquiryChange}
-                                                        placeholder='Write any message or special requests here...'
-                                                        style={{ height: "100px" }}
-                                                    ></textarea>
+                                                {/* No. of Children */}
+                                                <div className='trip-detail-contact-input flex-grow-1 stepper-item' style={{ flexBasis: '50%' }}>
+                                                    <label>CHILDREN</label>
+                                                    <div className='input-stepper-wrapper'>
+                                                        <input
+                                                            type='number'
+                                                            name='children'
+                                                            value={enquiryFormData.children}
+                                                            onChange={handleEnquiryChange}
+                                                            min='0'
+                                                            placeholder='0'
+                                                            readOnly
+                                                        />
+                                                        <div className='stepper-controls'>
+                                                            <button type='button' onClick={() => handleStepper('children', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
+                                                            <button type='button' onClick={() => handleStepper('children', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+
+                                            {/* --- 5. Full Name --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>FULL NAME *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-user input-icon"></i>
+                                                    <input
+                                                        type='text'
+                                                        name='full_name'
+                                                        value={enquiryFormData.full_name}
+                                                        onChange={handleEnquiryChange}
+                                                        placeholder='e.g. John Doe'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* --- 6. Email --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>EMAIL *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-envelope input-icon"></i>
+                                                    <input
+                                                        type='email'
+                                                        name='email'
+                                                        value={enquiryFormData.email}
+                                                        onChange={handleEnquiryChange}
+                                                        placeholder='e.g. JohnDoe@gmail.com'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* --- 7. Contact Number --- */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>CONTACT NUMBER *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-phone input-icon"></i>
+                                                    <input
+                                                        type='tel'
+                                                        name='contact_number'
+                                                        value={enquiryFormData.contact_number}
+                                                        onChange={handleEnquiryChange}
+                                                        placeholder='e.g. 1234567890'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* --- 8. Additional Comments - HIDDEN --- */}
+                                            <input
+                                                type='hidden'
+                                                name='additional_comments'
+                                                value={enquiryFormData.additional_comments}
+                                                onChange={handleEnquiryChange} 
+                                            />
+                                            
                                             <button type='submit' disabled={isSubmitting}>
-                                                {isSubmitting ? 'Submitting...' : 'Submit Enquiry'}
+                                                SUBMIT ENQUIRY
                                             </button>
                                         </div>
                                     </form>

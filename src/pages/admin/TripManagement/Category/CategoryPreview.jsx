@@ -91,7 +91,7 @@ const CategoryPreview = () => {
                 >
                   <div className="destination-overlay"></div>
                   <div className="destination-slide-content">
-                    <h3 className="dest-package-name text-center">
+                    <h3 className="dest-package-name text-center" style={{ visibility: "visible" }}>
                       {categoryData?.name}
                     </h3>
                     <p className="dest-package-para">

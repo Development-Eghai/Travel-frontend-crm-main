@@ -15,6 +15,7 @@ const Header = () => {
     "/terms-and-conditions",
     "/tour-overview",
     "/trips-bookings",
+   
   ];
 
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -271,27 +272,29 @@ const Header = () => {
                   </ul>
                 </li>
 
-                {/* Upcoming Group Trips (Added as normal links) */}
+                {/* Upcoming Group Trips */}
                 <li className="nav-item">
                   <Link
-                    to="/upcoming-group-trips"
+                    to="/category-preview/group-tours/6"
                     className="nav-link text-decoration-none"
-                    onClick={() => handleLinkClick("/upcoming-group-trips")}
+                    onClick={() => handleLinkClick("/category-preview/group-tours/6")}
                   >
                     Upcoming Group Trips
                   </Link>
                 </li>
 
-                {/* Honeymoon Trips (Added as normal links) */}
+                {/* Honeymoon Trips */}
                 <li className="nav-item">
                   <Link
-                    to="/honeymoon-trips"
+                    to="/category-preview/honeymoon-trips/5"
                     className="nav-link text-decoration-none"
-                    onClick={() => handleLinkClick("/honeymoon-trips")}
+                    onClick={() => handleLinkClick("/category-preview/honeymoon-trips/5")}
                   >
                     Honeymoon Trips
                   </Link>
                 </li>
+
+                
               </ul>
             </div>
 
@@ -357,11 +360,9 @@ const Header = () => {
                 About Us
               </Link>
             </li>
-
-            {/* Added Items for Mobile Menu */}
             <li>
               <Link
-                to="/upcoming-group-trips"
+                to="/category-preview/group-tours/6"
                 className="text-decoration-none text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -370,13 +371,14 @@ const Header = () => {
             </li>
             <li>
               <Link
-                to="/honeymoon-trips"
+                to="/category-preview/honeymoon-trips/5"
                 className="text-decoration-none text-white"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Honeymoon Trips
               </Link>
             </li>
+            
           </ul>
         </div>
       </div>

@@ -1288,3 +1288,96 @@ input::placeholder {
     padding:5px 30px;
     border-radius: 1px;
 }
+
+/* ----------------------------------------------------------------
+   WhatsApp Floating Widget Styles
+   ---------------------------------------------------------------- */
+.whatsapp-float-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    background: linear-gradient(135deg, #25d366 0%, #128c41 100%);
+    color: #FFF;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+    overflow: hidden;
+    /* animation: pulse 2s infinite; */
+}
+
+.whatsapp-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 20px;
+    gap: 10px;
+}
+
+.whatsapp-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.whatsapp-text {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.whatsapp-float-btn:hover {
+    background: linear-gradient(135deg, #128c41 0%, #0a6b2f 100%);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+    transform: scale(1.05) translateY(-3px);
+    color: #FFF;
+}
+
+/* Pulse animation to grab attention */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(37, 211, 102, 0.8);
+    }
+}
+
+/* Responsive adjustment for smaller screens */
+@media (max-width: 768px) {
+    .whatsapp-float-btn {
+        bottom: 20px;
+        right: 20px;
+        border-radius: 40px;
+    }
+    
+    .whatsapp-content {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+    
+    .whatsapp-icon {
+        font-size: 24px;
+    }
+    
+    .whatsapp-text {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .whatsapp-text {
+        font-size: 12px;
+    }
+    
+    .whatsapp-content {
+        padding: 10px 14px;
+    }
+}

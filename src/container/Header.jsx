@@ -37,9 +37,9 @@ const Header = ({
                     </button>
 
                     {/* Dropdown */}
-                    <div class="dropdown">
+                    <div className="dropdown"> {/* <-- FIX */}
                         <a
-                            class="d-flex align-items-center dropdown-toggle"
+                            className="d-flex align-items-center dropdown-toggle" /* <-- FIX */
                             href="#"
                             id="profileDropdown"
                             role="button"
@@ -49,16 +49,16 @@ const Header = ({
                             <img
                                 src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
                                 alt="profile"
-                                class="rounded-circle"
+                                className="rounded-circle" /* <-- FIX (This was the 'at img' error) */
                                 width="30"
                                 height="30"
                             />
                         </a>
 
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                            <li><a class="dropdown-item" href="#">My Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown"> {/* <-- FIX */}
+                            <li><a className="dropdown-item" href="#">My Profile</a></li> {/* <-- FIX */}
+                            <li><a className="dropdown-item" href="#">Settings</a></li> {/* <-- FIX */}
+                            <li><a className="dropdown-item" href="#">Logout</a></li> {/* <-- FIX */}
                         </ul>
                     </div>
 

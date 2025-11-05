@@ -31,19 +31,53 @@ const AddLeadDialog = ({ open, onClose }) => {
     children: 0
   });
 
-  // Fetch trip themes (if needed)
+  // ✅ Fixed: Use proper API endpoint or fallback data
   useEffect(() => {
     const fetchTripThemes = async () => {
       try {
-        const response = await fetch('/api/trip-themes');
-        const data = await response.json();
-        setTripThemes(data);
+        // Option 1: If you have the actual API endpoint
+        // const response = await fetch('https://api.yaadigo.com/public/api/trip-themes');
+        
+        // Option 2: Use fallback data until API is ready
+        const fallbackThemes = [
+          { id: 1, name: 'Domestic' },
+          { id: 2, name: 'International' },
+          { id: 3, name: 'Adventure' },
+          { id: 4, name: 'Beach' },
+          { id: 5, name: 'Hill Station' },
+          { id: 6, name: 'Religious' },
+          { id: 7, name: 'Wildlife' },
+        ];
+        
+        setTripThemes(fallbackThemes);
+        
+        // If you want to try the real API:
+        // const response = await fetch('/api/trip-themes');
+        // if (response.ok) {
+        //   const data = await response.json();
+        //   setTripThemes(data);
+        // } else {
+        //   setTripThemes(fallbackThemes);
+        // }
       } catch (error) {
         console.error('Error fetching trip themes:', error);
+        // Use fallback data on error
+        setTripThemes([
+          { id: 1, name: 'Domestic' },
+          { id: 2, name: 'International' },
+          { id: 3, name: 'Adventure' },
+          { id: 4, name: 'Beach' },
+          { id: 5, name: 'Hill Station' },
+          { id: 6, name: 'Religious' },
+          { id: 7, name: 'Wildlife' },
+        ]);
       }
     };
-    fetchTripThemes();
-  }, []);
+    
+    if (open) {
+      fetchTripThemes();
+    }
+  }, [open]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -86,23 +120,67 @@ const AddLeadDialog = ({ open, onClose }) => {
 
       if (response.ok) {
         console.log('✅ Lead created successfully');
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          mobile: '',
+          destinationType: '',
+          pickup: '',
+          drop: '',
+          travelFrom: null,
+          travelTo: null,
+          adults: 1,
+          children: 0
+        });
         onClose(true); // ✅ tell parent to refresh list
       } else {
         console.error('❌ Error creating lead:', await response.text());
+        alert('Failed to create lead. Please try again.');
       }
     } catch (error) {
       console.error('Error:', error);
+      alert('An error occurred. Please try again.');
     }
   };
 
+  const handleClose = () => {
+    // Reset form on close
+    setFormData({
+      name: '',
+      email: '',
+      mobile: '',
+      destinationType: '',
+      pickup: '',
+      drop: '',
+      travelFrom: null,
+      travelTo: null,
+      adults: 1,
+      children: 0
+    });
+    onClose(false);
+  };
+
   return (
-    <Dialog open={open} onClose={() => onClose(false)} maxWidth="md" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          maxHeight: '90vh',
+          overflow: 'auto'
+        }
+      }}
+    >
       <DialogTitle>Add New Lead</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
+              required
               label="Client Name"
               name="name"
               value={formData.name}
@@ -112,6 +190,7 @@ const AddLeadDialog = ({ open, onClose }) => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
+              required
               label="Email"
               name="email"
               type="email"
@@ -122,6 +201,7 @@ const AddLeadDialog = ({ open, onClose }) => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
+              required
               label="Mobile"
               name="mobile"
               value={formData.mobile}
@@ -129,7 +209,7 @@ const AddLeadDialog = ({ open, onClose }) => {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth>
+            <FormControl fullWidth required>
               <InputLabel>Destination Type</InputLabel>
               <Select
                 name="destinationType"
@@ -207,9 +287,14 @@ const AddLeadDialog = ({ open, onClose }) => {
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={() => onClose(false)}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+      <DialogActions sx={{ p: 2 }}>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button 
+          onClick={handleSubmit} 
+          variant="contained" 
+          color="primary"
+          disabled={!formData.name || !formData.email || !formData.mobile}
+        >
           Add Lead
         </Button>
       </DialogActions>
