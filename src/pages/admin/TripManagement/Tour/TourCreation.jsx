@@ -856,6 +856,7 @@ export default function TourCreation() {
 
   const renderStepContent = () => {
     switch (activeStep) {
+      
       case "basic":
         return (
           <div className="container">
