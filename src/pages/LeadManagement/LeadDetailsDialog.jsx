@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -14,10 +14,9 @@ import {
   Select,
   MenuItem,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
   Divider,
+  Chip,
+  Alert,
 } from '@mui/material';
 import { Close as CloseIcon, Edit as EditIcon } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -27,49 +26,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedLead, setEditedLead] = useState(lead || {});
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([]);
-  const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
-    // sync editedLead when prop changes
     setEditedLead(lead || {});
   }, [lead]);
-
-  const fetchComments = useCallback(async () => {
-    if (!lead || !lead.id) return;
-    try {
-      const response = await fetch(`/api/leads/${lead.id}/comments`);
-      const data = await response.json();
-      setComments(data);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-    }
-  }, [lead]);
-
-  const fetchDocuments = useCallback(async () => {
-    if (!lead || !lead.id) return;
-    try {
-      const response = await fetch(`/api/leads/${lead.id}/documents`);
-      const data = await response.json();
-      setDocuments(data);
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-    }
-  }, [lead]);
-
-  useEffect(() => {
-    // sync editedLead when prop changes
-    setEditedLead(lead || {});
-  }, [lead]);
-
-  useEffect(() => {
-    if (!lead || !lead.id) return;
-    fetchComments();
-    fetchDocuments();
-  }, [lead, fetchComments, fetchDocuments]);
-
-  // fetchComments and fetchDocuments are defined above with useCallback
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -87,12 +47,18 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
   };
 
   const handleSave = async () => {
+    if (!lead || !lead.id || lead.type !== 'lead') {
+      alert('Only manual leads can be edited.');
+      return;
+    }
+
     try {
-    if (!lead || !lead.id) return;
-    const response = await fetch(`/api/leads/${lead.id}`, {
+      const API_KEY = 'bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M';
+      const response = await fetch(`https://api.yaadigo.com/secure/api/leads/${lead.source_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
         },
         body: JSON.stringify(editedLead),
       });
@@ -100,48 +66,30 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
       if (response.ok) {
         setIsEditing(false);
         onRefresh();
+        alert('✅ Lead updated successfully!');
+      } else {
+        alert('❌ Failed to update lead.');
       }
     } catch (error) {
       console.error('Error updating lead:', error);
+      alert('❌ Error updating lead.');
     }
   };
 
-  const handleAddComment = async () => {
-    if (!lead || !lead.id) return;
-    try {
-      await fetch(`/api/leads/${lead.id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ comment }),
-      });
-      setComment('');
-      fetchComments();
-    } catch (error) {
-      console.error('Error adding comment:', error);
-    }
+  const handleWhatsApp = () => {
+    const phoneNumber = lead.mobile.replace(/[^0-9]/g, '');
+    const message = encodeURIComponent(`Hello ${lead.name}, Thank you for your interest!`);
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
 
-  const handleFileUpload = async (event) => {
-  if (!lead || !lead.id) return;
-  const file = event.target.files[0];
-  if (!file) return;
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('uploaded_by', 1); // Replace with actual user ID
-
-    try {
-      await fetch(`/api/leads/${lead.id}/documents`, {
-        method: 'POST',
-        body: formData,
-      });
-      fetchDocuments();
-    } catch (error) {
-      console.error('Error uploading document:', error);
-    }
+  const handleEmail = () => {
+    const subject = encodeURIComponent('Regarding Your Travel Enquiry');
+    const body = encodeURIComponent(`Dear ${lead.name},\n\nThank you for contacting us.\n\nBest regards,\nIndian Mountain Rovers`);
+    window.open(`mailto:${lead.email}?subject=${subject}&body=${body}`, '_blank');
   };
+
+  const canEdit = lead?.type === 'lead';
+  const isReadOnly = !canEdit || !isEditing;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -149,7 +97,7 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">Lead Details</Typography>
           <Box>
-            {!isEditing && (
+            {canEdit && !isEditing && (
               <IconButton onClick={() => setIsEditing(true)} sx={{ mr: 1 }}>
                 <EditIcon />
               </IconButton>
@@ -162,6 +110,14 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={3}>
+          {/* Source Information */}
+          <Grid item xs={12}>
+            <Alert severity="info">
+              <strong>Source:</strong> {lead.source} | <strong>Type:</strong> {lead.type.toUpperCase()}
+              {!canEdit && ' (Read-only)'}
+            </Alert>
+          </Grid>
+
           {/* Lead Management Section */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2 }}>
@@ -172,16 +128,16 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
                     <InputLabel>Status</InputLabel>
                     <Select
                       name="status"
-                      value={editedLead.status}
+                      value={editedLead.status || 'new'}
                       onChange={handleInputChange}
-                      disabled={!isEditing}
+                      disabled={isReadOnly}
                     >
-                      <MenuItem value="New">New</MenuItem>
-                      <MenuItem value="Contacted">Contacted</MenuItem>
-                      <MenuItem value="Quotation Sent">Quotation Sent</MenuItem>
-                      <MenuItem value="Awaiting Payment">Awaiting Payment</MenuItem>
-                      <MenuItem value="Failed">Failed</MenuItem>
-                      <MenuItem value="Booked">Booked</MenuItem>
+                      <MenuItem value="new">New</MenuItem>
+                      <MenuItem value="contacted">Contacted</MenuItem>
+                      <MenuItem value="quoted">Quotation Sent</MenuItem>
+                      <MenuItem value="awaiting">Awaiting Payment</MenuItem>
+                      <MenuItem value="failed">Failed</MenuItem>
+                      <MenuItem value="booked">Booked</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -190,28 +146,25 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
                     <InputLabel>Priority</InputLabel>
                     <Select
                       name="priority"
-                      value={editedLead.priority}
+                      value={editedLead.priority || 'medium'}
                       onChange={handleInputChange}
-                      disabled={!isEditing}
+                      disabled={isReadOnly}
                     >
-                      <MenuItem value="Low">Low</MenuItem>
-                      <MenuItem value="Medium">Medium</MenuItem>
-                      <MenuItem value="High">High</MenuItem>
+                      <MenuItem value="low">Low</MenuItem>
+                      <MenuItem value="medium">Medium</MenuItem>
+                      <MenuItem value="high">High</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <FormControl fullWidth>
-                    <InputLabel>Assigned To</InputLabel>
-                    <Select
-                      name="assigned_to"
-                      value={editedLead.assigned_to}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                    >
-                      {/* Add your user list here */}
-                    </Select>
-                  </FormControl>
+                  <TextField
+                    fullWidth
+                    label="Assigned To"
+                    name="assigned_to"
+                    value={editedLead.assigned_to || 'Unassigned'}
+                    onChange={handleInputChange}
+                    disabled={isReadOnly}
+                  />
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -219,7 +172,7 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
                       label="Follow-up Date"
                       value={editedLead.follow_up_date}
                       onChange={(value) => handleDateChange('follow_up_date', value)}
-                      disabled={!isEditing}
+                      disabled={isReadOnly}
                       renderInput={(params) => <TextField {...params} fullWidth />}
                     />
                   </LocalizationProvider>
@@ -238,9 +191,9 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
                     fullWidth
                     label="Name"
                     name="name"
-                    value={editedLead.name}
+                    value={editedLead.name || ''}
                     onChange={handleInputChange}
-                    disabled={!isEditing}
+                    disabled={isReadOnly}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -248,9 +201,9 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
                     fullWidth
                     label="Email"
                     name="email"
-                    value={editedLead.email}
+                    value={editedLead.email || ''}
                     onChange={handleInputChange}
-                    disabled={!isEditing}
+                    disabled={isReadOnly}
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -258,100 +211,75 @@ const LeadDetailsDialog = ({ lead, open, onClose, onRefresh }) => {
                     fullWidth
                     label="Mobile"
                     name="mobile"
-                    value={editedLead.mobile}
+                    value={editedLead.mobile || ''}
                     onChange={handleInputChange}
-                    disabled={!isEditing}
+                    disabled={isReadOnly}
                   />
                 </Grid>
               </Grid>
             </Paper>
           </Grid>
 
-          {/* Comments Section */}
+          {/* Travel Information */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>Comments</Typography>
-              <Box sx={{ mb: 2 }}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  label="Add a comment"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                />
-                <Button
-                  variant="contained"
-                  onClick={handleAddComment}
-                  sx={{ mt: 1 }}
-                >
-                  Add Comment
-                </Button>
-              </Box>
-              <List>
-                {comments.map((comment) => (
-                  <React.Fragment key={comment.id}>
-                    <ListItem>
-                      <ListItemText
-                        primary={comment.user_name}
-                        secondary={comment.comment}
-                      />
-                    </ListItem>
-                    <Divider />
-                  </React.Fragment>
-                ))}
-              </List>
+              <Typography variant="h6" gutterBottom>Travel Information</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Destination Type"
+                    value={editedLead.destination_type || '-'}
+                    disabled
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    label="Trip Type"
+                    value={editedLead.trip_type || '-'}
+                    disabled
+                  />
+                </Grid>
+              </Grid>
             </Paper>
           </Grid>
+
+          {/* Additional Information */}
+          {lead.additional_info && (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2 }}>
+                <Typography variant="h6" gutterBottom>Additional Information</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {Object.entries(lead.additional_info).map(([key, value]) => (
+                    <Box key={key} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {key.replace(/_/g, ' ').toUpperCase()}:
+                      </Typography>
+                      <Typography variant="body2">
+                        {value || '-'}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Paper>
+            </Grid>
+          )}
 
           {/* Quick Actions Section */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2 }}>
               <Typography variant="h6" gutterBottom>Quick Actions</Typography>
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button variant="contained" color="primary">Create Quotation</Button>
                 <Button variant="contained" color="primary">Create Invoice</Button>
-                <Button variant="contained" color="success">Send WhatsApp</Button>
-                <Button variant="contained">Send Email</Button>
+                <Button variant="contained" color="success" onClick={handleWhatsApp}>
+                  Send WhatsApp
+                </Button>
+                <Button variant="contained" onClick={handleEmail}>
+                  Send Email
+                </Button>
               </Box>
-            </Paper>
-          </Grid>
-
-          {/* Travel Preferences Section */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>Travel Preferences</Typography>
-              <Grid container spacing={2}>
-                {/* Add your travel preferences fields here */}
-              </Grid>
-            </Paper>
-          </Grid>
-
-          {/* Linked Documents Section */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>Linked Documents</Typography>
-              <Box sx={{ mb: 2 }}>
-                <input
-                  type="file"
-                  id="document-upload"
-                  style={{ display: 'none' }}
-                  onChange={handleFileUpload}
-                />
-                <label htmlFor="document-upload">
-                  <Button variant="contained" component="span">
-                    Add Document
-                  </Button>
-                </label>
-              </Box>
-              <List>
-                {documents.map((doc) => (
-                  <ListItem key={doc.id}>
-                    <ListItemText primary={doc.file_name} />
-                    <Button size="small">Download</Button>
-                  </ListItem>
-                ))}
-              </List>
             </Paper>
           </Grid>
         </Grid>

@@ -6231,3 +6231,57 @@ textarea:focus {
         display: block;
     }
 }
+
+/* Sidebar Header (Logo Area) */
+.sidebar-header {
+    height: 60px; /* Fixed height for the header */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Ensures content is horizontally centered */
+    padding: 10px;
+    border-bottom: 1px solid #eee; /* Optional: Add a subtle separator */
+}
+
+/* Base Logo Styling (Expanded State) */
+.sidebar-logo {
+    max-height: 40px;
+    /* Maintain aspect ratio and fit within container */
+    width: auto; 
+    max-width: 100%; /* Ensures it doesn't overflow the 250px sidebar */
+    object-fit: contain;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Logo Adjustment when Sidebar is Shrunk */
+.client-sidebar.shrink .sidebar-logo {
+    max-width: 40px; /* Adjust this value (e.g., 40px) to control the shrunk size */
+    max-height: 40px; /* Keep height consistent with width for squares */
+    width: auto;
+}
+
+/* Sidebar Header (Logo Area) */
+.sidebar-header {
+    height: 60px; /* Fixed height for the header */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Ensures content is horizontally centered */
+    padding: 10px;
+    border-bottom: 1px solid #eee; /* Optional: Add a subtle separator */
+}
+
+/* Base Logo Styling (Expanded State) */
+.sidebar-logo {
+    max-height: 40px;
+    /* Maintain aspect ratio and fit within container */
+    width: auto; 
+    max-width: 100%; /* Ensures it doesn't overflow the 250px sidebar */
+    object-fit: contain;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Logo Adjustment when Sidebar is Shrunk */
+.client-sidebar.shrink .sidebar-logo {
+    max-width: 40px; /* Adjust this value (e.g., 40px) to control the shrunk size */
+    max-height: 40px; /* Keep height consistent with width for squares */
+    width: auto;
+}

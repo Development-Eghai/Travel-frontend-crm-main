@@ -12,6 +12,8 @@ import {
   Box,
   Menu,
   MenuItem,
+  Checkbox,
+  Tooltip,
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -19,9 +21,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import EmailIcon from '@mui/icons-material/Email';
+import InfoIcon from '@mui/icons-material/Info';
 import LeadDetailsDialog from './LeadDetailsDialog';
 
-const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
+const LeadTable = ({ leads, selectedLeads, toggleSelectLead, onRefresh, onDeleteLead }) => {
   const [selectedLead, setSelectedLead] = React.useState(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedLeadId, setSelectedLeadId] = React.useState(null);
@@ -46,7 +49,6 @@ const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
     handleClose();
   };
 
-  // ✅ Delete now calls parent handler
   const handleDelete = async () => {
     const leadToDelete = leads.find((l) => l.id === selectedLeadId);
     if (!leadToDelete) {
@@ -55,9 +57,7 @@ const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
       return;
     }
 
-    console.log('🗑️ Deleting lead:', leadToDelete);
-
-    await onDeleteLead(leadToDelete); // calls the function from LeadManagement.jsx
+    await onDeleteLead(leadToDelete);
     handleClose();
   };
 
@@ -71,13 +71,17 @@ const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
     handleClose();
   };
 
-  const handleWhatsApp = () => {
-    // TODO: implement WhatsApp integration
+  const handleWhatsApp = (lead) => {
+    const phoneNumber = lead.mobile.replace(/[^0-9]/g, '');
+    const message = encodeURIComponent(`Hello ${lead.name}, Thank you for your interest in our travel packages!`);
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
     handleClose();
   };
 
-  const handleEmail = () => {
-    // TODO: implement email functionality
+  const handleEmail = (lead) => {
+    const subject = encodeURIComponent('Regarding Your Travel Enquiry');
+    const body = encodeURIComponent(`Dear ${lead.name},\n\nThank you for contacting us.\n\nBest regards,\nIndian Mountain Rovers`);
+    window.open(`mailto:${lead.email}?subject=${subject}&body=${body}`, '_blank');
     handleClose();
   };
 
@@ -111,12 +115,41 @@ const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
     }
   };
 
+  const getSourceColor = (source) => {
+    switch (source) {
+      case 'Booking Request':
+        return 'primary';
+      case 'Website Enquiry':
+        return 'success';
+      case 'Manual Entry':
+        return 'default';
+      default:
+        return 'default';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    try {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch {
+      return '-';
+    }
+  };
+
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer component={Paper} sx={{ maxHeight: 'calc(100vh - 400px)' }}>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
+              <TableCell padding="checkbox">
+                <Checkbox disabled />
+              </TableCell>
               <TableCell>S.No</TableCell>
               <TableCell>Lead Info</TableCell>
               <TableCell>Destination</TableCell>
@@ -131,53 +164,78 @@ const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {leads.map((lead, index) => (
-              <TableRow key={lead.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  <Box>
-                    <strong>{lead.name}</strong>
-                    <br />
-                    {lead.email}
-                    <br />
-                    {lead.mobile}
+            {leads.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={12} align="center">
+                  <Box sx={{ py: 4 }}>
+                    <InfoIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                    <Box>No leads found. Try adjusting your filters.</Box>
                   </Box>
                 </TableCell>
-                <TableCell>{lead.destination_type}</TableCell>
-                <TableCell>{lead.trip_type}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={lead.status}
-                    color={getStatusColor(lead.status)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={lead.priority}
-                    color={getPriorityColor(lead.priority)}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>{lead.assigned_to}</TableCell>
-                <TableCell>
-                  {lead.follow_up_date
-                    ? new Date(lead.follow_up_date).toLocaleDateString()
-                    : '-'}
-                </TableCell>
-                <TableCell>
-                  {lead.created_at
-                    ? new Date(lead.created_at).toLocaleDateString()
-                    : '-'}
-                </TableCell>
-                <TableCell>{lead.source}</TableCell>
-                <TableCell>
-                  <IconButton onClick={(e) => handleActionClick(e, lead.id)}>
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              leads.map((lead, index) => (
+                <TableRow 
+                  key={lead.id}
+                  sx={{ 
+                    backgroundColor: lead.type !== 'lead' ? 'rgba(0, 0, 0, 0.02)' : 'inherit',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' }
+                  }}
+                >
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedLeads.includes(lead.id)}
+                      onChange={() => toggleSelectLead(lead.id)}
+                      disabled={lead.type !== 'lead'}
+                    />
+                  </TableCell>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    <Box className="lead-info-cell">
+                      <strong>{lead.name}</strong>
+                      <small>{lead.email}</small>
+                      <small>{lead.mobile}</small>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{lead.destination_type}</TableCell>
+                  <TableCell>
+                    <Tooltip title={lead.additional_info ? JSON.stringify(lead.additional_info, null, 2) : ''}>
+                      <span>{lead.trip_type}</span>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={lead.status}
+                      color={getStatusColor(lead.status)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={lead.priority}
+                      color={getPriorityColor(lead.priority)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{lead.assigned_to}</TableCell>
+                  <TableCell>{formatDate(lead.follow_up_date)}</TableCell>
+                  <TableCell>{formatDate(lead.created_at)}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={lead.source}
+                      color={getSourceColor(lead.source)}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={(e) => handleActionClick(e, lead.id)} size="small">
+                      <MoreVertIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -185,28 +243,43 @@ const LeadTable = ({ leads, onRefresh, onDeleteLead }) => {
       {/* Action Menu */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem
-          onClick={() =>
-            handleView(leads.find((l) => l.id === selectedLeadId))
-          }
+          onClick={() => {
+            const lead = leads.find((l) => l.id === selectedLeadId);
+            handleView(lead);
+          }}
         >
-          <VisibilityIcon fontSize="small" sx={{ mr: 1 }} /> View
+          <VisibilityIcon fontSize="small" sx={{ mr: 1 }} /> View Details
         </MenuItem>
-        <MenuItem onClick={() => handleEdit(selectedLeadId)}>
-          <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
-        </MenuItem>
-        <MenuItem onClick={handleDelete}>
-          <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
-        </MenuItem>
+        {leads.find((l) => l.id === selectedLeadId)?.type === 'lead' && (
+          <>
+            <MenuItem onClick={() => handleEdit(selectedLeadId)}>
+              <EditIcon fontSize="small" sx={{ mr: 1 }} /> Edit
+            </MenuItem>
+            <MenuItem onClick={handleDelete}>
+              <DeleteIcon fontSize="small" sx={{ mr: 1 }} /> Delete
+            </MenuItem>
+          </>
+        )}
         <MenuItem onClick={() => handleCreateQuotation(selectedLeadId)}>
           Create Quotation
         </MenuItem>
         <MenuItem onClick={() => handleCreateInvoice(selectedLeadId)}>
           Create Invoice
         </MenuItem>
-        <MenuItem onClick={() => handleWhatsApp(selectedLeadId)}>
+        <MenuItem 
+          onClick={() => {
+            const lead = leads.find((l) => l.id === selectedLeadId);
+            handleWhatsApp(lead);
+          }}
+        >
           <WhatsAppIcon fontSize="small" sx={{ mr: 1 }} /> Send WhatsApp
         </MenuItem>
-        <MenuItem onClick={() => handleEmail(selectedLeadId)}>
+        <MenuItem 
+          onClick={() => {
+            const lead = leads.find((l) => l.id === selectedLeadId);
+            handleEmail(lead);
+          }}
+        >
           <EmailIcon fontSize="small" sx={{ mr: 1 }} /> Send Email
         </MenuItem>
       </Menu>

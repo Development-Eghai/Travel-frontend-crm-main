@@ -1,10 +1,36 @@
-import React, { useState } from 'react'; // Keep useState for local toggle
-// Removed errorMsg, successMsg, APIBaseUrl, handleSubmit, handleChange
-import EnquiryForm from './EnquiryForm'; // 👈 Import the new component
+import React, { useState } from 'react';
+import EnquiryForm from './EnquiryForm'; // 👈 Import the enquiry form component
 
 const TripCard = ({ trip }) => {
     // Local state to control modal visibility
     const [showForm, setShowForm] = useState(false);
+
+    // Determine the price and pricing model for display
+    const isFixedDeparture = trip?.pricing?.pricing_model === "fixed_departure";
+    
+    // Safely access prices based on the model
+    const basePrice = isFixedDeparture 
+        ? trip?.pricing?.fixed_departure?.[0]?.base_price
+        : trip?.pricing?.customized?.base_price;
+        
+    const finalPrice = isFixedDeparture 
+        ? trip?.pricing?.fixed_departure?.[0]?.costingPackages?.[0]?.final_price
+        : trip?.pricing?.customized?.final_price;
+    
+    // Fallback display logic for pricing (handles initial loading/data missing)
+    const priceDisplay = (
+        <>
+            {/* Base Price (Strikethrough) */}
+            {basePrice && <span>₹{basePrice.toLocaleString('en-IN')}</span>}
+            
+            {/* Final Price */}
+            {finalPrice ? (
+                ` ₹${finalPrice.toLocaleString('en-IN')}`
+            ) : (
+                " Price on Query"
+            )}
+        </>
+    );
 
     return (
         <>
@@ -39,17 +65,7 @@ const TripCard = ({ trip }) => {
                         </p>
 
                         <p className="featured-content">
-                            {trip?.pricing?.pricing_model === "customized" ? (
-                                <>
-                                    <span>₹{trip?.pricing?.customized?.base_price}</span>
-                                    ₹{trip?.pricing?.customized?.final_price}
-                                </>
-                            ) : (
-                                <>
-                                    <span>₹{trip?.pricing?.fixed_departure[0]?.base_price}</span>
-                                    ₹{trip?.pricing?.fixed_departure[0]?.final_price}
-                                </>
-                            )}
+                            {priceDisplay}
                         </p>
                     </div>
 
@@ -119,10 +135,10 @@ const TripCard = ({ trip }) => {
                 </div>
             </div>
 
-            {/* Render the Enquiry Form Component */}
+            {/* Render the Enquiry Form Component, passing the full trip data */}
             {showForm && (
                 <EnquiryForm 
-                    trip={trip} 
+                    trip={trip} // <-- Pass the full trip object
                     onClose={() => setShowForm(false)} 
                 />
             )}
