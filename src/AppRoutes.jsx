@@ -24,7 +24,8 @@ import TourCreation from "./pages/admin/TripManagement/Tour/TourCreation";
 import CategoryPreview from "./pages/admin/TripManagement/Category/CategoryPreview";
 import NotFound from "./common/NotFound";
 import WhatsAppWidget from './component/WhatsAppWidget'; 
-import './css/custom.css'; // <-- Import the global styles
+import ScrollToTop from './component/ScrollToTop'; // Import the ScrollToTop component
+import './css/custom.css';
 
 const DestinationDetail = lazy(() => import("./pages/user/DestinationDetail"));
 const Homepage = lazy(() => import("./pages/user/Homepage"));
@@ -33,6 +34,7 @@ const LeadManagement = lazy(() => import("./pages/LeadManagement/LeadManagement"
 const AppRoutes = () => {
     return (
         <Router>
+            <ScrollToTop /> {/* Add ScrollToTop component here */}
             <Routes>
                 <Route element={<CommonLayout />}>
                     <Route path="/" element={<Homepage />} />
@@ -51,7 +53,6 @@ const AppRoutes = () => {
                     <Route path="/trips-detail" element={<TripsDetail />} />
                     <Route path="/trips-bookings" element={<TripBookings />} />
                     
-                
                     {/* Preview Routes */}
                     <Route path="/destination/:slug?/:id?" element={<DestinationPreview />} />
                     <Route path="/trip-preview/:slug?/:id?" element={<TourPreview />} />
