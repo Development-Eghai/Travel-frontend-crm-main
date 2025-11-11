@@ -26,11 +26,12 @@ const ContactForm = ({ isOpen, onClose }) => {
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [captchaError, setCaptchaError] = useState('');
 
-  // API Endpoint
-  const API_ENDPOINT = 'https://api.yaadigo.com/public/api/enquires/';
+  // API Configuration
+  const API_ENDPOINT = 'https://api.yaadigo.com/secure/api/enquires/';
+  const API_KEY = 'bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M';
+  const DOMAIN_NAME = 'https://www.indianmountainrovers.com';
   
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // This regex is slightly adjusted to be more robust for international numbers while checking for minimum length
   const phoneRegex = /^(\+\d{1,3}[- ]?)?\d{7,15}$/; 
 
   // Generate captcha
@@ -73,7 +74,6 @@ const ContactForm = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    // For number inputs, convert value to a number
     const newValue = type === 'number' ? parseInt(value) : value;
 
     setFormData({
@@ -93,7 +93,6 @@ const ContactForm = ({ isOpen, onClose }) => {
     setFormData({
       ...formData,
       departureType: type,
-      // Clear travel_date if switching to flexible
       travel_date: type === 'flexible' ? '' : formData.travel_date, 
     });
   };
@@ -109,7 +108,6 @@ const ContactForm = ({ isOpen, onClose }) => {
       newErrors.departure_city = 'Required';
     }
 
-    // travel_date is required only if departureType is 'fixed'
     if (formData.departureType === 'fixed' && !formData.travel_date) {
       newErrors.travel_date = 'Required';
     }
@@ -132,7 +130,6 @@ const ContactForm = ({ isOpen, onClose }) => {
       newErrors.email = 'Invalid email';
     }
 
-    // Normalize phone number (remove spaces) for regex test
     const cleanContactNumber = formData.contact_number.replace(/\s/g, ''); 
     if (!formData.contact_number.trim()) {
       newErrors.contact_number = 'Required';
@@ -161,21 +158,22 @@ const ContactForm = ({ isOpen, onClose }) => {
 
     // 3. Submit to API
     setIsLoading(true);
-    setErrors({}); // Clear any previous form errors
+    setErrors({});
 
-    // Prepare data for API: exclude departureType and use empty string for flexible date
+    // Prepare payload with domain_name automatically included
     const payload = {
       destination: formData.destination,
       departure_city: formData.departure_city,
-      travel_date: formData.departureType === 'fixed' ? formData.travel_date : '', // Use empty string if flexible
+      travel_date: formData.departureType === 'fixed' ? formData.travel_date : '',
       adults: formData.adults,
       children: formData.children,
       infants: formData.infants,
       hotel_category: formData.hotel_category,
       full_name: formData.full_name,
-      contact_number: formData.contact_number.replace(/\s/g, ''), // Send cleaned number
+      contact_number: formData.contact_number.replace(/\s/g, ''),
       email: formData.email,
       additional_comments: formData.additional_comments,
+      domain_name: DOMAIN_NAME, // Automatically included
     };
 
     try {
@@ -183,28 +181,24 @@ const ContactForm = ({ isOpen, onClose }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Add any other required headers (e.g., Authorization) here
+          'x-api-key': API_KEY, // API key automatically included
         },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        // Successful submission
         console.log('Form submitted successfully:', payload);
         setIsSubmitted(true);
       } else {
-        // Handle API errors (e.g., 4xx or 5xx status codes)
         const errorData = await response.json();
         console.error('Submission failed:', response.status, errorData);
-        // Display a general submission error or specific field errors from API
         alert(`Submission Failed: ${errorData.message || 'Server error occurred.'}`);
-        generateCaptcha(); // Re-generate captcha on failure
+        generateCaptcha();
       }
     } catch (error) {
-      // Handle network errors
       console.error('Network error during submission:', error);
       alert('An error occurred. Please check your connection and try again.');
-      generateCaptcha(); // Re-generate captcha on failure
+      generateCaptcha();
     } finally {
       setIsLoading(false);
     }
@@ -235,7 +229,7 @@ const ContactForm = ({ isOpen, onClose }) => {
         </button>
 
         <div className="contact-form-fixed-container">
-          {/* LEFT PANEL (Unchanged) */}
+          {/* LEFT PANEL */}
           <div className="contact-form-fixed-left">
             <div className="contact-form-fixed-brand">
               <span className="contact-form-fixed-icon">✈️</span>
@@ -288,7 +282,7 @@ const ContactForm = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* RIGHT PANEL - FORM (Unchanged logic, except for handleSubmit) */}
+          {/* RIGHT PANEL - FORM */}
           <div className="contact-form-fixed-right">
             {isSubmitted ? (
               <div className="contact-form-fixed-success">

@@ -1,592 +1,88 @@
-.tour-creation {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #374151;
-}
-
-/* Header Styles */
-.tour-creation-header {
-  margin-bottom: 30px;
-}
-
-.tour-creation-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 8px;
-}
-
-.tour-creation-subtitle {
-  color: #6b7280;
-  font-size: 14px;
-}
-
-/* Progress Bar */
-.progress-container {
-  margin-bottom: 30px;
-}
-
-.progress-bar {
-  height: 4px;
-  background-color: #e5e7eb;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: #2563eb;
-  transition: width 0.3s ease;
-}
-
-.progress-steps {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-/* Main Layout */
-.tour-creation-main {
-  display: flex;
-  gap: 30px;
-}
-
-/* Sidebar */
-.tour-creation-sidebar {
-  width: 250px;
-  flex-shrink: 0;
-}
-
-.steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.step-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid #e5e7eb;
-}
-
-.step-item.active {
-  background-color: #dbeafe;
-  border-color: #2563eb;
-}
-
-.step-item.completed {
-  background-color: #f0f9ff;
-  border-color: #0ea5e9;
-}
-
-.step-icon {
-  margin-right: 12px;
-  width: 20px;
-  height: 20px;
-}
-
-.step-label {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* Content Area */
-.tour-creation-content {
-  flex: 1;
-}
-
-.step-content {
-  background-color: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.step-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 16px;
-}
-
-/* Form Elements */
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.form-input,
-.form-select,
-.form-textarea {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-}
-
-.form-textarea {
-  resize: none;
-}
-
-/* Grid Layouts */
-.grid-1 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.grid-cols-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-/* Radio and Checkbox Styles */
-.radio-group,
-.checkbox-group {
-  display: flex;
-  gap: 16px;
-  margin-top: 8px;
-}
-
-.radio-label,
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.radio-input,
-.checkbox-input {
-  margin-right: 8px;
-}
-
-/* Info Boxes */
-.info-box {
-  background-color: #f9fafb;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.info-box-title {
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 8px;
-}
-
-/* Status Messages */
-.status-message {
-  padding: 16px;
-  background-color: #dbeafe;
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.status-text {
-  font-size: 14px;
-  color: #1e40af;
-}
-
-.status-text strong {
-  font-weight: 600;
-}
-
-/* Itinerary Styles */
-.itinerary-day {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.itinerary-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  background-color: #f9fafb;
-  border-radius: 8px 8px 0 0;
-}
-
-.day-number {
-  width: 32px;
-  height: 32px;
-  background-color: #2563eb;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.day-content {
-  padding: 16px;
-}
-
-/* Upload Areas */
-.upload-area {
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  padding: 32px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.upload-area:hover {
-  border-color: #2563eb;
-}
-
-.upload-icon {
-  margin: 0 auto 16px;
-  color: #9ca3af;
-}
-
-.upload-text {
-  color: #6b7280;
-  margin-bottom: 8px;
-}
-
-.upload-hint {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-/* Button Styles */
-.btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-}
-
-.btn-primary {
-  background-color: #2563eb;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.btn-outline {
-  border: 2px dashed #d1d5db;
-  background-color: transparent;
-  color: #6b7280;
-  width: 100%;
-  padding: 12px;
-}
-
-.btn-outline:hover {
-  border-color: #60a5fa;
-  color: #2563eb;
-}
-
-/* Star Rating */
-.star-rating {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.star {
-  width: 16px;
-  height: 16px;
-}
-
-.star.filled {
-  fill: #fbbf24;
-  color: #fbbf24;
-}
-
-.star.empty {
-  color: #d1d5db;
-}
-
-/* Summary Grids */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  text-align: center;
-  margin-top: 16px;
-}
-
-.summary-item {
-  padding: 16px;
-}
-
-.summary-number {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.summary-label {
-  font-size: 14px;
-  color: #6b7280;
-}
-
-/* Pricing Cards */
-.pricing-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.pricing-card.selected {
-  border-color: #60a5fa;
-  background-color: #dbeafe;
-}
-
-/* Empty States */
-.empty-state {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 32px;
-  text-align: center;
-  color: #6b7280;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .tour-creation-main {
-    flex-direction: column;
-  }
-
-  .tour-creation-sidebar {
-    width: 100%;
-  }
-
-  .steps-list {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-
-  .step-item {
-    min-width: 150px;
-  }
-}
-
-@media (max-width: 768px) {
-  .grid-2,
-  .grid-cols-2 {
-    grid-template-columns: 1fr;
-  }
-
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tour-creation {
-    padding: 10px;
-  }
-}
-
-/* Utility Classes */
-.text-sm {
-  font-size: 14px;
-}
-
-.text-xs {
-  font-size: 12px;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.font-semibold {
-  font-weight: 600;
-}
-
-.text-gray-600 {
-  color: #6b7280;
-}
-
-.text-gray-500 {
-  color: #6b7280;
-}
-
-.text-gray-900 {
-  color: #111827;
-}
-
-.text-blue-600 {
-  color: #2563eb;
-}
-
-.mb-4 {
-  margin-bottom: 16px;
-}
-
-.mb-6 {
-  margin-bottom: 24px;
-}
-
-.mt-4 {
-  margin-top: 16px;
-}
-
-.mt-6 {
-  margin-top: 24px;
-}
-
-.space-y-4 > * + * {
-  margin-top: 16px;
-}
-
-.space-y-6 > * + * {
-  margin-top: 24px;
-}
-
-.flex {
-  display: flex;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.gap-2 {
-  gap: 8px;
-}
-
-.gap-3 {
-  gap: 12px;
-}
-
-.gap-4 {
-  gap: 16px;
-}
-
-.form-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.form-box {
-  flex: 1;
-}
-
-.form-box h5 {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-}
-
-.input-group input {
-  flex: 1;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px 0 0 6px;
-  outline: none;
-}
-
-.plus-btn {
-  background-color: #25d366;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 0 6px 6px 0;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.plus-btn:hover {
-  background-color: #0056b3;
-}
-
-/* Aliases and additional classes used by TourCreation.jsx */
+/* =====================================================================
+// TourCreation.css - Premium Design (Updated with Alignment Fixes)
+// ===================================================================== */
+
+:root {
+  --brand-dark: #3b2a1a;
+  --brand-light: #5a4b3d;
+  --brand-green: #25d366;
+  --brand-green-hover: #1eaf57;
+  --light-bg: #faf9f7;
+  --border-color: #e5e7eb;
+  --text-dark: #2c2c2c;
+  --text-muted: #6b7280;
+}
+
+/* -------------------------------------------------------------
+   General Layout
+-------------------------------------------------------------- */
 .tour-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 30px auto;
+  padding: 25px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-dark);
+  background: var(--light-bg);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.tour-header h2 {
-  margin: 0;
-  font-size: 22px;
-}
-.tour-header p {
-  margin: 4px 0 16px;
-  color: #6b7280;
+.tour-page-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
 }
 
+.tour-page-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+
+.admin-add-button {
+  background-color: var(--brand-dark);
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+.admin-add-button:hover {
+  background-color: var(--brand-light);
+}
+
+/* -------------------------------------------------------------
+   Progress Bar
+-------------------------------------------------------------- */
 .progress-bar {
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 6px;
+  height: 8px;
+  background: #eaeaea;
+  border-radius: 10px;
+  margin-bottom: 16px;
   overflow: hidden;
-  margin-bottom: 12px;
 }
 .progress-bar-fill {
   height: 100%;
-  background: #2563eb;
-  transition: width 200ms ease;
+  background: var(--brand-green);
+  border-radius: 10px;
+  transition: width 0.4s ease;
 }
 
+/* -------------------------------------------------------------
+   Stepper
+-------------------------------------------------------------- */
 .stepper {
   display: flex;
-  gap: 8px;
-  margin: 16px 0 24px;
   flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  margin-bottom: 25px;
 }
+
 .step-button {
   display: flex;
   align-items: center;
@@ -594,85 +90,363 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 6px 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
 }
+
+.step-button:hover {
+  background: rgba(59, 42, 26, 0.05);
+}
+
 .step-circle {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  border: 2px solid #ccc;
+  color: #888;
 }
-.step-active {
-  background: #2563eb;
-  color: white;
+.step-active .step-circle {
+  background: var(--brand-dark);
+  color: #fff;
+  border-color: var(--brand-dark);
 }
-.step-inactive {
-  background: #f3f4f6;
+.step-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
 }
-.step-label-active {
-  color: #111827;
-  font-weight: 600;
-}
-.step-label-inactive {
-  color: #6b7280;
+.step-label.fw-semibold {
+  color: var(--brand-dark);
 }
 
-.button {
-  padding: 8px 12px;
+/* -------------------------------------------------------------
+   Form Containers
+-------------------------------------------------------------- */
+.form-container {
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+.form-control,
+.form-select {
+  border: 1px solid #d1d5db;
   border-radius: 6px;
-  cursor: pointer;
-  border: 1px solid transparent;
-}
-.button-secondary {
-  background: #f3f4f6;
-  color: #374151;
-}
-.button-green {
-  background: #10b981;
-  color: white;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: all 0.25s;
 }
 
-.category-list {
+.form-control:focus {
+  border-color: var(--brand-dark);
+  box-shadow: 0 0 0 3px rgba(59, 42, 26, 0.15);
+  outline: none;
+}
+textarea.form-control {
+  min-height: 110px;
+}
+
+/* -------------------------------------------------------------
+   Itinerary Section
+-------------------------------------------------------------- */
+.itinerary-header {
+  background: #f8f9fa;
+  border: 1px solid var(--border-color);
+  padding: 12px 16px;
+  font-weight: 600;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.itinerary-body {
+  background: #fff;
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Fix horizontal alignment */
+.activity-multi-select-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
-.w-100 {
-  width: 100%;
+.meal-options {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
-.my-4 {
-  margin: 16px 0;
+.meal-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
 }
-.text-lg {
+
+/* Activity Chips */
+.activity-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #f3f4f6;
+  color: var(--text-dark);
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  gap: 5px;
+  margin: 2px 4px 2px 0;
+  border: 1px solid #ddd;
+}
+.activity-chip svg {
+  cursor: pointer;
+  color: #dc3545;
+}
+
+/* -------------------------------------------------------------
+   Delete Buttons
+-------------------------------------------------------------- */
+.delete-day-btn {
+  background: #dc3545 !important;
+  color: #fff !important;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px !important;
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px !important;
+  transition: all 0.25s ease;
+}
+.delete-day-btn:hover {
+  background: #b71c1c !important;
+}
+
+/* -------------------------------------------------------------
+   Add Buttons
+-------------------------------------------------------------- */
+.add-day-btn,
+.btn-add-slot,
+.btn-add-package {
+  background: var(--brand-green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+.add-day-btn:hover,
+.btn-add-slot:hover,
+.btn-add-package:hover {
+  background: var(--brand-green-hover);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------------------------
+   Media Upload Section
+-------------------------------------------------------------- */
+.upload-area {
+  border: 2px dashed #d1d5db;
+  padding: 28px;
+  background: #fcfcfc;
+  text-align: center;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+.upload-area:hover {
+  background: #f7f7f7;
+  border-color: var(--brand-green);
+}
+.media-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: background 0.25s, transform 0.15s;
+}
+.media-delete-btn:hover {
+  background: #b71c1c;
+  transform: scale(1.05);
+}
+
+/* -------------------------------------------------------------
+   Pricing Section
+-------------------------------------------------------------- */
+.pricing-model-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.pricing-model-card:hover {
+  border-color: var(--brand-green);
+  box-shadow: 0 3px 8px rgba(37, 211, 102, 0.15);
+}
+.pricing-model-card.active {
+  border-color: var(--brand-green);
+  background: #f0fdf4;
+}
+
+.fixed-departure-container,
+.custom-pricing-container {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: #fafafa;
+}
+.slot-container,
+.package-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+.slot-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--brand-green);
+  border-radius: 50%;
+}
+
+/* -------------------------------------------------------------
+   Confirm Modal
+-------------------------------------------------------------- */
+.confirm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.confirm-modal {
+  background: #fff;
+  padding: 22px;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+.confirm-modal h4 {
   font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--brand-dark);
 }
-.font-bold {
-  font-weight: 700;
+.confirm-modal p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-primary {
+  background: var(--brand-green);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+.btn-primary:hover {
+  background: var(--brand-green-hover);
+}
+.btn-secondary {
+  background: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+.btn-secondary:hover {
+  background: #e4e4e4;
 }
 
-.media-header h3 {
-  margin: 0 0 6px 0;
+/* -------------------------------------------------------------
+   Footer Actions
+-------------------------------------------------------------- */
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
 }
-.media-section {
-  width: 48%;
+.progress-text {
+  font-size: 14px;
+  color: var(--text-muted);
 }
-.section-title {
+.btn-success {
+  background: var(--brand-green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
   font-weight: 600;
-  margin-bottom: 10px;
+  transition: all 0.3s;
 }
-.required {
-  color: #ef4444;
-  margin-left: 6px;
-}
-.file-input {
-  display: none;
-}
-.file-restrictions {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 8px;
+.btn-success:hover {
+  background: var(--brand-green-hover);
 }
 
+/* -------------------------------------------------------------
+   Responsive
+-------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .tour-container {
+    padding: 15px;
+  }
+  .stepper {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 768px) {
+  .footer-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .confirm-modal {
+    width: 90%;
+  }
+}

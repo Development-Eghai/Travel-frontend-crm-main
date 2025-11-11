@@ -1,41 +1,127 @@
-import { useEffect, useState } from "react";
+// TourCreation.jsx
+// Full-featured Tour Creation / Edit component
+// Features:
+// - Search-style Destination / Category / Activity inputs with immediate suggestions
+// - Confirm modal redirects to /admin/... (relative paths) when "Create one?" is clicked
+// - Auto-generate itinerary days when Days changes
+// - Always-visible red delete icons
+// - Fixed, single-color progress bar
+// - Media upload (hero + gallery) using existing endpoints
+// - Pricing: fixed departure and custom pricing
+// - Details: highlights, inclusions, exclusions, FAQs
+// - Policies: terms, cancellation, payment
+// - Edit-mode loader to prefill all fields
+// - Toast notifications for UX feedback
+
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Info,
   Map,
-  Image,
+  Image as ImageIcon,
   DollarSign,
   FileText,
   Shield,
   ChevronDown,
   ChevronUp,
+  Trash2,
+  Plus,
+  X,
 } from "lucide-react";
 import "./TourCreation.css";
-import { useDispatch, useSelector } from "react-redux";
-import { getSpecificDestination } from "../../../../store/slices/destinationSlices";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { APIBaseUrl } from "../../../../common/api/api";
-import { errorMsg, successMsg } from "../../../../common/Toastify";
+import axios from "axios";
 import { CircularProgress } from "@mui/material";
 
+/* ---------- Config ---------- */
+const BASE_URL = "https://api.yaadigo.com";
+const SECURE_BASE = `${BASE_URL}/secure/api/`;
+const API_KEY = "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M";
+const AFTER_REDIRECT = "/admin/tour-list";
+
+/* ---------- Defaults ---------- */
+const defaultCostingPackage = {
+  title: "",
+  description: "",
+  base_price: "",
+  discount: "",
+  final_price: "",
+  booking_amount: "",
+  gst_percentage: "",
+};
+
+const defaultFixedDepartureSlot = {
+  from_date: "",
+  to_date: "",
+  available_slots: "",
+  costingPackages: [{ ...defaultCostingPackage }],
+};
+
+/* ---------- Reusable Confirm Modal ---------- */
+function ConfirmModal({ open, title, message, onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="confirm-modal-overlay">
+      <div className="confirm-modal">
+        <h4>{title}</h4>
+        <p>{message}</p>
+        <div className="confirm-actions">
+          <button className="btn-secondary" onClick={onCancel}>Cancel</button>
+          <button className="btn-primary" onClick={onConfirm}>Continue</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Main Component ---------- */
 export default function TourCreation() {
-  const [activeStep, setActiveStep] = useState("basic");
-  const [openDay, setOpenDay] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
+
+  // Steps and progress
+  const steps = useMemo(
+    () => [
+      { id: "basic", label: "Basic Info", icon: Info },
+      { id: "itinerary", label: "Itinerary", icon: Map },
+      { id: "media", label: "Media", icon: ImageIcon },
+      { id: "pricing", label: "Pricing", icon: DollarSign },
+      { id: "details", label: "Details", icon: FileText },
+      { id: "policies", label: "Policies", icon: Shield },
+    ],
+    []
+  );
+
+  // state
+  const [activeStep, setActiveStep] = useState("basic");
+  const [openDay, setOpenDay] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Form state
+  // lists from API
+  const [activityList, setActivityList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [destinationList, setDestinationList] = useState([]);
+
+  // details
+  const [faqs, setFaqs] = useState([]);
+  const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
+  const [highlightsText, setHighlightsText] = useState("");
+  const [inclusionsText, setInclusionsText] = useState("");
+  const [exclusionsText, setExclusionsText] = useState("");
+
+  // Pricing
+  const [fixedPackage, setFixedPackage] = useState([{ ...defaultFixedDepartureSlot }]);
+  const [selectedPricing, setSelectedPricing] = useState("custom");
+
+  // Form
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     overview: "",
     destination_id: "",
     destination_type: "",
-    // FIX 1: category_id remains an array for multiselect, populated with strings
     category_id: [],
-    themes: [],
     hotel_category: "",
     pickup_location: "",
     drop_location: "",
@@ -54,22 +140,8 @@ export default function TourCreation() {
     ],
     hero_image: null,
     gallery_images: [],
+    pricing_model: "custom",
     pricing: {
-      pricing_model: "",
-      fixed_departure: [
-        {
-          from_date: "",
-          to_date: "",
-          available_slots: "",
-          title: "",
-          description: "",
-          base_price: "",
-          discount: "",
-          final_price: "",
-          booking_amount: "",
-          gst_percentage: "",
-        },
-      ],
       customized: {
         pricing_type: "",
         base_price: "",
@@ -78,507 +150,287 @@ export default function TourCreation() {
         gst_percentage: "",
       },
     },
-    highlights: [],
-    inclusions: [],
-    exclusions: [],
-    faqs: [],
     terms: "",
     privacy_policy: "",
     payment_terms: "",
     custom_policies: [],
   });
 
-  const [selectedPricing, setSelectedPricing] = useState("");
-  const [highlightsInput, setHighlightsInput] = useState("");
-  const [inclusionsInput, setInclusionsInput] = useState("");
-  const [exclusionsInput, setExclusionsInput] = useState("");
-  const [faqs, setFaqs] = useState([]);
-  const [faqInput, setFaqInput] = useState({ question: "", answer: "" });
-  const [categoryList, setcategoryList] = useState([]);
-  const [fixedPackage, setFixedPackage] = useState([{
-    from_date: "", to_date: "", description: "",
-    available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-  }]);
-
-  const steps = [
-    { id: "basic", label: "Basic Info", icon: Info },
-    { id: "itinerary", label: "Itinerary", icon: Map },
-    { id: "media", label: "Media", icon: Image },
-    { id: "pricing", label: "Pricing", icon: DollarSign },
-    { id: "details", label: "Details", icon: FileText },
-    { id: "policies", label: "Policies", icon: Shield },
-  ];
-
-  const dispatch = useDispatch();
-  const { data: destinationData, loading, error } = useSelector((state) => state.destination);
-
-  useEffect(() => {
-    dispatch(getSpecificDestination());
-  }, [dispatch]);
-
   const currentIndex = steps.findIndex((s) => s.id === activeStep);
-  const progress = ((currentIndex + 1) / steps.length) * 100 + "%";
+  const progressPercent = ((currentIndex + 1) / steps.length) * 100 + "%";
 
-  // Helper function to generate slug
-  const generateSlug = (title) => {
-    return title
+  /* ---------- Utilities ---------- */
+  const generateSlug = (title) =>
+    title
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
 
-  // Handler functions
   const handleInputChange = (field, value) => {
     setFormData((prev) => {
-      const updated = {
-        ...prev,
-        [field]: value,
-      };
+      const updated = { ...prev, [field]: value };
 
-      // Auto-generate slug when title changes (only if not editing)
-      if (field === "title" && !id) {
-        updated.slug = generateSlug(value);
+      // slug generation from title if blank or new
+      if (field === "title") {
+        updated.slug = (!id || !prev.slug) ? generateSlug(value) : prev.slug;
+      }
+
+      // days -> auto-generate itinerary days
+      if (field === "days") {
+        const num = parseInt(value, 10);
+        if (!isNaN(num) && num > 0) {
+          const daysArr = Array.from({ length: num }, (_, i) => ({
+            id: i + 1,
+            day_number: i + 1,
+            title: `Day ${i + 1}: ${i === 0 ? "Arrival" : "Activity"}`,
+            description: "",
+            activities: [],
+            hotel_name: "",
+            meal_plan: [],
+          }));
+          updated.itineraryDays = daysArr;
+          updated.nights = Math.max(0, num - 1).toString();
+        } else {
+          updated.itineraryDays = [];
+          updated.nights = "";
+        }
       }
 
       return updated;
     });
   };
 
-  const handleCustomPricingChange = (field, value) => {
+  const handleCategoryMultiSelect = (categoryId, isChecked) => {
     setFormData((prev) => {
-      const updatedCustomized = {
-        ...prev.pricing.customized,
-        [field]: value,
-      };
+      const currentCategories = prev.category_id;
+      const cid = String(categoryId);
+      if (isChecked) {
+        if (!currentCategories.includes(cid)) {
+          return { ...prev, category_id: [...currentCategories, cid] };
+        }
+      } else {
+        return { ...prev, category_id: currentCategories.filter((c) => c !== cid) };
+      }
+      return prev;
+    });
+  };
 
-      const basePrice = parseFloat(updatedCustomized.base_price) || 0;
-      const discount = parseFloat(updatedCustomized.discount) || 0;
-      const gst = parseFloat(updatedCustomized.gst_percentage) || 0;
+  const handleArrayChange = (dayId, field, value, isChecked) => {
+    setFormData((prev) => ({
+      ...prev,
+      itineraryDays: prev.itineraryDays.map((d) =>
+        d.id === dayId
+          ? {
+              ...d,
+              [field]: isChecked ? [...d[field], value] : d[field].filter((a) => a !== value),
+            }
+          : d
+      ),
+    }));
+  };
 
-      const discountedPrice = basePrice - discount;
-      // Recalculate final price
-      const finalPrice = discountedPrice + (discountedPrice * gst / 100);
+  const toggleDay = (id) => setOpenDay(openDay === id ? null : id);
 
-      updatedCustomized.final_price = finalPrice.toFixed(2);
-
+  const addNewDay = () => {
+    setFormData((prev) => {
+      const newId = prev.itineraryDays.length + 1;
       return {
         ...prev,
-        pricing: {
-          ...prev.pricing,
-          customized: updatedCustomized,
-        },
+        itineraryDays: [
+          ...prev.itineraryDays,
+          {
+            id: newId,
+            day_number: newId,
+            title: `Day ${newId}: New Activity`,
+            description: "",
+            activities: [],
+            hotel_name: "",
+            meal_plan: [],
+          },
+        ],
       };
     });
   };
 
-  // Utility function for managing multiselect (themes and now categories)
-  const handleArrayChange = (field, value, isChecked) => {
+  const deleteDay = (dayId) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: isChecked
-        ? [...prev[field], value]
-        : prev[field].filter((item) => item !== value),
-    }));
-  };
-
-  const handleItineraryChange = (dayId, field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      itineraryDays: prev.itineraryDays.map((day) =>
-        day.id === dayId ? { ...day, [field]: value } : day
-      ),
-    }));
-  };
-
-  const handleActivitiesChange = (dayId, activity, isChecked) => {
-    setFormData((prev) => ({
-      ...prev,
-      itineraryDays: prev.itineraryDays.map((day) =>
-        day.id === dayId
-          ? {
-            ...day,
-            activities: isChecked
-              ? [...day.activities, activity]
-              : day.activities.filter((a) => a !== activity),
-          }
-          : day
-      ),
-    }));
-  };
-
-  const handleMealPlanChange = (dayId, meal, isChecked) => {
-    setFormData((prev) => ({
-      ...prev,
-      itineraryDays: prev.itineraryDays.map((day) =>
-        day.id === dayId
-          ? {
-            ...day,
-            meal_plan: isChecked
-              ? [...day.meal_plan, meal]
-              : day.meal_plan.filter((m) => m !== meal),
-          }
-          : day
-      ),
-    }));
-  };
-
-  const toggleDay = (id) => {
-    setOpenDay(openDay === id ? null : id);
-  };
-
-  const addNewDay = () => {
-    const newId = formData.itineraryDays.length + 1;
-    setFormData((prev) => ({
-      ...prev,
-      itineraryDays: [
-        ...prev.itineraryDays,
-        {
-          id: newId,
-          day_number: newId,
-          title: `Day ${newId}: New Activity`,
-          description: "",
-          activities: [],
-          hotel_name: "",
-          meal_plan: [],
-        },
-      ],
-    }));
-  };
-
-  const addHighlight = () => {
-    if (highlightsInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        highlights: [...prev.highlights, highlightsInput.trim()],
-      }));
-      setHighlightsInput("");
-    }
-  };
-
-  const addInclusion = () => {
-    if (inclusionsInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        inclusions: [...prev.inclusions, inclusionsInput.trim()],
-      }));
-      setInclusionsInput("");
-    }
-  };
-
-  const addExclusion = () => {
-    if (exclusionsInput.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        exclusions: [...prev.exclusions, exclusionsInput.trim()],
-      }));
-      setExclusionsInput("");
-    }
-  };
-
-  const addFaqs = () => {
-    if (faqInput?.question?.trim() && faqInput?.answer?.trim()) {
-      setFaqs([...faqs, faqInput]);
-      setFaqInput({ question: "", answer: "" });
-    } else {
-      alert("Please fill both question and answer!");
-    }
-  };
-
-  const deleteFaqs = (indexToRemove) => {
-    const updatedFaqs = faqs.filter((_, index) => index !== indexToRemove);
-    setFaqs(updatedFaqs);
-  };
-
-  const removeItem = (field, index) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const imageName = file.name;
-    const type = imageName.split(".").pop().toLowerCase();
-
-    if (!["jpeg", "png", "jpg", "pdf", "webp"].includes(type)) {
-      errorMsg("Unsupported file type");
-      return;
-    }
-
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      errorMsg("File size should not exceed 5MB.");
-      return;
-    }
-
-    const formDataForUpload = new FormData();
-    formDataForUpload.append("image", file);
-    formDataForUpload.append("storage", "local");
-
-    try {
-      const res = await APIBaseUrl.post("https://api.yaadigo.com/upload", formDataForUpload);
-
-      if (res?.data?.message === "Upload successful") {
-        successMsg("Image uploaded successfully");
-        setFormData((prev) => ({
-          ...prev,
-          hero_image: res.data.url,
-        }));
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      errorMsg("File upload failed");
-    }
-  };
-
-  const handleMultipleFileUpload = async (e) => {
-    const file = e.target.files[0];
-
-    if (!file) return;
-    let image_name = e?.target?.files[0]?.name;
-    let image_type = image_name?.split(".");
-    let type = image_type?.pop();
-    if (type !== "jpeg" && type !== "png" && type !== "jpg" && type !== "pdf" && type !== "webp") {
-      errorMsg("Unsupported file type")
-      return;
-    }
-
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      errorMsg("File size should not exceed 5MB.");
-      return;
-    }
-
-    const form_Data = new FormData();
-    form_Data.append("gallery_images", file);
-    form_Data.append("storage", "local");
-    try {
-      const res = await APIBaseUrl.post("https://api.yaadigo.com/multiple", form_Data);
-      if (res?.data?.message === "Files uploaded") {
-        successMsg("Image uploaded successfully");
-        const path = res.data.files;
-        const existingImages = formData?.gallery_images || [];
-
-        const newPaths = Array.isArray(path)
-          ? path.flat()
-          : [path];
-
-        const updatedImages = [...existingImages, ...newPaths];
-        setFormData((prev) => ({
-          ...prev,
-          gallery_images: updatedImages,
-        }));
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      errorMsg("File upload failed");
-    }
-  };
-
-  const removeHeroImage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      hero_image: null,
-    }));
-  };
-
-  const removeGalleryImage = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      gallery_images: prev.gallery_images.filter((_, i) => i !== index),
-    }));
-  };
-
-  const prepareSubmissionData = async () => {
-    const submissionData = {
-      title: formData.title,
-      overview: formData.overview,
-      destination_id: parseInt(formData.destination_id),
-      destination_type: formData.destination_type,
-      // category_id is already an array of strings in formData, so we send it directly
-      category_id: formData.category_id,
-      themes: formData.themes,
-      hotel_category: parseInt(formData.hotel_category) || 0,
-      pickup_location: formData.pickup_location,
-      drop_location: formData.drop_location,
-      days: parseInt(formData.days),
-      nights: parseInt(formData.nights),
-      meta_tags: `${formData.title}, ${formData.themes.join(", ")}`,
-      slug: id ? formData.slug : generateSlug(formData.title),
-      pricing_model: formData.pricing_model,
-      highlights: formData.highlights.join("; "),
-      inclusions: formData.inclusions.join("; "),
-      exclusions: formData.exclusions.join("; "),
-      faqs: faqs,
-      terms: formData.terms,
-      privacy_policy: formData.privacy_policy,
-      payment_terms: formData.payment_terms,
-      gallery_images: formData.gallery_images,
-      hero_image: formData.hero_image,
-      itinerary: formData.itineraryDays.map((day) => ({
-        day_number: day.day_number,
-        title: day.title,
-        description: day.description,
-        image_urls: [],
-        activities: day.activities,
-        hotel_name: day.hotel_name,
-        meal_plan: day.meal_plan,
+      itineraryDays: prev.itineraryDays.filter((d) => d.id !== dayId).map((d, idx) => ({
+        ...d,
+        id: idx + 1,
+        day_number: idx + 1,
+        title: `Day ${idx + 1}: ${d.title.split(": ")[1] || "Activity"}`,
       })),
-      pricing: {
-        pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
-        ...(formData.pricing_model === "fixed" && {
-          fixed_departure: fixedPackage?.map(
-            (item) => ({
-              from_date: `${item.from_date}T00:00:00`,
-              to_date: `${item.to_date}T00:00:00`,
-              available_slots: parseInt(item.available_slots),
-              title: item.title,
-              description: item.description || "",
-              base_price: parseFloat(item.base_price),
-              discount: parseFloat(item.discount) || 0,
-              final_price: parseFloat(item.final_price),
-              booking_amount: parseFloat(item.booking_amount) || 0,
-              gst_percentage: parseFloat(item.gst_percentage) || 0,
-            })
-          ),
-        }),
-        ...(formData.pricing_model === "custom" && {
-          customized: {
-            pricing_type: formData.pricing.customized.pricing_type,
-            base_price: parseFloat(formData.pricing.customized.base_price),
-            discount: parseFloat(formData.pricing.customized.discount) || 0,
-            final_price: parseFloat(formData.pricing.customized.final_price),
-            gst_percentage: parseFloat(formData.pricing.customized.gst_percentage) || 0,
-          },
-        }),
-      },
-      policies: [
-        ...(formData.terms
-          ? [{ title: "Terms and Conditions", content: formData.terms }]
-          : []),
-        ...(formData.privacy_policy
-          ? [{ title: "Privacy Policy", content: formData.privacy_policy }]
-          : []),
-        ...(formData.payment_terms
-          ? [{ title: "Payment Terms", content: formData.payment_terms }]
-          : []),
-        ...formData.custom_policies,
-      ],
-    };
-
-    return submissionData;
+    }));
+    setOpenDay(null);
   };
 
-  const handleSubmit = async () => {
-    try {
-      setIsLoading(true);
-      const submissionData = await prepareSubmissionData();
+  /* ---------- Media Handlers ---------- */
+  const handleMediaUpload = async (e, isMultiple) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-      const res = await APIBaseUrl.post("trips/", submissionData, {
-        headers: {
-          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-        },
-      });
-      if (res?.data?.success === true) {
-        toast.success("Trip created successfully!");
-        setFormData({});
-        setIsLoading(false);
-        navigate("/admin/tour-list")
+    const okTypes = ["jpeg", "png", "jpg", "webp"];
+    for (const f of files) {
+      const ext = f.name.split(".").pop().toLowerCase();
+      if (!okTypes.includes(ext)) {
+        toast.error(`Unsupported file type: ${f.name}`);
+        return;
       }
-    } catch (error) {
-      console.error("Error creating trip:", error);
-      toast.error("Error creating trip. Please try again.");
-      setIsLoading(false);
+      if (f.size > 5 * 1024 * 1024) {
+        toast.error(`File too large (>5MB): ${f.name}`);
+        return;
+      }
+    }
+
+    const fd = new FormData();
+    files.forEach((f) => fd.append(isMultiple ? "gallery_images" : "image", f));
+    fd.append("storage", "local");
+
+    const endpoint = isMultiple ? `${BASE_URL}/multiple` : `${BASE_URL}/upload`;
+    try {
+      const res = await axios.post(endpoint, fd);
+      if (res?.data?.message === "Upload successful" || res?.data?.message === "Files uploaded") {
+        if (isMultiple) {
+          const uploaded = Array.isArray(res.data.files) ? res.data.files.flat() : [res.data.files];
+          setFormData((prev) => ({ ...prev, gallery_images: [...(prev.gallery_images || []), ...uploaded] }));
+          toast.success(`${uploaded.length} image(s) uploaded to gallery.`);
+        } else {
+          setFormData((prev) => ({ ...prev, hero_image: res.data.url }));
+          toast.success("Hero image uploaded.");
+        }
+      } else {
+        toast.error("Upload failed.");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      toast.error("Upload error.");
     }
   };
 
-  const handleUpdate = async () => {
-    try {
-      setIsLoading(true);
-      const submissionData = await prepareSubmissionData();
+  const removeHeroImage = () => setFormData((prev) => ({ ...prev, hero_image: null }));
+  const removeGalleryImage = (index) => setFormData((prev) => ({ ...prev, gallery_images: prev.gallery_images.filter((_, i) => i !== index) }));
 
-      const res = await APIBaseUrl.put(`trips/${id}`, submissionData, {
-        headers: {
-          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-        },
-      });
-      if (res?.data?.success === true) {
-        toast.success("Trip updated successfully!");
-        setIsLoading(false);
-        navigate("/admin/tour-list")
-      }
-    } catch (error) {
-      console.error("Error updating trip:", error);
-      toast.error("Error updating trip. Please try again.");
-      setIsLoading(false);
-    }
-  };
-
-
-  const getAllTourCategory = async () => {
-    try {
-      const res = await APIBaseUrl.get("categories/", {
-        headers: {
-          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-        },
-      });
-      if (res?.data?.success === true) {
-        setcategoryList(res?.data?.data)
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error?.response?.data || error.message);
-    }
-  }
-
+  /* ---------- Fixed Departure / Costing Handlers ---------- */
   const addFixedPackage = () => {
-    setFixedPackage([...fixedPackage, {
-      from_date: "", to_date: "", description: "",
-      available_slots: "", title: "", base_price: "", discount: "", final_price: "", booking_amount: "", gst_percentage: ""
-    }]);
+    const newSlot = {
+      ...defaultFixedDepartureSlot,
+      costingPackages: fixedPackage[0]?.costingPackages.map((pkg) => ({ ...pkg })) || [{ ...defaultCostingPackage }],
+    };
+    setFixedPackage((p) => [...p, newSlot]);
   };
 
   const deleteFixedPackage = (indexToRemove) => {
-    if (indexToRemove !== 0) {
-      const updatedFaqs = fixedPackage.filter((_, index) => index !== indexToRemove);
-      setFixedPackage(updatedFaqs);
+    if (fixedPackage.length === 1) {
+      setFixedPackage([{ ...defaultFixedDepartureSlot }]);
+      return;
+    }
+    setFixedPackage((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
+  const addCostingPackage = () => {
+    setFixedPackage((prev) => {
+      const updated = [...prev];
+      for (let i = 0; i < updated.length; i++) {
+        updated[i].costingPackages.push({ ...defaultCostingPackage });
+      }
+      return updated;
+    });
+  };
+
+  const deleteCostingPackage = (pkgIndex) => {
+    setFixedPackage((prev) => {
+      const updated = [...prev];
+      if (updated[0].costingPackages.length === 1) {
+        for (let i = 0; i < updated.length; i++) {
+          updated[i].costingPackages = [{ ...defaultCostingPackage }];
+        }
+        return updated;
+      }
+      for (let i = 0; i < updated.length; i++) {
+        updated[i].costingPackages = updated[i].costingPackages.filter((_, idx) => idx !== pkgIndex);
+      }
+      return updated;
+    });
+  };
+
+  const updateFixedPackage = (slotIndex, key, value, packageIndex = null) => {
+    setFixedPackage((prev) => {
+      const updated = [...prev];
+      if (packageIndex === null) {
+        updated[slotIndex][key] = value;
+      } else {
+        for (let i = 0; i < updated.length; i++) {
+          if (key !== "final_price") updated[i].costingPackages[packageIndex][key] = value;
+          const pkg = updated[i].costingPackages[packageIndex];
+          const basePrice = parseFloat(pkg.base_price) || 0;
+          const discount = parseFloat(pkg.discount) || 0;
+          const gst = parseFloat(pkg.gst_percentage) || 0;
+          const discounted = Math.max(basePrice - discount, 0);
+          const finalPrice = discounted + (discounted * gst) / 100;
+          pkg.final_price = isNaN(finalPrice) ? "" : finalPrice.toFixed(2);
+        }
+      }
+      return updated;
+    });
+  };
+
+  const handleCustomPricingChange = (field, value) => {
+    setFormData((prev) => {
+      const customized = { ...prev.pricing.customized, [field]: value };
+      const base = parseFloat(customized.base_price) || 0;
+      const disc = parseFloat(customized.discount) || 0;
+      const gst = parseFloat(customized.gst_percentage) || 0;
+      const discounted = Math.max(base - disc, 0);
+      const final = discounted + (discounted * gst) / 100;
+      customized.final_price = isNaN(final) || !isFinite(final) ? "" : final.toFixed(2);
+      return { ...prev, pricing: { ...prev.pricing, customized } };
+    });
+  };
+
+  /* ---------- API Fetchers ---------- */
+  const fetchList = async (endpoint, setter) => {
+    try {
+      const res = await axios.get(`${SECURE_BASE}${endpoint}/`, {
+        headers: { "x-api-key": API_KEY },
+      });
+      if (res?.data?.success) {
+        if (endpoint === "activities") setter(Array.isArray(res.data.data) ? res.data.data.map((a) => a.name) : []);
+        else setter(res.data.data || []);
+      }
+    } catch (err) {
+      console.error(`Failed to fetch ${endpoint}:`, err);
     }
   };
 
-  const updateFixedPackage = (index, key, value) => {
-    const updatedPackages = [...fixedPackage];
-    updatedPackages[index][key] = value;
+  useEffect(() => {
+    fetchList("categories", setCategoryList);
+    fetchList("destinations", setDestinationList);
+    fetchList("activities", setActivityList);
 
-    const basePrice = parseFloat(updatedPackages[index].base_price) || 0;
-    const discount = parseFloat(updatedPackages[index].discount) || 0;
-    const gst = parseFloat(updatedPackages[index].gst_percentage) || 0;
+    if (!id && !formData.pricing_model) {
+      setFormData((prev) => ({ ...prev, pricing_model: "custom" }));
+    }
 
-    const discountedPrice = basePrice - discount;
-    const finalPrice = discountedPrice + (discountedPrice * gst / 100);
+    if (id) getSpecificTrip(id);
+    // eslint-disable-next-line
+  }, [id]);
 
-    updatedPackages[index].final_price = finalPrice.toFixed(2);
-
-    setFixedPackage(updatedPackages);
-  };
-
+  /* ---------- Load trip for edit ---------- */
   const getSpecificTrip = async (tripId) => {
     try {
-      const res = await APIBaseUrl.get(`trips/${tripId}`, {
-        headers: {
-          "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
-        },
+      const res = await axios.get(`${SECURE_BASE}trips/${tripId}`, {
+        headers: { "x-api-key": API_KEY },
       });
       if (res?.data?.success === true) {
-        const tripData = res?.data?.data;
-
-        const highlightsArray = tripData.highlights ? tripData.highlights.split("; ") : [];
-        const inclusionsArray = tripData.inclusions ? tripData.inclusions.split("; ") : [];
-        const exclusionsArray = tripData.exclusions ? tripData.exclusions.split("; ") : [];
+        const tripData = res.data.data;
+        const convertToLineBreaks = (text) => (text ? text.split("; ").join("\n") : "");
+        setHighlightsText(convertToLineBreaks(tripData.highlights));
+        setInclusionsText(convertToLineBreaks(tripData.inclusions));
+        setExclusionsText(convertToLineBreaks(tripData.exclusions));
 
         const itineraryDays = tripData.itinerary?.map((day, index) => ({
           id: index + 1,
@@ -590,11 +442,8 @@ export default function TourCreation() {
           meal_plan: day.meal_plan || [],
         })) || [];
 
-        // FIX 2: Ensure categoryId is always an array of STRINGS when loading from the API.
         const categoryId = tripData.category_id
-          ? (Array.isArray(tripData.category_id)
-            ? tripData.category_id.map(String) // If already an array, convert elements to string
-            : [String(tripData.category_id)]) // If single number/string, wrap in array and convert to string
+          ? Array.isArray(tripData.category_id) ? tripData.category_id.map(String) : [String(tripData.category_id)]
           : [];
 
         setFormData((prev) => ({
@@ -604,25 +453,20 @@ export default function TourCreation() {
           overview: tripData.overview || "",
           destination_id: tripData.destination_id || "",
           destination_type: tripData.destination_type || "",
-          category_id: categoryId, // FIXED: Use the corrected array of strings
-          themes: tripData.themes || [],
-          hotel_category: tripData.hotel_category?.toString() || "",
+          category_id: categoryId,
+          hotel_category: tripData.hoteL_category?.toString() || tripData.hotel_category?.toString() || "",
           pickup_location: tripData.pickup_location || "",
           drop_location: tripData.drop_location || "",
           days: tripData.days || "",
           nights: tripData.nights || "",
           hero_image: tripData.hero_image || null,
           gallery_images: tripData.gallery_images || [],
-          highlights: highlightsArray,
-          inclusions: inclusionsArray,
-          exclusions: exclusionsArray,
           terms: tripData.terms || "",
           privacy_policy: tripData.privacy_policy || "",
           payment_terms: tripData.payment_terms || "",
           pricing_model: tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom",
-          itineraryDays: itineraryDays,
+          itineraryDays,
           pricing: {
-            ...prev.pricing,
             customized: {
               pricing_type: tripData.pricing?.customized?.pricing_type || "",
               base_price: tripData.pricing?.customized?.base_price || "",
@@ -637,1259 +481,825 @@ export default function TourCreation() {
         setSelectedPricing(tripData.pricing?.pricing_model === "fixed_departure" ? "fixed" : "custom");
 
         if (tripData.pricing?.fixed_departure) {
-          setFixedPackage(tripData.pricing.fixed_departure.map(pkg => ({
-            from_date: pkg.from_date?.split('T')[0] || "",
-            to_date: pkg.to_date?.split('T')[0] || "",
-            available_slots: pkg.available_slots || "",
-            title: pkg.title || "",
-            description: pkg.description || "",
-            base_price: pkg.base_price || "",
-            discount: pkg.discount || "",
-            final_price: pkg.final_price || "",
-            booking_amount: pkg.booking_amount || "",
-            gst_percentage: pkg.gst_percentage || "",
+          setFixedPackage(tripData.pricing.fixed_departure.map((slot) => ({
+            from_date: slot.from_date?.split("T")[0] || "",
+            to_date: slot.to_date?.split("T")[0] || "",
+            available_slots: slot.available_slots || "",
+            costingPackages: Array.isArray(slot.costingPackages) && slot.costingPackages.length > 0 ?
+              slot.costingPackages.map((pkg) => ({
+                title: pkg.title || "",
+                description: pkg.description || "",
+                base_price: pkg.base_price || "",
+                discount: pkg.discount || "",
+                final_price: pkg.final_price || "",
+                booking_amount: pkg.booking_amount || "",
+                gst_percentage: pkg.gst_percentage || "",
+              })) : [{ ...defaultCostingPackage }]
           })));
         }
+      } else {
+        toast.error("Failed to load trip data");
       }
     } catch (error) {
-      console.error("Error fetching trip:", error?.response?.data || error.message);
-      errorMsg("Failed to load trip data");
+      console.error("Error fetching trip:", error);
+      toast.error("Failed to load trip data");
     }
   };
 
-  useEffect(() => {
-    getAllTourCategory();
-    if (id) {
-      getSpecificTrip(id);
+  /* ---------- Submission ---------- */
+  const formatDetailString = (text) =>
+    text.split("\n").map((item) => item.trim()).filter(Boolean).join("; ");
+
+  const prepareSubmissionData = () => ({
+    title: formData.title,
+    overview: formData.overview,
+    destination_id: formData.destination_id ? parseInt(formData.destination_id, 10) : null,
+    destination_type: formData.destination_type,
+    category_id: formData.category_id,
+    themes: [],
+    hotel_category: parseInt(formData.hotel_category, 10) || 0,
+    pickup_location: formData.pickup_location,
+    drop_location: formData.drop_location,
+    days: parseInt(formData.days, 10) || 0,
+    nights: parseInt(formData.nights, 10) || 0,
+    meta_tags: `${formData.title}`,
+    slug: formData.slug || generateSlug(formData.title || ""),
+    pricing_model: formData.pricing_model,
+    highlights: formatDetailString(highlightsText),
+    inclusions: formatDetailString(inclusionsText),
+    exclusions: formatDetailString(exclusionsText),
+    faqs,
+    terms: formData.terms,
+    privacy_policy: formData.privacy_policy,
+    payment_terms: formData.payment_terms,
+    gallery_images: formData.gallery_images,
+    hero_image: formData.hero_image,
+    itinerary: formData.itineraryDays.map((day) => ({
+      day_number: day.day_number,
+      title: day.title,
+      description: day.description,
+      image_urls: [],
+      activities: day.activities,
+      hotel_name: day.hotel_name,
+      meal_plan: day.meal_plan,
+    })),
+    pricing: {
+      pricing_model: formData?.pricing_model === "fixed" ? "fixed_departure" : "customized",
+      ...(formData.pricing_model === "fixed" && {
+        fixed_departure: fixedPackage
+          .filter(slot => slot.from_date || slot.to_date || slot.costingPackages.some(p => p.base_price))
+          .map((slot) => ({
+            from_date: slot.from_date ? `${slot.from_date}T00:00:00` : null,
+            to_date: slot.to_date ? `${slot.to_date}T00:00:00` : null,
+            available_slots: slot.available_slots ? parseInt(slot.available_slots, 10) : 0,
+            costingPackages: slot.costingPackages
+              .filter(pkg => pkg.base_price)
+              .map(pkg => ({
+                title: pkg.title || "",
+                description: pkg.description || "",
+                base_price: pkg.base_price ? parseFloat(pkg.base_price) : 0,
+                discount: pkg.discount ? parseFloat(pkg.discount) : 0,
+                final_price: pkg.final_price ? parseFloat(pkg.final_price) : 0,
+                booking_amount: pkg.booking_amount ? parseFloat(pkg.booking_amount) : 0,
+                gst_percentage: pkg.gst_percentage ? parseFloat(pkg.gst_percentage) : 0,
+              })),
+          }))
+      }),
+      ...(formData.pricing_model === "custom" && {
+        customized: {
+          pricing_type: formData.pricing.customized.pricing_type,
+          base_price: parseFloat(formData.pricing.customized.base_price) || 0,
+          discount: parseFloat(formData.pricing.customized.discount) || 0,
+          final_price: parseFloat(formData.pricing.customized.final_price) || 0,
+          gst_percentage: parseFloat(formData.pricing.customized.gst_percentage) || 0,
+        }
+      })
+    },
+    policies: [
+      ...(formData.terms ? [{ title: "Terms and Conditions", content: formData.terms }] : []),
+      ...(formData.privacy_policy ? [{ title: "Cancellation Policy", content: formData.privacy_policy }] : []),
+      ...(formData.payment_terms ? [{ title: "Payment Terms", content: formData.payment_terms }] : []),
+      ...formData.custom_policies,
+    ],
+  });
+
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const submissionData = prepareSubmissionData();
+      const res = await axios.post(`${SECURE_BASE}trips/`, submissionData, {
+        headers: { "x-api-key": API_KEY },
+      });
+      if (res?.data?.success) {
+        toast.success("Trip created successfully!");
+        navigate(AFTER_REDIRECT);
+      } else toast.error(res?.data?.message || "Failed to create trip");
+    } catch (error) {
+      console.error("Create trip error:", error?.response?.data || error.message);
+      toast.error("Failed to create trip");
+    } finally {
+      setIsLoading(false);
     }
-    // Set initial pricing model if none is set
-    if (!id && !formData.pricing_model) {
-      handleInputChange("pricing_model", "custom");
-      setSelectedPricing("custom");
+  };
+
+  const handleUpdate = async () => {
+    if (!id) return;
+    try {
+      setIsLoading(true);
+      const submissionData = prepareSubmissionData();
+      const res = await axios.put(`${SECURE_BASE}trips/${id}`, submissionData, {
+        headers: { "x-api-key": API_KEY },
+      });
+      if (res?.data?.success) {
+        toast.success("Trip updated successfully!");
+        navigate(AFTER_REDIRECT);
+      } else toast.error(res?.data?.message || "Failed to update trip");
+    } catch (error) {
+      console.error("Update trip error:", error?.response?.data || error.message);
+      toast.error("Failed to update trip");
+    } finally {
+      setIsLoading(false);
     }
-  }, [id]);
+  };
 
-  const renderStepContent = () => {
-    switch (activeStep) {
-      case "basic":
-        return (
-          <div className="container">
-            <h3 className="mb-4 fw-bold fs-5">Trip Details</h3>
-            <div className="row">
-              <div className="col-md-6">
-                <div className="mb-3">
-                  <label className="form-label">Trip Title *</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter trip title"
-                    maxLength="100"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                  />
-                  <small className="text-muted">
-                    {formData.title.length}/100 characters
-                  </small>
+  /* ---------- Search-style select components ---------- */
+
+  // Confirm modal state for create-redirects
+  const [createConfirm, setCreateConfirm] = useState({ open: false, url: "", message: "" });
+
+  const openCreateModal = (type) => {
+    const mapping = {
+      destination: "/admin/destination-create",
+      category: "/admin/category-create",
+      activity: "/admin/activity",
+    };
+    setCreateConfirm({ open: true, url: mapping[type], message: `No ${type} found. Go to create page?` });
+  };
+
+  const handleCreateConfirm = () => {
+    setCreateConfirm({ open: false, url: "", message: "" });
+    // navigate to relative path (same SPA or external)
+    try {
+      navigate(createConfirm.url);
+    } catch (err) {
+      window.location.href = createConfirm.url;
+    }
+  };
+
+  const DestinationSelect = () => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const filtered = destinationList.filter((d) => d.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const selectedDest = destinationList.find((d) => String(d.id) === formData.destination_id);
+    const displayValue = searchTerm || (selectedDest ? selectedDest.title : "");
+
+    return (
+      <div className="mb-3 custom-select-wrapper">
+        <label className="form-label">Destination *</label>
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search destinations..."
+          value={displayValue}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm !== "" && (
+          <div className="search-suggestion-box">
+            {filtered.length > 0 ? (
+              filtered.map((d) => (
+                <div key={d.id} className="search-option" onClick={() => { handleInputChange("destination_id", String(d.id)); setSearchTerm(""); }}>
+                  <span style={{ textAlign: "left", flex: 1 }}>{d.title}</span>
                 </div>
+              ))
+            ) : (
+              <div className="search-option no-result" onClick={() => openCreateModal("destination")}>No destinations found. <b>Create one?</b></div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
-                <div className="mb-3">
-                  <label className="form-label">Trip Overview *</label>
-                  <textarea
-                    rows="3"
-                    className="form-control"
-                    placeholder="Describe the trip overview..."
-                    value={formData.overview}
-                    onChange={(e) =>
-                      handleInputChange("overview", e.target.value)
-                    }
-                  ></textarea>
+  const CategoryMultiSelect = () => {
+    const [search, setSearch] = useState("");
+    const filtered = categoryList.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
+    const selectedNames = formData.category_id.map((id) => categoryList.find((c) => String(c.id) === id)?.name).filter(Boolean);
+
+    return (
+      <div className="mb-3 custom-select-wrapper">
+        <label className="form-label">Categories *</label>
+        <div className="mb-2">
+          {selectedNames.length === 0 ? <small className="text-muted">No categories selected</small> :
+            selectedNames.map((name) => (
+              <span key={name} className="activity-chip me-1">
+                {name}
+                <X size={12} onClick={() => { const catId = categoryList.find((c) => c.name === name)?.id; if (catId) handleCategoryMultiSelect(catId, false); }} />
+              </span>
+            ))
+          }
+        </div>
+        <input type="text" className="form-control" placeholder="Search or add categories..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        {search !== "" && (
+          <div className="search-suggestion-box">
+            {filtered.length > 0 ? filtered.map((cat) => (
+              <div key={cat.id} className="search-option" onClick={() => { handleCategoryMultiSelect(cat.id, !formData.category_id.includes(String(cat.id))); setSearch(""); }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <input type="checkbox" checked={formData.category_id.includes(String(cat.id))} readOnly />
+                  <span style={{ textAlign: "left" }}>{cat.name}</span>
                 </div>
+              </div>
+            )) : <div className="search-option no-result" onClick={() => openCreateModal("category")}>No categories found. <b>Create one?</b></div>}
+          </div>
+        )}
+      </div>
+    );
+  };
 
-                <div className="mb-3">
-                  <label className="form-label">Destination *</label>
-                  <select
-                    className="form-select"
-                    value={formData.destination_id}
-                    onChange={(e) =>
-                      handleInputChange("destination_id", e.target.value)
-                    }
-                  >
-                    <option value="">Select destination</option>
-                    {destinationData?.data?.map((destination) => (
-                      <option key={destination.id} value={destination.id}>
-                        {destination.title}
-                      </option>
-                    ))}
-                  </select>
+  const ActivityMultiSelect = ({ dayId, currentActivities }) => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const filtered = activityList.filter((a) => a.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    return (
+      <div className="form-group mb-3 custom-select-wrapper activity-multi-select-group">
+        <label className="form-label d-block">Select Activities</label>
+
+        <div className="mb-2">
+          {currentActivities.length === 0 ? <small className="text-muted">No activities added</small> :
+            currentActivities.map((activity) => (
+              <span key={activity} className="activity-chip me-1">
+                <span style={{ textAlign: "left", marginRight: 6 }}>{activity}</span>
+                <X size={12} onClick={() => handleArrayChange(dayId, "activities", activity, false)} />
+              </span>
+            ))
+          }
+        </div>
+
+        <input type="text" className="form-control" placeholder="Search activity..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        {searchTerm !== "" && (
+          <div className="search-suggestion-box">
+            {filtered.length > 0 ? filtered.map((a) => (
+              <div key={a} className="search-option" onClick={() => { handleArrayChange(dayId, "activities", a, true); setSearchTerm(""); }}>
+                <span style={{ textAlign: "left" }}>{a}</span>
+              </div>
+            )) : <div className="search-option no-result" onClick={() => openCreateModal("activity")}>No activity found. <b>Create one?</b></div>}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ---------- Render steps ---------- */
+
+  const renderBasic = () => (
+    <div>
+      <h3 className="mb-4 fw-bold fs-5">Trip Details</h3>
+      <div className="row">
+        <div className="col-md-6">
+          <div className="mb-3">
+            <label className="form-label">Trip Title *</label>
+            <input type="text" className="form-control" placeholder="Enter trip title" value={formData.title} onChange={(e) => handleInputChange("title", e.target.value)} maxLength={100} />
+            <small className="text-muted">{(formData.title || "").length}/100 characters</small>
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">URL Slug *</label>
+            <input type="text" className="form-control" placeholder="enter-url-slug" value={formData.slug} onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))} />
+            <small className="text-muted">Only alphanumeric, hyphens and underscores. Auto-generated from title on new trips.</small>
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Trip Overview *</label>
+            <textarea rows={3} className="form-control" placeholder="Describe the trip overview..." value={formData.overview} onChange={(e) => setFormData(prev => ({ ...prev, overview: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <DestinationSelect />
+          <CategoryMultiSelect />
+
+          <div className="mb-3">
+            <label className="form-label d-block">Destination Type *</label>
+            <div className="form-check form-check-inline">
+              <input type="radio" name="destType" className="form-check-input" checked={formData.destination_type === "Domestic"} onChange={() => setFormData(prev => ({ ...prev, destination_type: "Domestic" }))} />
+              <label className="form-check-label">Domestic</label>
+            </div>
+            <div className="form-check form-check-inline">
+              <input type="radio" name="destType" className="form-check-input" checked={formData.destination_type === "International"} onChange={() => setFormData(prev => ({ ...prev, destination_type: "International" }))} />
+              <label className="form-check-label">International</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 className="mb-4 fw-bold fs-5 mt-4">Location & Duration</h3>
+      <div className="row">
+        <div className="col-md-6">
+          <div className="mb-3">
+            <label className="form-label">Pickup city *</label>
+            <input type="text" className="form-control" placeholder="Enter pickup city" value={formData.pickup_location} onChange={(e) => setFormData(prev => ({ ...prev, pickup_location: e.target.value }))} />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Drop city *</label>
+            <input type="text" className="form-control" placeholder="Enter drop city" value={formData.drop_location} onChange={(e) => setFormData(prev => ({ ...prev, drop_location: e.target.value }))} />
+          </div>
+
+          <div className="row">
+            <div className="col-6 mb-3">
+              <label className="form-label">Days *</label>
+              <input type="number" className="form-control" placeholder="Days" value={formData.days} onChange={(e) => handleInputChange("days", e.target.value)} />
+            </div>
+            <div className="col-6 mb-3">
+              <label className="form-label">Nights</label>
+              <input type="number" className="form-control" placeholder="Nights" value={formData.nights} readOnly />
+            </div>
+          </div>
+          <small className="text-muted">Nights auto-set to Days - 1</small>
+        </div>
+
+        <div className="col-md-6">
+          <div className="mb-3">
+            <label className="form-label d-block">Hotel Category *</label>
+            {["Camping & Cottages", "Home Stays", "3 Star Hotel", "4 Star Hotel", "5 Star Hotel"].map((cat, idx) => (
+              <div className="form-check" key={cat}>
+                <input type="radio" name="hotelCategory" className="form-check-input" checked={formData.hotel_category === (idx + 1).toString()} onChange={() => setFormData(prev => ({ ...prev, hotel_category: (idx + 1).toString() }))} />
+                <label className="form-check-label">{cat}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderItinerary = () => (
+    <div>
+      <h3 className="mb-3 fw-bold">Trip Itinerary</h3>
+      {formData.itineraryDays.length === 0 && (
+        <div className="mb-3">
+          <small className="text-muted">No days created. Enter Days in Basic Info to auto-generate itinerary days.</small>
+          <div className="mt-2">
+            <button className="add-day-btn" onClick={addNewDay}><Plus size={14} /> Add day</button>
+          </div>
+        </div>
+      )}
+      {formData.itineraryDays.map((day) => (
+        <div key={day.id} style={{ marginBottom: 12 }}>
+          <div className="itinerary-header" onClick={() => toggleDay(day.id)}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <strong style={{ fontSize: 15 }}>{day.title}</strong>
+              <small className="text-muted">Day {day.day_number}</small>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button className="delete-day-btn" onClick={(e) => { e.stopPropagation(); deleteDay(day.id); }}>
+                <Trash2 size={14} /> Delete
+              </button>
+              {openDay === day.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </div>
+          </div>
+
+          {openDay === day.id && (
+            <div className="itinerary-body">
+              <div className="row">
+                <div className="col-md-6 mb-2">
+                  <label>Day Title *</label>
+                  <input type="text" className="form-control" value={day.title} onChange={(e) => setFormData(prev => ({ ...prev, itineraryDays: prev.itineraryDays.map(d => d.id === day.id ? { ...d, title: e.target.value } : d) }))} />
                 </div>
-
-                <div className="mb-3">
-                  <label className="form-label d-block">
-                    Destination Type *
-                  </label>
-                  <div className="form-check form-check-inline">
-                    <input
-                      type="radio"
-                      name="destType"
-                      className="form-check-input"
-                      checked={formData.destination_type === "Domestic"}
-                      onChange={() =>
-                        handleInputChange("destination_type", "Domestic")
-                      }
-                    />
-                    <label className="form-check-label">Domestic</label>
-                  </div>
-                  <div className="form-check form-check-inline">
-                    <input
-                      type="radio"
-                      name="destType"
-                      className="form-check-input"
-                      checked={formData.destination_type === "International"}
-                      onChange={() =>
-                        handleInputChange("destination_type", "International")
-                      }
-                    />
-                    <label className="form-check-label">International</label>
-                  </div>
+                <div className="col-md-6 mb-2">
+                  <ActivityMultiSelect dayId={day.id} currentActivities={day.activities} />
                 </div>
               </div>
 
-              <div className="col-md-6">
-                <div className="mb-3">
-                  <label className="form-label d-block">Categories *</label>
-                  {categoryList?.length > 0 &&
-                    categoryList.map((cat) => (
-                      <div className="form-check" key={cat.id}>
-                        <input
-                          type="checkbox" // FIX 3: Changed to checkbox for multiselect
-                          name="category"
-                          className="form-check-input"
-                          // Check if the current category ID (converted to string) is included in the formData array
-                          checked={formData.category_id.includes(String(cat.id))}
-                          onChange={(e) =>
-                            // Use handleArrayChange for multiselect, passing the ID as a STRING
-                            handleArrayChange(
-                              "category_id",
-                              String(cat.id),
-                              e.target.checked
-                            )
-                          }
-                        />
-                        <label className="form-check-label">{cat.name}</label>
-                      </div>
-                    ))}
+              <div className="row">
+                <div className="col-md-12 mb-2">
+                  <label>Description</label>
+                  <textarea className="form-control" rows={3} value={day.description} onChange={(e) => setFormData(prev => ({ ...prev, itineraryDays: prev.itineraryDays.map(d => d.id === day.id ? { ...d, description: e.target.value } : d) }))} />
                 </div>
+              </div>
 
-                <div className="mb-3">
-                  <label className="form-label d-block">Trip Theme *</label>
-                  {[
-                    "Adventure",
-                    "Nature",
-                    "Religious",
-                    "Wildlife",
-                    "Water Activities",
-                  ].map((cat) => (
-                    <div className="form-check" key={cat}>
-                      <input
-                        type="checkbox"
-                        className="form-check-input"
-                        checked={formData.themes.includes(cat)}
-                        onChange={(e) =>
-                          handleArrayChange("themes", cat, e.target.checked)
-                        }
-                      />
-                      <label className="form-check-label">{cat}</label>
-                    </div>
-                  ))}
+              <div className="row">
+                <div className="col-md-6 mb-2">
+                  <label>Hotel Name</label>
+                  <input type="text" className="form-control" value={day.hotel_name} onChange={(e) => setFormData(prev => ({ ...prev, itineraryDays: prev.itineraryDays.map(d => d.id === day.id ? { ...d, hotel_name: e.target.value } : d) }))} />
+                </div>
+                <div className="col-md-6 mb-2">
+                  <label>Meal Plan</label>
+                  <div className="meal-options">
+                    {["Breakfast", "Lunch", "Dinner"].map((meal) => (
+                      <label key={meal} className="meal-checkbox">
+                        <input type="checkbox" className="form-check-input" checked={day.meal_plan.includes(meal)} onChange={(e) => handleArrayChange(day.id, "meal_plan", meal, e.target.checked)} />
+                        {meal}
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 
-            <h3 className="mb-4 fw-bold fs-5 mt-5">Location Details</h3>
-            <div className="row">
-              <div className="col-md-6">
-                <div className="mb-3">
-                  <label className="form-label">Pickup city *</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter pickup city"
-                    value={formData.pickup_location}
-                    onChange={(e) =>
-                      handleInputChange("pickup_location", e.target.value)
-                    }
-                  />
+  const renderMedia = () => (
+    <div>
+      <h3 className="mb-3 fw-bold">Media Assets</h3>
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        {/* Hero */}
+        <div className="media-section" style={{ minWidth: 360 }}>
+          <div className="section-title">📷 Hero Image / Thumbnail <span className="required">*</span></div>
+          <div className="upload-area" onClick={() => document.getElementById("heroImage")?.click()}>
+            <div className="upload-icon">📷</div>
+            <div className="upload-text">
+              <h4>Upload Hero Image</h4>
+              <p>Click to browse or drag-and-drop</p>
+              {formData.hero_image && <p>Selected: {formData.hero_image.substring(formData.hero_image.lastIndexOf("/") + 1)}</p>}
+            </div>
+            <input type="file" id="heroImage" accept=".png,.jpeg,.jpg,.webp" style={{ display: "none" }} onChange={(e) => handleMediaUpload(e, false)} />
+          </div>
+
+          {formData.hero_image && (
+            <div className="upload-image-div mt-2" style={{ position: "relative" }}>
+              <img src={formData.hero_image} alt="Hero" style={{ width: "100%", height: 220, objectFit: "cover", borderRadius: 8 }} />
+              <button className="media-delete-btn" onClick={removeHeroImage} title="Remove">×</button>
+            </div>
+          )}
+
+          <div className="file-restrictions mt-2">
+            • Use JPG, PNG or WebP. Recommended 1200x800. Max 5MB.
+          </div>
+        </div>
+
+        {/* Gallery */}
+        <div className="media-section" style={{ minWidth: 360 }}>
+          <div className="section-title">🖼️ Image Gallery <span className="required">*</span></div>
+          <div className="upload-area" onClick={() => document.getElementById("galleryImages")?.click()}>
+            <div className="upload-icon">🖼️</div>
+            <div className="upload-text">
+              <h4>Image Gallery</h4>
+              <p>Click to select multiple images</p>
+            </div>
+            <input type="file" id="galleryImages" accept=".png,.jpeg,.jpg,.webp" multiple style={{ display: "none" }} onChange={(e) => handleMediaUpload(e, true)} />
+          </div>
+
+          {Array.isArray(formData.gallery_images) && formData.gallery_images.length > 0 && (
+            <div className="gallery-preview-container mt-2">
+              {formData.gallery_images.map((image, index) => (
+                <div className="gallery-image-wrapper" key={`${image}-${index}`} style={{ position: "relative" }}>
+                  <img src={encodeURI(image)} alt={`Gallery-${index}`} style={{ width: 120, height: 84, objectFit: "cover", borderRadius: 6 }} />
+                  <button className="media-delete-btn" onClick={() => removeGalleryImage(index)} title="Remove">×</button>
                 </div>
+              ))}
+            </div>
+          )}
 
-                <div className="mb-3">
-                  <label className="form-label">Drop city *</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter drop city"
-                    value={formData.drop_location}
-                    onChange={(e) =>
-                      handleInputChange("drop_location", e.target.value)
-                    }
-                  />
+          <div className="file-restrictions mt-2">
+            • Upload 5-10 high-quality images. Recommended 1200x800 minimum.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPricing = () => {
+    const masterCostingPackages = fixedPackage[0]?.costingPackages || [];
+    return (
+      <div>
+        <h3 className="mb-3 fw-bold">Pricing</h3>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ flex: 1, minWidth: 280 }}>
+            <div className={`pricing-model-card p-3 ${selectedPricing === "fixed" ? "active" : ""}`} onClick={() => { setSelectedPricing("fixed"); setFormData(prev => ({ ...prev, pricing_model: "fixed" })); }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input type="radio" checked={selectedPricing === "fixed"} readOnly />
+                <div>
+                  <div style={{ fontWeight: 600 }}>Fixed Departure</div>
+                  <div className="text-muted small">Set specific dates with group bookings</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{ flex: 1, minWidth: 280 }}>
+            <div className={`pricing-model-card p-3 ${selectedPricing === "custom" ? "active" : ""}`} onClick={() => { setSelectedPricing("custom"); setFormData(prev => ({ ...prev, pricing_model: "custom" })); }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input type="radio" checked={selectedPricing === "custom"} readOnly />
+                <div>
+                  <div style={{ fontWeight: 600 }}>Customized Trip</div>
+                  <div className="text-muted small">Flexible dates based on customer preference</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {selectedPricing === "fixed" && (
+          <div className="fixed-departure-container mt-3 p-3">
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h5 className="mb-0">Departure Slots</h5>
+              <button className="btn-add-slot" onClick={addFixedPackage}><Plus size={12} /> Add Slot</button>
+            </div>
+
+            {fixedPackage.map((slot, slotIndex) => (
+              <div key={`slot-${slotIndex}`} className="slot-container mb-3 p-3">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <div className="slot-dot" />
+                    <strong>Slot {slotIndex + 1}</strong>
+                  </div>
+                  {fixedPackage.length > 1 && <button className="delete-day-btn" onClick={() => deleteFixedPackage(slotIndex)}><Trash2 size={14} /> Delete Slot</button>}
                 </div>
 
                 <div className="row">
-                  <div className="col-6 mb-3">
-                    <label className="form-label">Days *</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Days"
-                      value={formData.days}
-                      onChange={(e) =>
-                        handleInputChange("days", e.target.value)
-                      }
-                    />
+                  <div className="col-md-4 mb-2">
+                    <label>From Date *</label>
+                    <input type="date" className="form-control" value={slot.from_date} onChange={(e) => updateFixedPackage(slotIndex, "from_date", e.target.value)} />
                   </div>
-                  <div className="col-6 mb-3">
-                    <label className="form-label">Nights</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Nights"
-                      value={formData.nights}
-                      onChange={(e) =>
-                        handleInputChange("nights", e.target.value)
-                      }
-                    />
+                  <div className="col-md-4 mb-2">
+                    <label>To Date *</label>
+                    <input type="date" className="form-control" value={slot.to_date} onChange={(e) => updateFixedPackage(slotIndex, "to_date", e.target.value)} />
+                  </div>
+                  <div className="col-md-4 mb-2">
+                    <label>Available Slots *</label>
+                    <input type="number" className="form-control" value={slot.available_slots} onChange={(e) => updateFixedPackage(slotIndex, "available_slots", e.target.value)} />
                   </div>
                 </div>
-                <small className="text-muted">
-                  Example: 5 Days 4 Nights should be less than Days!
-                </small>
-              </div>
-
-              <div className="col-md-6">
-                <div className="mb-3">
-                  <label className="form-label d-block">Hotel Category *</label>
-                  {["1 Star", "2 Stars", "3 Stars", "4 Stars", "5 Stars"].map(
-                    (cat, index) => (
-                      <div className="form-check" key={cat}>
-                        <input
-                          type="radio"
-                          name="hotelCategory"
-                          className="form-check-input"
-                          checked={
-                            formData.hotel_category === (index + 1).toString()
-                          }
-                          onChange={() =>
-                            handleInputChange(
-                              "hotel_category",
-                              (index + 1).toString()
-                            )
-                          }
-                        />
-                        <label className="form-check-label">{cat}</label>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "itinerary":
-        return (
-          <div className="form-container">
-            <h3 className="mb-4 font-bold text-lg">Trip Itinerary</h3>
-            {formData.itineraryDays.map((day) => (
-              <div
-                key={day.id}
-                style={{
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  marginBottom: "12px",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    background: "#f8f9fa",
-                    padding: "12px 16px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => toggleDay(day.id)}
-                >
-                  <span className="font-medium">{day.title}</span>
-                  {openDay === day.id ? (
-                    <ChevronUp size={18} />
-                  ) : (
-                    <ChevronDown size={18} />
-                  )}
-                </div>
-
-                {openDay === day.id && (
-                  <div style={{ padding: "16px", background: "#fff" }}>
-                    <div className="form-group">
-                      <label>Day Title *</label>
-                      <input
-                        type="text"
-                        value={day.title}
-                        onChange={(e) =>
-                          handleItineraryChange(day.id, "title", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Description</label>
-                      <textarea
-                        rows="3"
-                        placeholder="Trip Description"
-                        value={day.description}
-                        onChange={(e) =>
-                          handleItineraryChange(
-                            day.id,
-                            "description",
-                            e.target.value
-                          )
-                        }
-                      ></textarea>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Select Activities</label>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "12px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {[
-                          "City Tour",
-                          "Beach Visit",
-                          "Trekking",
-                          "Sightseeing",
-                          "Shopping",
-                          "Adventure Sports",
-                        ].map((activity) => (
-                          <label
-                            key={activity}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "4px",
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={day.activities.includes(activity)}
-                              onChange={(e) =>
-                                handleActivitiesChange(
-                                  day.id,
-                                  activity,
-                                  e.target.checked
-                                )
-                              }
-                            />
-                            {activity}
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Hotel Name *</label>
-                      <input
-                        type="text"
-                        placeholder="Hotel Name"
-                        value={day.hotel_name}
-                        onChange={(e) =>
-                          handleItineraryChange(
-                            day.id,
-                            "hotel_name",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Meal Plan</label>
-                      <div style={{ display: "flex", gap: "12px" }}>
-                        {["Breakfast", "Lunch", "Dinner"].map((meal) => (
-                          <label key={meal}>
-                            <input
-                              type="checkbox"
-                              checked={day.meal_plan.includes(meal)}
-                              onChange={(e) =>
-                                handleMealPlanChange(
-                                  day.id,
-                                  meal,
-                                  e.target.checked
-                                )
-                              }
-                            />
-                            {meal}
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
 
-            <button
-              onClick={addNewDay}
-              style={{
-                marginTop: "12px",
-                padding: "8px 16px",
-                background: "#2563eb",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              + Add Another Day
-            </button>
-          </div>
-        );
-
-      case "media":
-        return (
-          <div className="form-container">
-            <div className="media-header">
-              <h3>Media Assets</h3>
-              <p>Upload images and videos for your trip package</p>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-around" }}>
-              <div className="media-section">
-                <div className="section-title">
-                  📷 Hero Image / Thumbnail <span className="required">*</span>
-                </div>
-                <div
-                  className="upload-area"
-                  onClick={() => document.getElementById("heroImage")?.click()}
-                >
-                  <div className="upload-icon">📷</div>
-                  <div className="upload-text">
-                    <h4>Upload Hero Image</h4>
-                    <p>Drag and drop or click to browse</p>
-                    {formData?.hero_image && (
-                      <p>Selected: {formData?.hero_image}</p>
-                    )}
-                  </div>
-                  <input
-                    type="file"
-                    id='heroImage'
-                    name='hero_image'
-                    accept='.png,.jpeg,.jpg,.pdf,.webp'
-                    className="file-input"
-                    onChange={handleFileUpload}
-                  />
-                </div>
-                <div className="file-restrictions">
-                  • Use high quality JPG, PNG or WebP format
-                  <br />
-                  • Recommended size: 1200x800 pixels
-                  <br />
-                  • Maximum file size: 5MB
-                  <br />• This will be the main image that represents your trip
-                  package
-                </div>
-
-                {formData?.hero_image && (
-                  <div className='upload-image-div' style={{ position: 'relative' }}>
-                    <img src={`${formData?.hero_image}`} alt="Hero-Preview" />
-                    <span
-                      className="delete-image-icon"
-                      onClick={removeHeroImage}
-                      style={{
-                        position: 'absolute',
-                        top: '5px',
-                        right: '5px',
-                        background: 'red',
-                        color: 'white',
-                        borderRadius: '50%',
-                        width: '25px',
-                        height: '25px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        lineHeight: '25px',
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      &times;
-                    </span>
-                  </div>
-                )}
+            <div className="costing-packages-section p-3">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <h6>Costing Packages</h6>
+                <button className="btn-add-package" onClick={addCostingPackage}><Plus size={12} /> Add Package</button>
               </div>
-              <div className="media-section">
-                <div className="section-title">
-                  🖼️ Image Gallery <span className="required">*</span>
-                </div>
-                <div
-                  className="upload-area"
-                  onClick={() =>
-                    document.getElementById("galleryImages")?.click()
-                  }
-                >
-                  <div className="upload-icon">🖼️</div>
-                  <div className="upload-text">
-                    <h4>Image Gallery</h4>
-                    <p>Add multiple images</p>
+
+              {masterCostingPackages.map((pkg, pkgIndex) => (
+                <div className="package-card mb-2 p-3" key={`pkg-${pkgIndex}`}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <strong>Package {pkgIndex + 1}</strong>
+                    <div>
+                      {(pkgIndex !== 0 || masterCostingPackages.length > 1) && <button className="delete-day-btn" onClick={() => deleteCostingPackage(pkgIndex)}><Trash2 size={12} /> Delete</button>}
+                    </div>
                   </div>
-                  <input
-                    type="file"
-                    id="galleryImages"
-                    name='gallery_images'
-                    accept='.png,.jpeg,.jpg,.pdf,.webp'
-                    className="file-input"
-                    onChange={handleMultipleFileUpload}
-                  />
-                </div>
-                <div className="file-restrictions">
-                  Gallery best practices: • Upload 5-10 high-quality images
-                  <br />
-                  • Show different attractions and activities
-                  <br />
-                  • Include both landscape and close-up shots
-                  <br />
-                  • Maintain consistent quality and style
-                  <br />• Recommended size: 1200x800px minimum
-                </div>
-                {formData?.gallery_images && formData?.gallery_images?.length > 0 && (
-                  <div className="d-flex flex-wrap">
-                    {formData?.gallery_images?.map((image, index) => (
-                      <div className='upload-image-div destination-image-div' key={index} style={{ position: 'relative' }}>
-                        <div>
-                          <img src={encodeURI(image)} alt="Gallery-Preview" />
-                        </div>
-                        <span
-                          className="delete-image-icon"
-                          onClick={() => removeGalleryImage(index)}
-                          style={{
-                            position: 'absolute',
-                            top: '5px',
-                            right: '5px',
-                            background: 'red',
-                            color: 'white',
-                            borderRadius: '50%',
-                            width: '20px',
-                            height: '20px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            lineHeight: '20px',
-                            fontSize: '14px',
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          &times;
-                        </span>
-                      </div>
-                    ))}
+
+                  <div className="row">
+                    <div className="col-md-6 mb-2">
+                      <label>Package Title *</label>
+                      <input type="text" className="form-control" value={pkg.title} onChange={(e) => updateFixedPackage(0, "title", e.target.value, pkgIndex)} />
+                    </div>
+                    <div className="col-md-3 mb-2">
+                      <label>Base Price (₹) *</label>
+                      <input type="number" className="form-control" value={pkg.base_price} onChange={(e) => updateFixedPackage(0, "base_price", e.target.value, pkgIndex)} />
+                    </div>
+                    <div className="col-md-3 mb-2">
+                      <label>Discount (₹)</label>
+                      <input type="number" className="form-control" value={pkg.discount} onChange={(e) => updateFixedPackage(0, "discount", e.target.value, pkgIndex)} />
+                    </div>
                   </div>
-                )}
-              </div>
+
+                  <div className="row">
+                    <div className="col-md-4 mb-2">
+                      <label>Booking Amount (₹)</label>
+                      <input type="number" className="form-control" value={pkg.booking_amount} onChange={(e) => updateFixedPackage(0, "booking_amount", e.target.value, pkgIndex)} />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label>GST (%)</label>
+                      <input type="number" className="form-control" value={pkg.gst_percentage} onChange={(e) => updateFixedPackage(0, "gst_percentage", e.target.value, pkgIndex)} />
+                    </div>
+                    <div className="col-md-4 mb-2">
+                      <label>Final Price (₹)</label>
+                      <input type="number" className="form-control" value={pkg.final_price} readOnly />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        );
+        )}
 
-      case "pricing":
-        return (
-          <div className="container">
-            <h5 className="mb-3 fw-bold">Pricing Model *</h5>
-
-            <div className="row mb-4">
-              <div className="col-md-6">
-                <div
-                  className={`p-3 border rounded d-flex align-items-center ${selectedPricing === "fixed" ? "border-primary" : ""
-                    }`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setSelectedPricing("fixed");
-                    handleInputChange("pricing_model", "fixed");
-                  }}
-                >
-                  <input
-                    type="radio"
-                    className="form-check-input me-2"
-                    checked={selectedPricing === "fixed"}
-                    onChange={() => {
-                      setSelectedPricing("fixed");
-                      handleInputChange("pricing_model", "fixed");
-                    }}
-                  />
-                  <div>
-                    <label className="form-check-label fw-bold">
-                      Fixed Departure
-                    </label>
-                    <div className="small text-muted">
-                      Set specific dates with group bookings
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div
-                  className={`p-3 border rounded d-flex align-items-center ${selectedPricing === "custom" ? "border-primary" : ""
-                    }`}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setSelectedPricing("custom");
-                    handleInputChange("pricing_model", "custom");
-                  }}
-                >
-                  <input
-                    type="radio"
-                    className="form-check-input me-2"
-                    checked={selectedPricing === "custom"}
-                    onChange={() => {
-                      setSelectedPricing("custom");
-                      handleInputChange("pricing_model", "custom");
-                    }}
-                  />
-                  <div>
-                    <label className="form-check-label fw-bold">
-                      Customized Trip
-                    </label>
-                    <div className="small text-muted">
-                      Flexible dates based on customer preference
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {selectedPricing === "fixed" && (
-              <>
-                <div className="mt-3 destination-faq">
-                  <div className="accordion" id="accordionExample">
-                    {fixedPackage.map((trip, index) => (
-                      <div className='mt-4' key={index}>
-                        <div className="accordion-item">
-                          <h2 className="accordion-header d-flex align-items-center justify-content-between">
-                            <button
-                              className="accordion-button flex-grow-1 fw-bold"
-                              type="button"
-                              data-bs-toggle="collapse"
-                              data-bs-target={`#collapse${index}`}
-                              aria-expanded="true"
-                              aria-controls={`collapse${index}`}
-                            >
-                              Available Slots {index + 1}
-                            </button>
-                            <div className="ms-3 d-flex gap-2">
-                              <button className={`destination-faq-add ${index === 0 && "me-3"}`} onClick={addFixedPackage}>
-                                Add
-                              </button>
-                              {index !== 0 && (
-                                <button
-                                  className="destination-faq-add faq-delete me-3"
-                                  onClick={() => deleteFixedPackage(index)}
-                                >
-                                  Delete
-                                </button>
-                              )}
-                            </div>
-                          </h2>
-
-                          <div
-                            id={`collapse${index}`}
-                            className="accordion-collapse collapse show"
-                            data-bs-parent="#accordionExample"
-                          >
-                            <div className="accordion-body">
-
-                              <div className="row mb-3">
-                                <div className="col-md-4">
-                                  <label className="form-label">From Date *</label>
-                                  <input
-                                    type="date"
-                                    className="form-control"
-                                    value={trip?.from_date}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "from_date", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-4">
-                                  <label className="form-label">To Date *</label>
-                                  <input
-                                    type="date"
-                                    className="form-control"
-                                    value={trip?.to_date}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "to_date", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-4">
-                                  <label className="form-label">Available Slots *</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="Enter available slots"
-                                    value={trip?.available_slots}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "available_slots", e.target.value)
-                                    }
-                                  />
-                                </div>
-                              </div>
-
-                              <h6 className="fw-bold mb-4 mt-5">Costing Packages</h6>
-                              <div className="row mb-3">
-                                <div className="col-md-6">
-                                  <label className="form-label">Package Title *</label>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="e.g. Triple Occupancy"
-                                    value={trip?.title}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "title", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-3">
-                                  <label className="form-label">Base Price (₹) *</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="Enter base price"
-                                    value={trip?.base_price}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "base_price", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-3">
-                                  <label className="form-label">Discount (₹)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    placeholder="Enter discount price"
-                                    value={trip?.discount}
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "discount", e.target.value)
-                                    }
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="row mb-3">
-                                <div className="col-md-4">
-                                  <label className="form-label">Booking Amount (₹)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    value={trip?.booking_amount}
-                                    placeholder="Enter booking amount"
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "booking_amount", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-4">
-                                  <label className="form-label">GST Percentage (%)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    value={trip?.gst_percentage}
-                                    placeholder="Enter GST percentage"
-                                    onChange={(e) =>
-                                      updateFixedPackage(index, "gst_percentage", e.target.value)
-                                    }
-                                  />
-                                </div>
-                                <div className="col-md-4">
-                                  <label className="form-label">Final Price (₹)</label>
-                                  <input
-                                    type="number"
-                                    className="form-control"
-                                    readOnly
-                                    value={trip?.final_price}
-                                    placeholder="Auto-calculated"
-                                  />
-                                </div>
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {selectedPricing === "custom" && (
-              <>
-                <h6 className="fw-bold mb-2">Customized Pricing</h6>
-                <div className="row mb-3">
-                  <div className="col-md-6">
-                    <label className="form-label d-block">Pricing Type *</label>
-                    <div className="form-check form-check-inline">
-                      <input
-                        type="radio"
-                        name="pricingType"
-                        className="form-check-input"
-                        checked={
-                          formData.pricing.customized.pricing_type ===
-                          "Price Per Person"
-                        }
-                        onChange={() =>
-                          handleCustomPricingChange(
-                            "pricing_type",
-                            "Price Per Person"
-                          )
-                        }
-                      />
-                      <label className="form-check-label">
-                        Price Per Person
-                      </label>
-                    </div>
-                    <div className="form-check form-check-inline">
-                      <input
-                        type="radio"
-                        name="pricingType"
-                        className="form-check-input"
-                        checked={
-                          formData.pricing.customized?.pricing_type ===
-                          "Price Per Package"
-                        }
-                        onChange={() =>
-                          handleCustomPricingChange(
-                            "pricing_type",
-                            "Price Per Package"
-                          )
-                        }
-                      />
-                      <label className="form-check-label">
-                        Price Per Package
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="row mb-3">
-                  <div className="col-md-4">
-                    <label className="form-label">Base Price (₹) *</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Enter base price"
-                      value={formData.pricing?.customized?.base_price}
-                      onChange={(e) =>
-                        handleCustomPricingChange("base_price", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label className="form-label">Discount (₹)</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Enter discount price"
-                      value={formData.pricing.customized?.discount}
-                      onChange={(e) =>
-                        handleCustomPricingChange("discount", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label className="form-label">GST Percentage (%)</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Enter GST percentage"
-                      value={formData.pricing.customized?.gst_percentage || ""}
-                      onChange={(e) =>
-                        handleCustomPricingChange("gst_percentage", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="col-md-4">
-                    <label className="form-label mt-3">Final Price (₹)</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Auto-calculated"
-                      readOnly
-                      value={formData.pricing.customized?.final_price}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        );
-
-      case "details":
-        return (
-          <div className="form-container details">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                margin: "20px",
-                gap: "20px"
-              }}
-            >
-              <div
-                style={{
-                  border: "1px solid black",
-                  width: "100%",
-                  padding: "20px",
-                }}
-                className="form-container"
-              >
-                <h3>Trip Highlight</h3>
-                <label>Add Trip Highlight</label>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="TajMahal"
-                    value={highlightsInput}
-                    onChange={(e) => setHighlightsInput(e.target.value)}
-                    style={{ flexGrow: 1 }}
-                  />
-                  <button onClick={addHighlight}>+</button>
-                </div>
+        {selectedPricing === "custom" && (
+          <div className="custom-pricing-container mt-3 p-3">
+            <h5 className="mb-2">Customized Pricing</h5>
+            <div className="row">
+              <div className="col-md-6 mb-2">
+                <label>Pricing Type *</label>
                 <div>
-                  {formData.highlights.map((highlight, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{highlight}</span>
-                      <button onClick={() => removeItem("highlights", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
+                  <label style={{ marginRight: 10 }}>
+                    <input type="radio" name="pricingType" checked={formData.pricing.customized.pricing_type === "Price Per Person"} onChange={() => handleCustomPricingChange("pricing_type", "Price Per Person")} /> Price Per Person
+                  </label>
+                  <label>
+                    <input type="radio" name="pricingType" checked={formData.pricing.customized.pricing_type === "Price Per Package"} onChange={() => handleCustomPricingChange("pricing_type", "Price Per Package")} /> Price Per Package
+                  </label>
                 </div>
               </div>
 
-              <div
-                style={{
-                  border: "1px solid black",
-                  width: "100%",
-                  padding: "20px",
-                }}
-                className="form-container"
-              >
-                <h3>Inclusions</h3>
-                <label>Add Inclusions</label>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="4 Nights"
-                    value={inclusionsInput}
-                    onChange={(e) => setInclusionsInput(e.target.value)}
-                    style={{ flexGrow: 1 }}
-                  />
-                  <button onClick={addInclusion}>+</button>
-                </div>
-                <div>
-                  {formData.inclusions.map((inclusion, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{inclusion}</span>
-                      <button onClick={() => removeItem("inclusions", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
+              <div className="col-md-4 mb-2">
+                <label>Base Price (₹)</label>
+                <input type="number" className="form-control" value={formData.pricing.customized.base_price} onChange={(e) => handleCustomPricingChange("base_price", e.target.value)} />
               </div>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-around",
-                margin: "20px",
-                gap: "20px"
-              }}
-            >
-              <div
-                style={{
-                  border: "1px solid black",
-                  width: "100%",
-                  padding: "20px",
-                }}
-                className="form-container"
-              >
-                <h3>Exclusions</h3>
-                <label>Add Exclusions</label>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Personal expenses"
-                    value={exclusionsInput}
-                    onChange={(e) => setExclusionsInput(e.target.value)}
-                    style={{ flexGrow: 1 }}
-                  />
-                  <button onClick={addExclusion}>+</button>
-                </div>
-                <div>
-                  {formData.exclusions.map((exclusion, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <span>{exclusion}</span>
-                      <button onClick={() => removeItem("exclusions", index)}>
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
+              <div className="col-md-4 mb-2">
+                <label>Discount (₹)</label>
+                <input type="number" className="form-control" value={formData.pricing.customized.discount} onChange={(e) => handleCustomPricingChange("discount", e.target.value)} />
+              </div>
+              <div className="col-md-4 mb-2">
+                <label>GST (%)</label>
+                <input type="number" className="form-control" value={formData.pricing.customized.gst_percentage || ""} onChange={(e) => handleCustomPricingChange("gst_percentage", e.target.value)} />
               </div>
 
-              <div
-                style={{
-                  border: "1px solid black",
-                  width: "100%",
-                  padding: "20px",
-                }}
-                className="form-container"
-              >
-                <h3>FAQ (Optional)</h3>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Add FAQ question"
-                    value={faqInput?.question}
-                    onChange={(e) =>
-                      setFaqInput({ ...faqInput, question: e.target.value })
-                    }
-                    style={{ width: "100%" }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Add FAQ answer"
-                    value={faqInput?.answer}
-                    onChange={(e) =>
-                      setFaqInput({ ...faqInput, answer: e.target.value })
-                    }
-                    style={{ width: "100%" }}
-                  />
-                  <button onClick={addFaqs}>Add FAQ</button>
-                </div>
-                <div>
-                  {faqs.length > 0 &&
-                    faqs.map((faq, index) =>
-                      faq.question && faq.answer ? (
-                        <div
-                          key={index}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: "8px",
-                            borderBottom: "1px solid #ccc",
-                            paddingBottom: "5px",
-                          }}
-                        >
-                          <div>
-                            <strong>Q:</strong> {faq.question}
-                            <br />
-                            <strong>A:</strong> {faq.answer}
-                          </div>
-                          <button
-                            style={{
-                              color: "white",
-                              background: "red",
-                              border: "none",
-                              padding: "5px 10px",
-                              cursor: "pointer",
-                              borderRadius: "4px",
-                            }}
-                            onClick={() => deleteFaqs(index)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      ) : null
-                    )}
-                </div>
+              <div className="col-md-4 mb-2">
+                <label>Final Price (₹)</label>
+                <input type="number" className="form-control" value={formData.pricing.customized.final_price} readOnly />
               </div>
             </div>
           </div>
-        );
+        )}
+      </div>
+    );
+  };
 
-      case "policies":
-        return (
-          <div className="form-container">
-            <div className="form-group">
-              <label>Terms and Conditions Content</label>
-              <textarea
-                rows="3"
-                placeholder="Enter terms and conditions"
-                value={formData.terms}
-                onChange={(e) => handleInputChange("terms", e.target.value)}
-              ></textarea>
-            </div>
+  const renderDetails = () => (
+    <div>
+      <h3 className="mb-3 fw-bold">Details</h3>
+      <div className="row g-4">
+        <div className="col-md-6">
+          <div className="detail-card">
+            <h4>Trip Highlight</h4>
+            <label>Enter highlights (one per line)</label>
+            <textarea className="form-control" rows={6} placeholder="E.g., Visit Taj Mahal" value={highlightsText} onChange={(e) => setHighlightsText(e.target.value)} />
+          </div>
+        </div>
 
-            <div className="form-group">
-              <label>Cancellation Policy Content</label>
-              <textarea
-                rows="3"
-                placeholder="Enter cancellation policy"
-                value={formData.privacy_policy}
-                onChange={(e) =>
-                  handleInputChange("privacy_policy", e.target.value)
-                }
-              ></textarea>
-            </div>
+        <div className="col-md-6">
+          <div className="detail-card">
+            <h4>Inclusions</h4>
+            <label>Enter inclusions (one per line)</label>
+            <textarea className="form-control" rows={6} placeholder="E.g., 4 Nights Accommodation" value={inclusionsText} onChange={(e) => setInclusionsText(e.target.value)} />
+          </div>
+        </div>
 
-            <div className="form-group">
-              <label>Payment Content</label>
-              <textarea
-                rows="3"
-                placeholder="Enter payment details"
-                value={formData.payment_terms}
-                onChange={(e) =>
-                  handleInputChange("payment_terms", e.target.value)
-                }
-              ></textarea>
+        <div className="col-md-6">
+          <div className="detail-card">
+            <h4>Exclusions</h4>
+            <label>Enter exclusions (one per line)</label>
+            <textarea className="form-control" rows={6} placeholder="E.g., Airfare/Visa charges" value={exclusionsText} onChange={(e) => setExclusionsText(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <div className="detail-card">
+            <h4>FAQ (Optional)</h4>
+            <label>Add FAQ</label>
+            <div className="faq-input-group">
+              <input className="form-control" placeholder="Question" value={faqInput.question} onChange={(e) => setFaqInput(prev => ({ ...prev, question: e.target.value }))} />
+              <input className="form-control" placeholder="Answer" value={faqInput.answer} onChange={(e) => setFaqInput(prev => ({ ...prev, answer: e.target.value }))} />
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="btn btn-primary" onClick={() => {
+                  if (faqInput.question.trim() && faqInput.answer.trim()) {
+                    setFaqs(prev => [...prev, faqInput]);
+                    setFaqInput({ question: "", answer: "" });
+                  } else toast.warn("Please fill question and answer.");
+                }}><Plus size={12} /> Add FAQ</button>
+              </div>
+
+              <div className="faq-list mt-3">
+                {faqs.map((f, idx) => (
+                  <div key={idx} className="faq-item">
+                    <div className="faq-content">
+                      <strong>Q:</strong> {f.question}<br />
+                      <strong>A:</strong> {f.answer}
+                    </div>
+                    <button className="delete-day-btn" onClick={() => setFaqs(prev => prev.filter((_, i) => i !== idx))}><Trash2 size={12} /> Delete</button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        );
+        </div>
+      </div>
+    </div>
+  );
 
-      default:
-        return <div>Step Not Found</div>;
+  const renderPolicies = () => (
+    <div>
+      <h3 className="mb-3 fw-bold">Policies</h3>
+      <div className="form-container">
+        <div className="form-group mb-3">
+          <label>Terms and Conditions</label>
+          <textarea rows={5} className="form-control" value={formData.terms} onChange={(e) => setFormData(prev => ({ ...prev, terms: e.target.value }))} />
+        </div>
+
+        <div className="form-group mb-3">
+          <label>Cancellation Policy</label>
+          <textarea rows={5} className="form-control" value={formData.privacy_policy} onChange={(e) => setFormData(prev => ({ ...prev, privacy_policy: e.target.value }))} />
+        </div>
+
+        <div className="form-group mb-3">
+          <label>Payment Terms</label>
+          <textarea rows={5} className="form-control" value={formData.payment_terms} onChange={(e) => setFormData(prev => ({ ...prev, payment_terms: e.target.value }))} />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStepContent = () => {
+    switch (activeStep) {
+      case "basic": return renderBasic();
+      case "itinerary": return renderItinerary();
+      case "media": return renderMedia();
+      case "pricing": return renderPricing();
+      case "details": return renderDetails();
+      case "policies": return renderPolicies();
+      default: return <div>Step not found</div>;
     }
+  };
+
+  /* ---------- Create-modal handlers (centered) ---------- */
+  const [createModal, setCreateModal] = useState({ open: false, url: "", text: "" });
+  const openCreate = (url, text) => setCreateModal({ open: true, url, text });
+  const cancelCreate = () => setCreateModal({ open: false, url: "", text: "" });
+  const confirmCreate = () => {
+    setCreateModal({ open: false, url: "", text: "" });
+    navigate(createModal.url);
   };
 
   return (
     <div className="tour-container">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <div className="d-flex justify-content-between">
-        <div className="tour-header">
-          <h2>{id ? "Edit Trip" : "Add New Trip"}</h2>
-          <p>Create a comprehensive travel package</p>
+      {/* Header */}
+      <div className="d-flex justify-content-between tour-page-header align-items-center">
+        <div>
+          <h2>{id ? "Edit Tour" : "Add New Tour"}</h2>
+          <p className="text-muted">Create a comprehensive travel package</p>
         </div>
         <div>
-          <button className='admin-add-button mt-0' onClick={() => navigate(-1)}>
-            <i className="fa-solid fa-arrow-left me-2"></i> Back
-          </button>
+          <button className="admin-add-button" onClick={() => navigate(-1)}>Back</button>
         </div>
       </div>
 
-      <div className="progress-bar">
-        <div className="progress-bar-fill" style={{ width: progress }}></div>
+      {/* Progress */}
+      <div className="progress-bar mb-3">
+        <div className="progress-bar-fill" style={{ width: progressPercent }} />
       </div>
 
-      <div className="stepper">
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          const active = index <= currentIndex;
+      {/* Stepper */}
+      <div className="stepper mb-3">
+        {steps.map((s, i) => {
+          const Icon = s.icon;
+          const active = i <= currentIndex;
           return (
-            <button
-              key={step.id}
-              onClick={() => setActiveStep(step.id)}
-              className="step-button"
-            >
-              <div
-                className={`step-circle ${active ? "step-active" : "step-inactive"}`}
-              >
-                <Icon />
-              </div>
-              <span
-                className={`step-label ${active ? "step-label-active" : "step-label-inactive"}`}
-              >
-                {step.label}
-              </span>
+            <button key={s.id} onClick={() => setActiveStep(s.id)} className={`step-button ${active ? "step-active" : ""}`}>
+              <div className={`step-circle ${active ? "step-active" : ""}`}><Icon size={16} /></div>
+              <span className={`step-label ${active ? "fw-semibold" : ""}`}>{s.label}</span>
             </button>
           );
         })}
       </div>
 
-      {renderStepContent()}
-
-      <div
-        style={{
-          marginTop: "24px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <span style={{ color: "#6b7280", fontSize: "14px" }}>
-          {currentIndex + 1}/{steps.length} sections complete
-        </span>
-        <div style={{ display: "flex", gap: "8px" }}>
-          {id ? (
-            <button
-              className="button button-green"
-              onClick={handleUpdate}
-              disabled={isLoading}
-            >
-              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Update Trip"}
-            </button>
-          ) : (
-            <button
-              className="button button-green"
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Publish Trip"}
-            </button>
-          )}
+      <div className="tour-creation-form-wrapper mb-3">
+        <div className="form-container">
+          {renderStepContent()}
         </div>
       </div>
+
+      <div className="footer-actions">
+        <span className="progress-text">{currentIndex + 1}/{steps.length} sections complete</span>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn btn-secondary" onClick={() => setActiveStep(steps[Math.max(0, currentIndex - 1)].id)}>Previous</button>
+          {id ? (
+            <button className="btn-success" onClick={handleUpdate} disabled={isLoading}>{isLoading ? <CircularProgress size={18} /> : "Update Tour"}</button>
+          ) : (
+            <button className="btn-success" onClick={handleSubmit} disabled={isLoading}>{isLoading ? <CircularProgress size={18} /> : "Publish Tour"}</button>
+          )}
+          <button className="btn btn-secondary" onClick={() => setActiveStep(steps[Math.min(steps.length - 1, currentIndex + 1)].id)}>Next</button>
+        </div>
+      </div>
+
+      {/* Create-confirm modal (uses relative admin paths) */}
+      {createModal.open && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal">
+            <h4>Go to create page?</h4>
+            <p>{createModal.text}</p>
+            <div className="confirm-actions">
+              <button className="btn-secondary" onClick={cancelCreate}>Cancel</button>
+              <button className="btn-primary" onClick={confirmCreate}>Go</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create confirm used by earlier openCreateModal (shared pattern) */}
+      {createConfirm.open && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal">
+            <h4>Confirm Navigation</h4>
+            <p>{createConfirm.message}</p>
+            <div className="confirm-actions">
+              <button className="btn-secondary" onClick={() => setCreateConfirm({ open: false, url: "", message: "" })}>Cancel</button>
+              <button className="btn-primary" onClick={() => { setCreateConfirm({ open: false, url: "", message: "" }); navigate(createConfirm.url); }}>Yes, go</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,40 +4,52 @@ import { Navigation, EffectFade, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
-import { Images } from "../../../../helpers/Images/images";
 import { useNavigate, useParams } from "react-router";
-import { TourPreviewDetails } from '../../../../common/api/ApiService';
-import { BACKEND_DOMAIN } from '../../../../common/api/ApiClient';
-import { APIBaseUrl } from '../../../../common/api/api';
+import { APIBaseUrl } from '../../../../common/api/api'; 
 import TripCard from '../../../../component/TripCard';
 import { errorMsg, successMsg } from '../../../../common/Toastify';
 import './TourPreview.css';
+import axios from 'axios'; 
+
+// Define API constants as per requirements
+const DOMAIN_NAME = "https://www.indianmountainrovers.com";
+const API_KEY = "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M"; // Used for all API calls
+const ENQUIRY_ENDPOINT = "https://api.yaadigo.com/secure/api/enquires/";
+const BOOKING_REQUEST_ENDPOINT = "https://api.yaadigo.com/secure/api/booking_request/";
+
 
 const TourPreview = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [specificTourData, setSpecificTourData] = useState()
-    const [isFixedPackage, setIsFixedPackage] = useState(false)
     const [showReadMore, setShowReadMore] = useState(false);
     const [activeTab, setActiveTab] = useState(1);
     const [tripList, setTripList] = useState([])
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // --- NEW: Enquiry Form State ---
-    const [enquiryFormData, setEnquiryFormData] = useState({
-        departure_city: '', // Kept in state but hidden from UI
+    // Customized Package Form State
+    const [customizedFormData, setCustomizedFormData] = useState({
         travel_date: '',
-        adults: 1, // Default minimum 1 adult
+        adults: 1,
         children: 0,
-        infants: 0, 
+        infants: 0,
         hotel_category: '',
         full_name: '',
         contact_number: '',
         email: '',
-        additional_comments: '' // Kept in state but hidden from UI
+        departure_city: '', // <-- NEW FIELD ADDED
     })
-    // -------------------------------
 
+    // Fixed Departure Form State
+    const [fixedDepartureFormData, setFixedDepartureFormData] = useState({
+        departure_date_id: '', // Will store the selected fixed_departure slot index
+        sharing_option_id: '', // Will store the selected costing package index
+        adults: 1,
+        children: 0,
+        full_name: '',
+        contact_number: '', // Mapped to phone_number for API
+        email: '',
+    })
 
     const TripTab = [
         {
@@ -95,29 +107,18 @@ const TourPreview = () => {
         }
     };
 
-    // Helper function to parse and split inclusions/exclusions
     const parseListItems = (htmlString) => {
         if (!htmlString) return [];
-
-        // Remove HTML tags
         const text = htmlString.replace(/<[^>]*>/g, '');
-
-        // Split by semicolon and filter out empty items
         return text.split(';').map(item => item.trim()).filter(item => item.length > 0);
     };
 
-    // Helper function to parse policy content by full stops
     const parsePolicyItems = (content) => {
         if (!content) return [];
-
-        // Remove HTML tags if any
         const text = content.replace(/<[^>]*>/g, '');
-
-        // Split by full stop (period) and filter out empty items
         return text.split('.').map(item => item.trim()).filter(item => item.length > 0);
     };
 
-    // Helper function to get icon for policy type
     const getPolicyIcon = (title) => {
         const lowerTitle = title.toLowerCase();
 
@@ -132,32 +133,27 @@ const TourPreview = () => {
         }
     };
 
-    // Helper function to format policy title
     const formatPolicyTitle = (title) => {
         if (!title) return title;
-
-        // Replace "Privacy Policy" with "Cancellation Policy"
-        if (title.toLowerCase().includes('privacy')) {
+        const lowerTitle = title.toLowerCase();
+        if (lowerTitle.includes('cancellation') || lowerTitle.includes('privacy')) {
             return 'Cancellation Policy';
         }
-
-        // Replace "Payment Terms" remains as is but can be customized
-        if (title.toLowerCase().includes('payment')) {
+        if (lowerTitle.includes('payment')) {
             return 'Payment Terms';
         }
-
         return title;
     };
 
-    // --- NEW: Stepper functions ---
-    const handleStepper = (field, increment) => {
-        setEnquiryFormData(prev => {
+    // Customized Package Stepper
+    const handleCustomizedStepper = (field, increment) => {
+        setCustomizedFormData(prev => {
             let newValue = prev[field] + increment;
-            
+
             if (field === 'adults') {
-                newValue = Math.max(1, newValue); // Adults minimum 1
-            } else if (field === 'children') {
-                newValue = Math.max(0, newValue); // Children minimum 0
+                newValue = Math.max(1, newValue);
+            } else if (field === 'children' || field === 'infants') {
+                newValue = Math.max(0, newValue);
             }
 
             return {
@@ -166,13 +162,30 @@ const TourPreview = () => {
             };
         });
     };
-    // ------------------------------
+
+    // Fixed Departure Stepper
+    const handleFixedDepartureStepper = (field, increment) => {
+        setFixedDepartureFormData(prev => {
+            let newValue = prev[field] + increment;
+
+            if (field === 'adults') {
+                newValue = Math.max(1, newValue);
+            } else if (field === 'children') {
+                newValue = Math.max(0, newValue);
+            }
+
+            return {
+                ...prev,
+                [field]: newValue,
+            };
+        });
+    };
 
     const getSpecificTour = async () => {
         try {
             const res = await APIBaseUrl.get(`trips/${id}`, {
                 headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    "x-api-key": API_KEY,
                 },
             });
             if (res?.data?.success === true && res?.data?.error_code === 0) {
@@ -180,8 +193,7 @@ const TourPreview = () => {
             }
 
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
-            throw error;
+            console.error("Error fetching specific tour:", error?.response?.data || error.message);
         }
     }
 
@@ -189,7 +201,7 @@ const TourPreview = () => {
         try {
             const res = await APIBaseUrl.get("trips", {
                 headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    "x-api-key": API_KEY,
                 },
             });
             if (res?.data?.success === true && res?.data?.error_code === 0) {
@@ -197,15 +209,8 @@ const TourPreview = () => {
             }
 
         } catch (error) {
-            console.error("Error fetching trips:", error?.response?.data || error.message);
-            throw error;
+            console.error("Error fetching all trips:", error?.response?.data || error.message);
         }
-    };
-
-
-    const handlePreview = (id) => {
-        const url = `/booking/${specificTourData?.slug}/${id}`;
-        window.location.href = url;
     };
 
     useEffect(() => {
@@ -223,30 +228,27 @@ const TourPreview = () => {
         }
     };
 
-    const [expandedSections, setExpandedSections] = useState({});
-
-    const toggleViewMore = (index) => {
-        setExpandedSections((prev) => ({
-            ...prev,
-            [index]: !prev[index],
-        }));
-    };
-
-    // --- NEW: Enquiry Form Handlers ---
-    const handleEnquiryChange = (e) => {
+    // Customized Package Form Handlers
+    const handleCustomizedChange = (e) => {
         const { name, value, type } = e.target;
-        setEnquiryFormData(prev => ({
+        setCustomizedFormData(prev => ({
             ...prev,
             [name]: type === 'number' ? parseInt(value) || 0 : value,
         }));
     };
 
-    const handleEnquirySubmit = async (e) => {
+    // UPDATED CUSTOMIZED SUBMISSION
+    const handleCustomizedSubmit = async (e) => {
         e.preventDefault();
 
-        // Basic validation
-        if (!enquiryFormData.full_name || !enquiryFormData.email || !enquiryFormData.contact_number || !enquiryFormData.travel_date) {
+        if (!customizedFormData.full_name || !customizedFormData.email || !customizedFormData.contact_number || !customizedFormData.travel_date) {
             errorMsg("Please fill in Full Name, Email, Contact Number, and Travel Date.");
+            return;
+        }
+        
+        // Added required validation for departure_city
+        if (!customizedFormData.departure_city) {
+            errorMsg("Please fill in your Departure City.");
             return;
         }
 
@@ -256,33 +258,31 @@ const TourPreview = () => {
         }
 
         const payload = {
-            destination: specificTourData.title, 
-            departure_city: enquiryFormData.departure_city || "N/A", 
-            travel_date: enquiryFormData.travel_date,
-            adults: enquiryFormData.adults || 1, 
-            children: enquiryFormData.children || 0,
-            infants: enquiryFormData.infants || 0,
-            hotel_category: enquiryFormData.hotel_category || "N/A",
-            full_name: enquiryFormData.full_name,
-            contact_number: enquiryFormData.contact_number,
-            email: enquiryFormData.email,
-            additional_comments: enquiryFormData.additional_comments || ""
+            destination: specificTourData.title,
+            departure_city: customizedFormData.departure_city, // <-- USING NEW STATE VALUE
+            travel_date: customizedFormData.travel_date,
+            adults: customizedFormData.adults || 1,
+            children: customizedFormData.children || 0,
+            infants: customizedFormData.infants || 0,
+            hotel_category: customizedFormData.hotel_category || "N/A",
+            full_name: customizedFormData.full_name,
+            contact_number: customizedFormData.contact_number,
+            email: customizedFormData.email,
+            additional_comments: "",
+            domain_name: DOMAIN_NAME 
         };
 
         setIsSubmitting(true);
         try {
-            
-            const res = await APIBaseUrl.post(`https://api.yaadigo.com/public/api/enquires/`, payload, {
+            const res = await axios.post(ENQUIRY_ENDPOINT, payload, { 
                 headers: {
-                    "x-api-key": "bS8WV0lnLRutJH-NbUlYrO003q30b_f8B4VGYy9g45M",
+                    "x-api-key": API_KEY,
                 },
             });
 
             if (res?.data?.success === true) {
                 successMsg("Your enquiry has been submitted successfully! We will contact you soon.");
-                // Reset form
-                setEnquiryFormData({
-                    departure_city: '',
+                setCustomizedFormData({
                     travel_date: '',
                     adults: 1,
                     children: 0,
@@ -291,7 +291,7 @@ const TourPreview = () => {
                     full_name: '',
                     contact_number: '',
                     email: '',
-                    additional_comments: ''
+                    departure_city: '', // <-- RESET NEW FIELD
                 });
             } else {
                 errorMsg(res?.data?.message || "Failed to submit enquiry. Please try again.");
@@ -305,7 +305,121 @@ const TourPreview = () => {
             setIsSubmitting(false);
         }
     };
-    // ------------------------------------
+
+    // Fixed Departure Form Handlers
+    const handleFixedDepartureChange = (e) => {
+        const { name, value, type } = e.target;
+        setFixedDepartureFormData(prev => ({
+            ...prev,
+            [name]: type === 'number' ? parseInt(value) || 0 : value,
+        }));
+    };
+
+    // FIXED DEPARTURE SUBMISSION
+    const handleFixedDepartureSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!fixedDepartureFormData.departure_date_id || !fixedDepartureFormData.sharing_option_id) {
+            errorMsg("Please select Departure Date and Sharing Option.");
+            return;
+        }
+
+        if (!fixedDepartureFormData.full_name || !fixedDepartureFormData.email || !fixedDepartureFormData.contact_number) {
+            errorMsg("Please fill in Full Name, Email, and Phone Number.");
+            return;
+        }
+
+        if (!specificTourData?.title) {
+            errorMsg("Tour details are not loaded. Cannot submit booking request.");
+            return;
+        }
+
+        // Get selected departure and package details
+        const departureIndex = parseInt(fixedDepartureFormData.departure_date_id, 10);
+        const packageIndex = parseInt(fixedDepartureFormData.sharing_option_id, 10);
+        
+        // Safety check for indices
+        const selectedDeparture = specificTourData.pricing.fixed_departure[departureIndex];
+        const selectedPackage = selectedDeparture?.costingPackages[packageIndex];
+
+        if (!selectedDeparture || !selectedPackage) {
+             errorMsg("Selected departure or sharing option details are missing. Cannot proceed.");
+             return;
+        }
+
+
+        const pricePerPerson = selectedPackage.final_price;
+        const totalTravelers = fixedDepartureFormData.adults + fixedDepartureFormData.children;
+        const estimatedTotalPrice = pricePerPerson * totalTravelers;
+
+        // API Payload structure for Booking Request
+        const payload = {
+            departure_date: selectedDeparture.from_date, 
+            sharing_option: selectedPackage.title,
+            price_per_person: pricePerPerson,
+            adults: fixedDepartureFormData.adults || 1,
+            children: fixedDepartureFormData.children || 0,
+            estimated_total_price: estimatedTotalPrice,
+            full_name: fixedDepartureFormData.full_name,
+            email: fixedDepartureFormData.email,
+            phone_number: fixedDepartureFormData.contact_number, // Mapped from contact_number state
+            domain_name: DOMAIN_NAME 
+        };
+
+        setIsSubmitting(true);
+        try {
+            const res = await axios.post(BOOKING_REQUEST_ENDPOINT, payload, { 
+                headers: {
+                    "x-api-key": API_KEY,
+                },
+            });
+
+            if (res?.data?.success === true) {
+                successMsg("Your booking request has been submitted successfully! We will contact you soon.");
+                setFixedDepartureFormData({
+                    departure_date_id: '',
+                    sharing_option_id: '',
+                    adults: 1,
+                    children: 0,
+                    full_name: '',
+                    contact_number: '',
+                    email: '',
+                });
+            } else {
+                errorMsg(res?.data?.message || "Failed to submit booking request. Please try again.");
+            }
+
+        } catch (error) {
+            console.error("Booking submission error:", error?.response?.data || error.message);
+            const apiError = error?.response?.data?.detail || error?.response?.data?.message;
+            errorMsg(apiError || "An error occurred during submission. Please check your network and API configuration.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Check pricing model
+    const isFixedDeparture = specificTourData?.pricing?.pricing_model === "fixed_departure";
+
+    // Utility for total price calculation in display
+    const getFixedDepartureTotalPrice = () => {
+        const departureIndex = parseInt(fixedDepartureFormData.departure_date_id, 10);
+        const packageIndex = parseInt(fixedDepartureFormData.sharing_option_id, 10);
+
+        if (
+            fixedDepartureFormData.departure_date_id === '' || 
+            fixedDepartureFormData.sharing_option_id === '' || 
+            !specificTourData?.pricing?.fixed_departure?.[departureIndex]?.costingPackages?.[packageIndex]
+        ) {
+            return null;
+        }
+
+        const pricePerPerson = specificTourData.pricing.fixed_departure[departureIndex].costingPackages[packageIndex].final_price;
+        const totalTravelers = fixedDepartureFormData.adults + fixedDepartureFormData.children;
+        return (pricePerPerson * totalTravelers).toLocaleString('en-IN');
+    };
+    
+    const totalPriceDisplay = getFixedDepartureTotalPrice();
 
     return (
         <div className='overflow-hidden-page'>
@@ -335,7 +449,6 @@ const TourPreview = () => {
                                 >
                                     <div className="destination-overlay"></div>
                                     <div className="destination-slide-content">
-                                        {/* Tour Title and Overview removed from banner */}
                                     </div>
                                 </div>
                             </SwiperSlide>
@@ -350,11 +463,8 @@ const TourPreview = () => {
                         <div className='col-lg-8'>
                             <div className='trip-detail-left'>
                                 
-                                {/* Tour Title here */}
                                 <h2 className='trip-detail-heading'>{specificTourData?.title}</h2>
-                                {/* Tour Short Description/Tagline below the main title */}
                                 <p className='lead' style={{color: '#495057', fontSize: '18px', marginBottom: '30px'}}>{specificTourData?.short_description}</p>
-
 
                                 <div className='d-flex trip-pickup-parent'>
                                     <div className='trip-pickup-drop me-lg-4 me-0'>
@@ -452,11 +562,8 @@ const TourPreview = () => {
                                     </div>
                                 </div>
 
-                                
-
                                 <div className='trip-detail-section inclusion' ref={inclusionRef}>
                                     <h3>Inclusions</h3>
-
                                     <div className='mt-4'>
                                         <ul className='inclusion-exclusion-list' style={{ listStyle: 'none', paddingLeft: 0 }}>
                                             {parseListItems(specificTourData?.inclusions).map((item, index) => (
@@ -470,7 +577,6 @@ const TourPreview = () => {
                                             <p>No inclusions available</p>
                                         )}
                                     </div>
-
                                 </div>
 
                                 <div className='trip-detail-section' ref={exclusionRef}>
@@ -551,9 +657,8 @@ const TourPreview = () => {
                                         )}
                                     </div>
                                 </div>
-                                    {/* FAQ Section */}
 
-                                    {specificTourData?.faqs && specificTourData?.faqs.length > 0 && (
+                                {specificTourData?.faqs && specificTourData?.faqs.length > 0 && (
                                     <div className='trip-detail-section'>
                                         <h3>Frequently Asked Questions</h3>
                                         <div className="container">
@@ -594,22 +699,20 @@ const TourPreview = () => {
                                     <div className='d-flex'>
                                         <p className='trip-price'>
                                             ₹
-
-                                            {specificTourData?.pricing?.pricing_model === "fixed_departure" ? specificTourData?.pricing?.fixed_departure[0]?.final_price :
-                                                specificTourData?.pricing?.customized?.final_price}
-
-                                            /-</p>
+                                            {isFixedDeparture 
+                                                ? specificTourData?.pricing?.fixed_departure?.[0]?.costingPackages?.[0]?.final_price 
+                                                : specificTourData?.pricing?.customized?.final_price}
+                                            /-
+                                        </p>
                                         <p className='trip-price-per'>Per Person</p>
                                     </div>
-
-                                    {/* <button >Dates & Pricing</button> */}
-
                                 </div>
                             </div>
 
                             <div className='trip-detail-right'>
-                                {!isFixedPackage && (
-                                    <form className='trip-detail-contact-form' onSubmit={handleEnquirySubmit}>
+                                {/* FIXED DEPARTURE FORM */}
+                                {isFixedDeparture ? (
+                                    <form className='trip-detail-contact-form' onSubmit={handleFixedDepartureSubmit}>
                                         <div className='trip-detail-contact-form-head'>
                                             <p className='head-1'>Enquiry Now !</p>
                                             <p className='head-2'>Allow Us to Call You Back!</p>
@@ -617,14 +720,13 @@ const TourPreview = () => {
 
                                         <div className='trip-detail-contact-input-container'>
                                             
-                                            {/* --- 1. Travel To (Destination) - Read Only with Icon --- */}
+                                            {/* Destination - Read Only */}
                                             <div className='trip-detail-contact-input'>
                                                 <label>TRAVEL TO (DESTINATION)</label>
                                                 <div className='input-with-icon-wrapper'>
                                                     <i className="fa-solid fa-plane-departure input-icon"></i>
                                                     <input
                                                         type='text'
-                                                        name='destination_display'
                                                         value={specificTourData?.title || 'Loading...'}
                                                         readOnly 
                                                         className="form-control-plaintext"
@@ -632,16 +734,218 @@ const TourPreview = () => {
                                                 </div>
                                             </div>
                                             
-                                            {/* --- 2. Travel From (Departure City) - HIDDEN --- */}
-                                            <input
-                                                type='hidden'
-                                                name='departure_city'
-                                                value={enquiryFormData.departure_city}
-                                                onChange={handleEnquiryChange}
-                                            />
+                                            {/* Departure Date Dropdown */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>DEPARTURE DATE *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-calendar-alt input-icon"></i>
+                                                    <select
+                                                        name="departure_date_id"
+                                                        value={fixedDepartureFormData.departure_date_id}
+                                                        onChange={handleFixedDepartureChange}
+                                                        required
+                                                    >
+                                                        <option value="">Select Departure Date</option>
+                                                        {specificTourData?.pricing?.fixed_departure?.map((departure, index) => (
+                                                            <option key={index} value={index}>
+                                                                {departure.title} ({new Date(departure.from_date).toLocaleDateString()} - {new Date(departure.to_date).toLocaleDateString()})
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {/* Sharing Option Dropdown */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>SHARING OPTION *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-users input-icon"></i>
+                                                    <select
+                                                        name="sharing_option_id"
+                                                        value={fixedDepartureFormData.sharing_option_id}
+                                                        onChange={handleFixedDepartureChange}
+                                                        required
+                                                        disabled={fixedDepartureFormData.departure_date_id === ''}
+                                                    >
+                                                        <option value="">Select Sharing Option</option>
+                                                        {fixedDepartureFormData.departure_date_id !== '' && 
+                                                           specificTourData?.pricing?.fixed_departure?.[fixedDepartureFormData.departure_date_id]?.costingPackages?.map((pkg, index) => (
+                                                                <option key={index} value={index}>
+                                                                    {pkg.title} - ₹{pkg.final_price}
+                                                                </option>
+                                                            ))}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {/* Adults and Children - COMBINED IN ONE LINE */}
+                                            <div className='trip-combined-line-group d-flex' style={{ gap: '10px' }}>
+                                                {/* No. of Adults */}
+                                                <div className='trip-detail-contact-input flex-grow-1 stepper-item' style={{ flexBasis: '50%' }}>
+                                                    <label>ADULTS (12+) *</label>
+                                                    <div className='input-stepper-wrapper'>
+                                                        <input
+                                                            type='number'
+                                                            name='adults'
+                                                            value={fixedDepartureFormData.adults}
+                                                            onChange={handleFixedDepartureChange}
+                                                            min='1'
+                                                            placeholder='1'
+                                                            required
+                                                            readOnly
+                                                        />
+                                                        <div className='stepper-controls'>
+                                                            <button type='button' onClick={() => handleFixedDepartureStepper('adults', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
+                                                            <button type='button' onClick={() => handleFixedDepartureStepper('adults', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* No. of Children */}
+                                                <div className='trip-detail-contact-input flex-grow-1 stepper-item' style={{ flexBasis: '50%' }}>
+                                                    <label>CHILDREN (2-11)</label>
+                                                    <div className='input-stepper-wrapper'>
+                                                        <input
+                                                            type='number'
+                                                            name='children'
+                                                            value={fixedDepartureFormData.children}
+                                                            onChange={handleFixedDepartureChange}
+                                                            min='0'
+                                                            placeholder='0'
+                                                            readOnly
+                                                        />
+                                                        <div className='stepper-controls'>
+                                                            <button type='button' onClick={() => handleFixedDepartureStepper('children', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
+                                                            <button type='button' onClick={() => handleFixedDepartureStepper('children', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Full Name */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>FULL NAME *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-user input-icon"></i>
+                                                    <input
+                                                        type='text'
+                                                        name='full_name'
+                                                        value={fixedDepartureFormData.full_name}
+                                                        onChange={handleFixedDepartureChange}
+                                                        placeholder='e.g. John Doe'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Email */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>EMAIL *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-envelope input-icon"></i>
+                                                    <input
+                                                        type='email'
+                                                        name='email'
+                                                        value={fixedDepartureFormData.email}
+                                                        onChange={handleFixedDepartureChange}
+                                                        placeholder='e.g. JohnDoe@gmail.com'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Contact Number (Phone Number for API) */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>PHONE NUMBER *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-phone input-icon"></i>
+                                                    <input
+                                                        type='tel'
+                                                        name='contact_number'
+                                                        value={fixedDepartureFormData.contact_number}
+                                                        onChange={handleFixedDepartureChange}
+                                                        placeholder='e.g. 1234567890'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Total Price Display - Only show when sharing option is selected */}
+                                            {totalPriceDisplay && (
+                                                <div className='trip-total-price-display' style={{
+                                                    background: '#3b2a1a',
+                                                    padding: '20px',
+                                                    borderRadius: '12px',
+                                                    textAlign: 'center',
+                                                    marginTop: '15px',
+                                                    marginBottom: '15px',
+                                                    boxShadow: '0 4px 15px rgba(0,123,255,0.2)'
+                                                }}>
+                                                    <p style={{
+                                                        color: '#ffffff',
+                                                        fontSize: '16px',
+                                                        marginBottom: '8px',
+                                                        fontWeight: '500',
+                                                        letterSpacing: '0.5px'
+                                                    }}>Total Estimated Price</p>
+                                                    <p style={{
+                                                        color: '#ffffff',
+                                                        fontSize: '32px',
+                                                        fontWeight: 'bold',
+                                                        margin: '0',
+                                                        letterSpacing: '1px'
+                                                    }}>
+                                                        ₹{totalPriceDisplay}
+                                                    </p>
+                                                </div>
+                                            )}
                                             
-                                           
-                                            {/* --- 3. Travel Date and Hotel Category - COMBINED IN ONE LINE --- */}
+                                            <button type='submit' disabled={isSubmitting}>
+                                                {isSubmitting ? 'SUBMITTING...' : 'SUBMIT ENQUIRY'}
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    /* CUSTOMIZED PACKAGE FORM */
+                                    <form className='trip-detail-contact-form' onSubmit={handleCustomizedSubmit}>
+                                        <div className='trip-detail-contact-form-head'>
+                                            <p className='head-1'>Enquiry Now !</p>
+                                            <p className='head-2'>Allow Us to Call You Back!</p>
+                                        </div>
+
+                                        <div className='trip-detail-contact-input-container'>
+                                            
+                                            {/* Destination - Read Only */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>TRAVEL TO (DESTINATION)</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-plane-departure input-icon"></i>
+                                                    <input
+                                                        type='text'
+                                                        value={specificTourData?.title || 'Loading...'}
+                                                        readOnly 
+                                                        className="form-control-plaintext"
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Travel From / Departure City */}
+                                            <div className='trip-detail-contact-input'>
+                                                <label>TRAVEL FROM (DEPARTURE CITY) *</label>
+                                                <div className='input-with-icon-wrapper'>
+                                                    <i className="fa-solid fa-city input-icon"></i>
+                                                    <input
+                                                        type='text'
+                                                        name='departure_city'
+                                                        value={customizedFormData.departure_city}
+                                                        onChange={handleCustomizedChange}
+                                                        placeholder='e.g. New Delhi, Mumbai, etc.'
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Travel Date and Hotel Category - COMBINED IN ONE LINE */}
                                             <div className='trip-combined-line-group d-flex' style={{ gap: '10px' }}>
                                                 {/* Travel Date */}
                                                 <div className='trip-detail-contact-input flex-grow-1 date-category-item' style={{ flexBasis: '50%' }}>
@@ -651,8 +955,8 @@ const TourPreview = () => {
                                                         <input
                                                             type='date'
                                                             name='travel_date'
-                                                            value={enquiryFormData.travel_date}
-                                                            onChange={handleEnquiryChange}
+                                                            value={customizedFormData.travel_date}
+                                                            onChange={handleCustomizedChange}
                                                             required
                                                         />
                                                     </div>
@@ -666,8 +970,8 @@ const TourPreview = () => {
                                                             <i className="fa-solid fa-hotel input-icon"></i>
                                                             <select
                                                                 name="hotel_category"
-                                                                value={enquiryFormData.hotel_category}
-                                                                onChange={handleEnquiryChange}
+                                                                value={customizedFormData.hotel_category}
+                                                                onChange={handleCustomizedChange}
                                                             >
                                                                 <option value="">Select Category</option>
                                                                 <option value="Five Star">⭐⭐⭐⭐⭐</option>
@@ -680,7 +984,7 @@ const TourPreview = () => {
                                                 </div>
                                             </div>
 
-                                            {/* --- 4. Adults and Children - COMBINED IN ONE LINE --- */}
+                                            {/* Adults and Children - COMBINED IN ONE LINE */}
                                             <div className='trip-combined-line-group d-flex' style={{ gap: '10px' }}>
                                                 {/* No. of Adults */}
                                                 <div className='trip-detail-contact-input flex-grow-1 stepper-item' style={{ flexBasis: '50%' }}>
@@ -689,16 +993,16 @@ const TourPreview = () => {
                                                         <input
                                                             type='number'
                                                             name='adults'
-                                                            value={enquiryFormData.adults}
-                                                            onChange={handleEnquiryChange}
+                                                            value={customizedFormData.adults}
+                                                            onChange={handleCustomizedChange}
                                                             min='1'
                                                             placeholder='1'
                                                             required
                                                             readOnly
                                                         />
                                                         <div className='stepper-controls'>
-                                                            <button type='button' onClick={() => handleStepper('adults', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
-                                                            <button type='button' onClick={() => handleStepper('adults', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
+                                                            <button type='button' onClick={() => handleCustomizedStepper('adults', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
+                                                            <button type='button' onClick={() => handleCustomizedStepper('adults', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -710,21 +1014,21 @@ const TourPreview = () => {
                                                         <input
                                                             type='number'
                                                             name='children'
-                                                            value={enquiryFormData.children}
-                                                            onChange={handleEnquiryChange}
+                                                            value={customizedFormData.children}
+                                                            onChange={handleCustomizedChange}
                                                             min='0'
                                                             placeholder='0'
                                                             readOnly
                                                         />
                                                         <div className='stepper-controls'>
-                                                            <button type='button' onClick={() => handleStepper('children', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
-                                                            <button type='button' onClick={() => handleStepper('children', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
+                                                            <button type='button' onClick={() => handleCustomizedStepper('children', 1)} className='stepper-up'><i className="fa-solid fa-caret-up"></i></button>
+                                                            <button type='button' onClick={() => handleCustomizedStepper('children', -1)} className='stepper-down'><i className="fa-solid fa-caret-down"></i></button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {/* --- 5. Full Name --- */}
+                                            
+                                            {/* Full Name */}
                                             <div className='trip-detail-contact-input'>
                                                 <label>FULL NAME *</label>
                                                 <div className='input-with-icon-wrapper'>
@@ -732,15 +1036,15 @@ const TourPreview = () => {
                                                     <input
                                                         type='text'
                                                         name='full_name'
-                                                        value={enquiryFormData.full_name}
-                                                        onChange={handleEnquiryChange}
+                                                        value={customizedFormData.full_name}
+                                                        onChange={handleCustomizedChange}
                                                         placeholder='e.g. John Doe'
                                                         required
                                                     />
                                                 </div>
                                             </div>
 
-                                            {/* --- 6. Email --- */}
+                                            {/* Email */}
                                             <div className='trip-detail-contact-input'>
                                                 <label>EMAIL *</label>
                                                 <div className='input-with-icon-wrapper'>
@@ -748,15 +1052,15 @@ const TourPreview = () => {
                                                     <input
                                                         type='email'
                                                         name='email'
-                                                        value={enquiryFormData.email}
-                                                        onChange={handleEnquiryChange}
+                                                        value={customizedFormData.email}
+                                                        onChange={handleCustomizedChange}
                                                         placeholder='e.g. JohnDoe@gmail.com'
                                                         required
                                                     />
                                                 </div>
                                             </div>
 
-                                            {/* --- 7. Contact Number --- */}
+                                            {/* Contact Number */}
                                             <div className='trip-detail-contact-input'>
                                                 <label>CONTACT NUMBER *</label>
                                                 <div className='input-with-icon-wrapper'>
@@ -764,24 +1068,16 @@ const TourPreview = () => {
                                                     <input
                                                         type='tel'
                                                         name='contact_number'
-                                                        value={enquiryFormData.contact_number}
-                                                        onChange={handleEnquiryChange}
+                                                        value={customizedFormData.contact_number}
+                                                        onChange={handleCustomizedChange}
                                                         placeholder='e.g. 1234567890'
                                                         required
                                                     />
                                                 </div>
                                             </div>
-
-                                            {/* --- 8. Additional Comments - HIDDEN --- */}
-                                            <input
-                                                type='hidden'
-                                                name='additional_comments'
-                                                value={enquiryFormData.additional_comments}
-                                                onChange={handleEnquiryChange} 
-                                            />
                                             
                                             <button type='submit' disabled={isSubmitting}>
-                                                SUBMIT ENQUIRY
+                                                {isSubmitting ? 'SUBMITTING...' : 'SUBMIT ENQUIRY'}
                                             </button>
                                         </div>
                                     </form>
@@ -811,8 +1107,8 @@ const TourPreview = () => {
                                                 <button className="destination-viewall" onClick={handleToggle}>
                                                     {visibleCount >= tripList.length ? "Show Less" : "Show More"}
                                                     <i
-                                                        className={`fa-solid ms-2 ${visibleCount >= tripList.length ? "fa-arrow-up" : "fa-arrow-right"
-                                                            }`}
+                                                         className={`fa-solid ms-2 ${visibleCount >= tripList.length ? "fa-arrow-up" : "fa-arrow-right"
+                                                             }`}
                                                     ></i>
                                                 </button>
                                             </div>
